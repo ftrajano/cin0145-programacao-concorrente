@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lição 3 — wait, notify e por que while</title>
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --rule:#d9d4c7; --accent:#8b2500; --bg:#fffdf8;
+          --ok:#1f6f3a; --bad:#9b1c1c; --soft:#f3efe4; }
+  html { background:var(--bg); }
+  body { max-width: 46rem; margin: 3rem auto 6rem; padding: 0 1.25rem; color:var(--ink);
+         font: 17px/1.6 Georgia, "Iowan Old Style", "Palatino Linotype", serif; }
+  header .kicker { color:var(--muted); font-size:.85rem; letter-spacing:.08em; text-transform:uppercase; }
+  h1 { font-weight: normal; font-size: 2.3rem; line-height:1.15; margin: .2rem 0 .4rem; letter-spacing:-.01em; }
+  .sub { color:var(--muted); font-style: italic; margin: 0 0 2.2rem; }
+  h2 { font-weight: normal; font-size: 1.4rem; margin: 2.8rem 0 .6rem; border-bottom:1px solid var(--rule); padding-bottom:.2rem; }
+  p { margin: .7rem 0; }
+  .src { color:var(--muted); font-size:.82rem; }
+  a { color: var(--accent); }
+  code { font: .88em/1.4 "SF Mono", Menlo, Consolas, monospace; background:var(--soft); padding:0 .25em; border-radius:3px; }
+  pre { background:var(--soft); padding: .8rem 1rem; border-radius:4px; overflow-x:auto; font-size:.86rem; line-height:1.45; }
+  pre code { background:none; padding:0; }
+  .box { border:1px solid var(--rule); border-radius:6px; padding: 1rem 1.2rem; margin: 1.2rem 0; background:#fff; }
+  .box.recall { border-left: 4px solid var(--accent); }
+  .box.task { border-left: 4px solid #2c5282; }
+  .box.ask { background:var(--soft); border:none; }
+  .box.exam { border-left: 4px solid #8a6d00; }
+  nav { font-size:.9rem; color:var(--muted); margin-bottom: 2rem; }
+  nav a { margin-right: .75rem; }
+  .cols { display:grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 600px) { .cols { grid-template-columns: 1fr; } }
+  table { border-collapse: collapse; width:100%; font-size:.95rem; margin:.5rem 0; }
+  td, th { padding:.35rem .5rem; border-bottom:1px solid var(--rule); text-align:left; vertical-align:top; }
+  th { font-weight:normal; color:var(--muted); font-size:.82rem; }
+  /* simulador */
+  .sim .modes { display:flex; gap:.4rem; flex-wrap:wrap; margin-bottom:.8rem; }
+  .sim .modes button { font:inherit; font-size:.88rem; padding:.35rem .7rem; border:1px solid var(--rule); background:#fff; border-radius:4px; cursor:pointer; }
+  .sim .modes button.on { background:var(--ink); color:#fff; border-color:var(--ink); }
+  .sim .thread { background:#fff; border:1px solid var(--rule); border-radius:6px; padding:.8rem 1rem; }
+  .sim .thread h4 { margin:0 0 .5rem; font-weight:normal; font-size:1rem; color:var(--muted); }
+  .sim .thread.locked { border-color:var(--accent); box-shadow: inset 0 0 0 2px #f1d9d0; }
+  .sim .thread.waiting { opacity:.55; }
+  .sim button.step { display:block; width:100%; text-align:left; margin:.3rem 0; padding:.45rem .7rem;
+       font: .9rem "SF Mono", Menlo, Consolas, monospace; background:var(--soft); border:1px solid var(--rule);
+       border-radius:4px; cursor:pointer; color:var(--ink); }
+  .sim button.step:disabled { opacity:.35; cursor:default; }
+  .sim button.step.done { background:#e6efe8; border-color:#b7d1bd; opacity:.7; }
+  .sim .state { display:flex; gap:1.5rem; flex-wrap:wrap; margin:1rem 0 .4rem; font-size:1rem; }
+  .sim .state span { background:#fff; border:1px solid var(--rule); border-radius:4px; padding:.3rem .7rem; }
+  .sim .state b { font-weight:normal; color:var(--muted); }
+  .sim .trace { font: .95rem "SF Mono", Menlo, monospace; min-height:1.5rem; letter-spacing:.15em; }
+  .sim .result { margin:.6rem 0; min-height:1.6rem; }
+  .sim .note { font-size:.9rem; color:var(--muted); margin:.4rem 0 .6rem; min-height:1.2rem; }
+  .sim .goals { list-style:none; padding:0; margin:.6rem 0 0; }
+  .sim .goals li::before { content:"○ "; color:var(--muted); }
+  .sim .goals li.hit::before { content:"● "; color:var(--ok); }
+  button.plain { font: inherit; font-size:.9rem; padding:.35rem .8rem; border:1px solid var(--rule); background:#fff; border-radius:4px; cursor:pointer; }
+  /* quiz */
+  .q { margin: 1.4rem 0; }
+  .q p.stem { margin:.2rem 0 .5rem; }
+  .q button.opt { display:block; width:100%; text-align:left; font:inherit; font-size:.97rem; padding:.45rem .8rem; margin:.3rem 0;
+       background:#fff; border:1px solid var(--rule); border-radius:4px; cursor:pointer; color:var(--ink); }
+  .q button.opt:hover { background:var(--soft); }
+  .q button.opt.ok { border-color:var(--ok); background:#e6efe8; }
+  .q button.opt.bad { border-color:var(--bad); background:#f8e5e5; }
+  .q .fb { font-size:.92rem; margin:.4rem 0 0; min-height:1.2rem; }
+  .q .fb.ok { color:var(--ok); } .q .fb.bad { color:var(--bad); }
+  .score { font-style: italic; color: var(--muted); }
+  footer { margin-top:3rem; border-top:1px solid var(--rule); padding-top:1rem; font-size:.9rem; color:var(--muted); }
+  @media print { body { margin:0; max-width:none; font-size:11pt; } nav, .sim, button { display:none; } }
+</style>
+<style>
+  .sim .cfg { display:flex; gap:1.2rem; flex-wrap:wrap; margin-bottom:.6rem; }
+  .sim .cfg .grp { display:flex; gap:.35rem; flex-wrap:wrap; align-items:center; }
+  .sim .cfg .lbl { font-size:.8rem; color:var(--muted); margin-right:.2rem; }
+  .sim .tri { display:grid; grid-template-columns: repeat(3, 1fr); gap:.7rem; }
+  @media (max-width: 700px) { .sim .tri { grid-template-columns: 1fr; } }
+  .sim pre.code { margin:.2rem 0 .5rem; padding:.5rem .6rem; font-size:.78rem; background:var(--bg); }
+  .sim pre.code span { display:block; padding:0 .2rem; border-radius:2px; }
+  .sim pre.code span.cur { background:#f6e3b4; }
+  .sim .status { font-size:.82rem; color:var(--muted); min-height:2.2em; }
+  .sim .thread.sleeping { border-style:dashed; opacity:.7; }
+  .sim .thread.over { opacity:.45; }
+  .sim button.adv { width:100%; font:inherit; font-size:.88rem; padding:.4rem .5rem; border:1px solid var(--rule); background:var(--soft); border-radius:4px; cursor:pointer; }
+  .sim button.adv:disabled { opacity:.4; cursor:default; }
+  .sim ol.log { font-size:.86rem; margin:.6rem 0; padding-left:1.4rem; max-height:14rem; overflow-y:auto; }
+  .sim ol.log li.warn { color:var(--bad); }
+  textarea { width:100%; box-sizing:border-box; min-height:7rem; font: .9rem/1.4 "SF Mono", Menlo, monospace; padding:.5rem; border:1px solid var(--rule); border-radius:4px; background:#fff; }
+  .reveal { display:none; } .reveal.on { display:block; }
+  .chk label { display:block; margin:.35rem 0; }
+  .lbtn { display:inline-block; font:inherit; font-size:.88rem; padding:.3rem .65rem; margin:.2rem .2rem 0 0; border:1px solid var(--rule); background:#fff; border-radius:4px; cursor:pointer; }
+  .lbtn.ok { border-color:var(--ok); background:#e6efe8; } .lbtn.bad { border-color:var(--bad); background:#f8e5e5; }
+</style>
+</head>
+<body>
+<nav><a href="../index.html">Início</a> <a href="../reference/mapa-do-curso.html">Mapa do curso</a> <a href="../reference/glossario.html">Glossário</a> <a href="./0002-threads-e-synchronized-em-java.html">← Lição 2</a> <a href="./0004-recomeco-revisao-e-primeira-dissertativa.html">Lição 4 →</a></nav>
+
+<header>
+  <div class="kicker">Lição 3 · Concorrência em Java</div>
+  <h1><code>wait</code>, <code>notify</code> e por que <code>while</code></h1>
+  <p class="sub">Como fazer uma thread esperar até uma condição ficar verdadeira, e os dois erros que a prova cobra. Tempo estimado: 25 minutos. A página é autocontida; as marcações "slide N" indicam só a origem de cada afirmação.</p>
+</header>
+
+<div class="box recall">
+  <strong>Recuperação das lições 1 e 2</strong> (de memória, antes de continuar):
+  <ol>
+    <li>Dois métodos <code>synchronized</code> do mesmo objeto: o que a regra garante?</li>
+    <li>Por que proteger a leitura e a escrita de <code>saldo</code> em dois blocos <code>synchronized</code> separados não basta?</li>
+    <li>Quais métodos de <code>Thread</code> iniciam uma thread e esperam o término dela?</li>
+    <li>Quem escolhe a ordem de intercalação dos comandos?</li>
+  </ol>
+  <p class="src">As respostas estão no fim da página. Confira só depois de tentar.</p>
+</div>
+
+<h2>1. Dois motivos diferentes para esperar</h2>
+<p>Na lição 2, uma thread <em>t</em> esperava por outra thread <em>u</em> por causa do <strong>lock</strong>: <em>u</em> estava dentro de um método sincronizado e <em>t</em> queria entrar em um método sincronizado do mesmo objeto.</p>
+<p>O material apresenta um segundo motivo. <em>t</em> tem que esperar por <em>u</em> quando <strong>a semântica da aplicação</strong> exige que uma operação de <em>t</em> só seja executada em condições que podem ser garantidas por uma operação de <em>u</em>. Nesse caso quem pede a espera é a própria aplicação, e a ferramenta é <code>wait</code>.</p>
+<table>
+<tr><th>Espera por</th><th>Quem decide</th><th>Ferramenta</th></tr>
+<tr><td>lock do objeto</td><td>a linguagem, sozinha</td><td><code>synchronized</code></td></tr>
+<tr><td>uma condição da aplicação</td><td>a aplicação, pedindo</td><td><code>wait</code> + <code>notify</code>/<code>notifyAll</code></td></tr>
+</table>
+<p class="src">11-Concorrencia.pdf, slides 29–30.</p>
+
+<h2>2. O exemplo: não debitar além do saldo</h2>
+<p>A regra de negócio: um débito maior que o saldo não dá erro, ele <strong>espera</strong> até haver saldo. Quem pode criar essa condição é um crédito, executado por outra thread.</p>
+<div class="cols">
+<pre><code>synchronized void debitar(double v) {
+  while (saldo &lt; v) {
+    wait();
+  }
+  saldo = saldo - v;
+}</code></pre>
+<pre><code>synchronized void creditar(double v) {
+  saldo = saldo + v;
+  notifyAll();
+}</code></pre>
+</div>
+<p><code>wait()</code> interrompe a execução do método e da thread associada. A thread só volta a executar quando <strong>notificada</strong> por outra thread. <code>notifyAll()</code> avisa a todas as threads que estavam esperando para executar um método do mesmo objeto (<code>this</code>).</p>
+<p class="src">11-Concorrencia.pdf, slides 31 e 33.</p>
+
+<h2>3. As três regras do <code>wait</code></h2>
+<div class="box">
+<ol>
+<li><strong>Só pode ser chamado dentro de um método <code>synchronized</code>.</strong></li>
+<li>Coloca a thread que o executou para <strong>esperar por uma notificação</strong>.</li>
+<li><strong>Libera a restrição de sincronização</strong>: outro método sincronizado pode começar a executar no mesmo objeto.</li>
+</ol>
+</div>
+<p>A regra 3 é a que faz o exemplo funcionar. Se o <code>debitar</code> dormisse segurando o lock, o <code>creditar</code> (também <code>synchronized</code>) nunca conseguiria entrar e o saldo nunca aumentaria.</p>
+<p class="src">11-Concorrencia.pdf, slide 34.</p>
+
+<h2>4. <code>notify</code> e <code>notifyAll</code></h2>
+<table>
+<tr><th>Método</th><th>Quem acorda</th></tr>
+<tr><td><code>notifyAll()</code></td><td><strong>todas</strong> as threads esperando para executar um método do objeto que fez a chamada</td></tr>
+<tr><td><code>notify()</code></td><td><strong>só uma</strong>, escolhida de forma arbitrária pelo interpretador</td></tr>
+</table>
+<p class="src">11-Concorrencia.pdf, slide 35.</p>
+
+<h2>5. Por que <code>while</code> e não <code>if</code></h2>
+<p>A notificação avisa que <em>talvez</em> seja possível fazer o débito, mas não garante. A thread acordada precisa <strong>testar de novo</strong>. Com <code>while</code>, ela volta ao teste. Com <code>if</code>, ela segue direto para <code>saldo = saldo - v</code>.</p>
+<p>Um caso concreto: saldo 0, duas threads tentando debitar 50 e as duas dormindo no <code>wait</code>. Chega um crédito de 60 e o <code>notifyAll</code> acorda as duas. A primeira a pegar o lock debita e o saldo fica em 10. A segunda:</p>
+<table>
+<tr><th>Com</th><th>O que a segunda thread faz</th><th>Saldo final</th></tr>
+<tr><td><code>while</code></td><td>testa <code>10 &lt; 50</code>, é verdadeiro, volta a dormir</td><td>10</td></tr>
+<tr><td><code>if</code></td><td>não testa de novo e debita</td><td>−40</td></tr>
+</table>
+<p class="src">11-Concorrencia.pdf, slide 32. O caso com dois débitos de 50 e crédito de 60 foi montado para esta lição.</p>
+
+<h2>6. Cuidado com concorrência</h2>
+<p>Os mecanismos de sincronização <strong>diminuem a eficiência</strong> do sistema e <strong>podem complicar o código</strong>. E dois estados ruins passam a ser possíveis:</p>
+<div class="box">
+<p><strong>Deadlock</strong>: todas as threads paradas, uma esperando pela outra.</p>
+<p><strong>Livelock</strong>: threads executando, mas sem gerar nada que possa ser observado pelo usuário.</p>
+</div>
+<p>Decore essas duas frases. A questão 1 da prova usa quase as mesmas palavras.</p>
+<p class="src">11-Concorrencia.pdf, slide 36.</p>
+
+<h2>Prática 1 · Simulador</h2>
+<p>Saldo inicial 0. As threads D1 e D2 tentam debitar 50 cada, e C credita. Você faz o papel do interpretador e escolhe quem avança. Quando <code>notify()</code> precisar escolher uma thread, o simulador sorteia.</p>
+<div class="sim box" id="sim">
+  <div class="cfg">
+    <div class="grp"><span class="lbl">Código</span>
+      <button class="lbtn mode" data-mode="while-all">while + notifyAll</button>
+      <button class="lbtn mode" data-mode="if-all">if + notifyAll</button>
+      <button class="lbtn mode" data-mode="while-one">while + notify</button>
+    </div>
+    <div class="grp"><span class="lbl">Crédito</span>
+      <button class="lbtn cred" data-v="60">60</button>
+      <button class="lbtn cred" data-v="100">100</button>
+    </div>
+  </div>
+  <div class="tri">
+    <div class="thread" id="th-D1"><h4>D1 · debitar(50)</h4><pre class="code"></pre><div class="status"></div><button class="adv"></button></div>
+    <div class="thread" id="th-D2"><h4>D2 · debitar(50)</h4><pre class="code"></pre><div class="status"></div><button class="adv"></button></div>
+    <div class="thread" id="th-C"><h4>C · creditar(<span class="cv">60</span>)</h4><pre class="code"></pre><div class="status"></div><button class="adv"></button></div>
+  </div>
+  <div class="state">
+    <span><b>saldo</b> = <span id="v-saldo">0</span></span>
+    <span><b>lock de this</b>: <span id="v-lock">livre</span></span>
+  </div>
+  <ol class="log" id="log"></ol>
+  <div class="result" id="result"></div>
+  <button class="plain" id="reset">Reiniciar</button>
+  <ul class="goals">
+    <li id="g1"><code>while + notifyAll</code>, crédito 60: termine com saldo 10 e uma thread dormindo (que é o correto)</li>
+    <li id="g2"><code>if + notifyAll</code>, crédito 60: faça o saldo ficar negativo</li>
+    <li id="g3"><code>while + notify</code>, crédito 100: termine com saldo 50 e uma thread dormindo para sempre, mesmo com saldo suficiente. Dica: faça D1 e D2 dormirem antes do crédito.</li>
+  </ul>
+</div>
+<p>Depois do objetivo 3, responda para si: por que, nesse caso, <code>notify</code> é um erro e <code>notifyAll</code> não? Você vai precisar dessa resposta na prova.</p>
+
+<h2>Prática 2 · Quiz</h2>
+<p>Sem consultar o texto. O feedback aparece na hora.</p>
+<div id="quiz"></div>
+<p class="score" id="score"></p>
+
+<h2>Prática 3 · Rode as três variantes em Java</h2>
+<div class="box task">
+<p><code>code/0003/Conta3.java</code> tem exatamente o cenário do simulador: D1 e D2 debitam 50 e C credita o valor passado na linha de comando. O programa imprime o que cada thread faz, o saldo final e se D1 ou D2 continuam esperando. As linhas com <code>Thread.sleep</code> e <code>isAlive</code> não estão no material; servem só para a demonstração e estão marcadas no código.</p>
+<p>O programa completo, como exemplo resolvido. Repare que <code>Conta</code> é exatamente a da seção 2, só com mensagens impressas, e que <code>Debito</code> e <code>Credito</code> seguem o padrão da lição 2.</p>
+<pre><code>class Conta {
+  private double saldo = 0;
+
+  synchronized void debitar(String quem, double v) throws InterruptedException {
+    while (saldo &lt; v) {                 // &lt;- Etapa 3: troque while por if
+      System.out.println(quem + ": saldo " + saldo + " &lt; " + v + ", vou esperar (wait)");
+      wait();
+      System.out.println(quem + ": fui notificada, saldo agora " + saldo);
+    }
+    saldo = saldo - v;
+    System.out.println(quem + ": debitei " + v + ", saldo agora " + saldo);
+  }
+
+  synchronized void creditar(double v) {
+    saldo = saldo + v;
+    System.out.println("C: creditei " + v + ", saldo agora " + saldo);
+    notifyAll();                        // &lt;- Etapa 2: troque por notify()
+  }
+
+  synchronized double getSaldo() { return saldo; }
+}
+
+class Debito extends Thread {
+  private Conta conta; private double val; private String nome;
+  Debito(String n, Conta c, double v) { nome = n; conta = c; val = v; }
+  public void run() {
+    try { conta.debitar(nome, val); } catch (InterruptedException e) {}
+  }
+}
+
+class Credito extends Thread {
+  private Conta conta; private double val;
+  Credito(Conta c, double v) { conta = c; val = v; }
+  public void run() { conta.creditar(val); }
+}
+
+public class Conta3 {
+  public static void main(String[] args) throws InterruptedException {
+    double credito = Double.parseDouble(args[0]);
+    Conta c = new Conta();
+    Thread d1 = new Debito("D1", c, 50);
+    Thread d2 = new Debito("D2", c, 50);
+    d1.start(); d2.start();
+
+    // Fora do material, só para a demonstração: dar tempo para D1 e D2
+    // chegarem ao wait() antes do crédito.
+    Thread.sleep(300);
+
+    Thread cr = new Credito(c, credito);
+    cr.start();
+    cr.join();
+
+    // Fora do material: em vez de join() nas threads de débito (que poderia
+    // esperar para sempre), espera um pouco e mostra quem ainda está parada.
+    Thread.sleep(300);
+    System.out.println("--&gt; saldo final: " + c.getSaldo());
+    System.out.println("--&gt; D1 ainda esperando? " + d1.isAlive());
+    System.out.println("--&gt; D2 ainda esperando? " + d2.isAlive());
+    System.exit(0);
+  }
+}</code></pre>
+<p>Para cada etapa, <strong>escreva sua previsão antes de rodar</strong> (saldo final, e quem fica esperando).</p>
+<pre><code>cd code/0003
+javac Conta3.java
+java Conta3 100      # etapa 1a
+java Conta3 60       # etapa 1b</code></pre>
+<p><strong>Etapa 2.</strong> No <code>creditar</code>, troque <code>notifyAll()</code> por <code>notify()</code>. Compile e rode <code>java Conta3 100</code>.</p>
+<p><strong>Etapa 3.</strong> Volte para <code>notifyAll()</code> e troque o <code>while</code> do <code>debitar</code> por <code>if</code>. Compile e rode <code>java Conta3 60</code>.</p>
+<p>Quando testei nesta máquina, as quatro execuções terminaram com saldo 0, 10, 50 e −40. Se os seus valores forem outros, me diga: isso também ensina alguma coisa.</p>
+<p><strong>Etapa 4 (mais difícil).</strong> Volte à versão correta e acrescente à <code>Conta</code> um método <code>synchronized void transferirPara(Conta outra, double v)</code>. Ele espera, com <code>wait</code>, até haver saldo para tirar <code>v</code> desta conta e então credita <code>v</code> na <code>outra</code>. No <code>main</code>, crie uma segunda conta e uma thread que transfere 50 para ela antes do crédito. Agora três threads disputam 100 de saldo, e cada uma quer 50. Preveja: quais combinações de saldo final são possíveis nas duas contas, e quem fica esperando? Rode <code>java Conta3 100</code> várias vezes e confira.</p>
+</div>
+
+<h2>Questões da prova: 2026-1, questões 1 e 7 (com resposta)</h2>
+<div class="box exam">
+<p><strong>Questão 1 (1 ponto).</strong> Marque L para livelock, D para deadlock ou S para starvation; algumas ficam em branco.</p>
+<table>
+<tr><th>Descrição</th><th>Resposta</th></tr>
+<tr><td>As threads continuam executando, mas não geram progresso útil observável pelo usuário.</td><td><strong>L</strong> (11, s.36)</td></tr>
+<tr><td>O sistema trava completamente, com todas as threads paradas, esperando umas pelas outras.</td><td><strong>D</strong> (11, s.36)</td></tr>
+<tr><td>Uma ou mais threads monopoliza(m) o processador e impede(m) que outras executem.</td><td><strong>S</strong>, com ressalva: é o mais próximo da definição de starvation, "se um processo quer entrar na região crítica, em algum momento ele entrará" (03, s.5). Aqui, outras threads querem executar e nunca conseguem. O material não usa a palavra "monopolizar".</td></tr>
+<tr><td>O sistema encerra a execução por falta de memória RAM disponível.</td><td>em branco: não é nenhum dos três</td></tr>
+</table>
+<div id="q1" hidden></div>
+</div>
+
+<div class="box exam">
+<p><strong>Questão 7 (2,2 pontos).</strong> O problema dos Leitores e Escritores permite que vários Leitores leiam os dados ao mesmo tempo, desde que nenhum Escritor esteja escrevendo. Já os Escritores só podem executar sozinhos, sem outros leitores ou escritores ao mesmo tempo. O código abaixo implementa início e fim de leitura (chamados pelos Leitores) e início e fim de escrita (chamados pelos Escritores).</p>
+<p>Da forma como está, o código apresenta algum problema se tivermos um grande número de Leitores e um único Escritor? Se for preciso corrigir, indique as modificações necessárias.</p>
+<pre><code>class RWMonitor {
+  private String dado = "Conteúdo Inicial";
+  private int numeroLeitores = 0;
+  private boolean escritorAtivo = false;
+
+  public void iniciarLeitura(String nomeLeitor) throws InterruptedException {
+    while (escritorAtivo) {
+      wait();
+    }
+    numeroLeitores++;
+    System.out.println(nomeLeitor + " entrou. Leitores ativos: " + numeroLeitores);
+  }
+
+  public synchronized void terminarLeitura(String nomeLeitor) {
+    numeroLeitores--;
+    System.out.println(nomeLeitor + " saiu. Leitores ativos: " + numeroLeitores);
+    if (numeroLeitores == 0) {
+      notifyAll();
+    }
+  }
+
+  public void iniciarEscrita(String nomeEscritor) throws InterruptedException {
+    while (numeroLeitores &gt; 0 || escritorAtivo) {
+      wait();
+    }
+    escritorAtivo = true;
+    System.out.println(nomeEscritor + " começou a escrever.");
+  }
+
+  public synchronized void terminarEscrita(String nomeEscritor) {
+    escritorAtivo = false;
+    System.out.println(nomeEscritor + " terminou de escrever.");
+    notify();
+  }
+
+  public String getDado() { return this.dado; }
+  public void setDado(String novoDado) { this.dado = novoDado; }
+}</code></pre>
+<textarea id="q7txt" hidden></textarea><button id="q7btn" hidden></button>
+<div class="reveal on" id="q7rev">
+  <p><strong>Resposta, derivada só do material</strong> (não é o gabarito oficial):</p>
+  <div class="chk">
+    <label>✓ <strong>Sim</strong>, há problema.</label>
+    <label>✓ <code>iniciarLeitura</code> e <code>iniciarEscrita</code> chamam <code>wait()</code> mas não são <code>synchronized</code>. <code>wait</code> só pode ser chamado dentro de um método <code>synchronized</code> (seção 3, regra 1). <strong>Correção:</strong> acrescentar <code>synchronized</code> aos dois.</label>
+    <label>✓ Sem <code>synchronized</code>, os testes e as atualizações de <code>numeroLeitores</code> e <code>escritorAtivo</code> nesses dois métodos podem se intercalar com outras threads, o mesmo tipo de interferência da lição 1.</label>
+    <label>✓ <code>terminarEscrita</code> usa <code>notify()</code>, que acorda só uma thread, escolhida de forma arbitrária (seção 4). Com muitos Leitores esperando, só um acorda e os outros continuam parados, mesmo podendo ler juntos. <strong>Correção:</strong> trocar por <code>notifyAll()</code>. É o objetivo 3 do simulador.</label>
+    <label>✓ O que já estava certo: os dois testes usam <code>while</code> (seção 5), e <code>terminarLeitura</code> já usa <code>notifyAll</code>.</label>
+  </div>
+  <p class="src">Base: 11-Concorrencia.pdf, slides 32, 34 e 35. O problema dos leitores e escritores volta na lição de monitores (05-monitores.pdf).</p>
+</div>
+</div>
+
+<div class="box">
+<strong>Respostas da recuperação inicial:</strong> (1) Só um deles executa por vez naquele objeto; o outro espera. (2) Entre a leitura e a escrita de uma thread, a outra pode fazer um ciclo inteiro: não há race condition, mas pode haver interferência. (3) <code>start()</code> inicia; <code>join()</code> espera o término. (4) O interpretador, de forma arbitrária.
+</div>
+
+<h2>De onde veio esta lição</h2>
+<p>Slides 29 a 36 de <code>11-Concorrencia.pdf</code> (Paulo Borba), e as questões 1 e 7 da prova de 2026-1. O programa <code>Conta3.java</code> foi escrito para este workspace a partir dos slides 31 e 33. Leitura opcional, fora do material: Ben-Ari, 2ª ed., seção 2.12 "Concurrency in Java"; Andrews, seção 5.4 "Case Study: Java".</p>
+
+<div class="box ask">
+  <strong>Ficou alguma dúvida?</strong> Pergunte ao agente. Por exemplo: "se o <code>wait</code> solta o lock, quando a thread pega de volta?", "por que o simulador não chama o objetivo 3 de deadlock?", "o <code>notifyAll</code> do <code>terminarLeitura</code> está dentro de um <code>if</code>; isso é um problema?".
+</div>
+
+<footer>
+  Próxima lição: <em>O problema da exclusão mútua e as tentativas 1–4</em> (<code>03-ExclusaoMutua.pdf</code>, slides 2–21). Ela define starvation e completa a questão 1.
+  Referências: <a href="../index.html">Início</a> · <a href="../reference/glossario.html">Glossário</a> · <a href="../reference/mapa-do-curso.html">Mapa do curso</a> · <a href="../reference/guia-da-prova.html">Guia da prova</a>.
+</footer>
+
+<script>
+(function () {
+  // ---------- Simulador ----------
+  var mode = 'while-all', cred = 60, st, log;
+  var goals = { g1:false, g2:false, g3:false };
+  var dLabels = { enter:'pegar o lock e entrar', test:'testar saldo < 50', wait:'chamar wait()', reacq:'pegar o lock de novo',
+                  debit:'saldo = saldo − 50', exit:'sair e soltar o lock' };
+  var dLine = { enter:0, test:1, wait:2, reacq:2, debit:4, exit:5, done:-1 };
+  var cLabels = { enter:'pegar o lock e entrar', credit:'', notify:'', exit:'sair e soltar o lock' };
+  var cLine = { enter:0, credit:1, notify:2, exit:3, done:-1 };
+  function fmt(v){ return String(v).replace('-', '−'); }
+  function dCode() { var kw = mode === 'if-all' ? 'if' : 'while';
+    return ['synchronized void debitar(50) {', '  ' + kw + ' (saldo &lt; 50) {', '    wait();', '  }', '  saldo = saldo - 50;', '}']; }
+  function cCode() { var n = mode === 'while-one' ? 'notify();' : 'notifyAll();';
+    return ['synchronized void creditar(' + cred + ') {', '  saldo = saldo + ' + cred + ';', '  ' + n, '}']; }
+  function add(msg, warn) { log.push({ m: msg, w: !!warn }); }
+  function canAdv(t) {
+    var th = st.th[t];
+    if (th.pc === 'done' || th.sleeping) return false;
+    if (th.pc === 'enter' || th.pc === 'reacq') return st.lock === null;
+    return st.lock === t;
+  }
+  function advance(t) {
+    var th = st.th[t];
+    if (t === 'C') {
+      if (th.pc === 'enter') { st.lock = 'C'; th.pc = 'credit'; add('C pega o lock e entra em creditar'); }
+      else if (th.pc === 'credit') { st.saldo += cred; th.pc = 'notify'; add('C credita ' + cred + ': saldo = ' + st.saldo); }
+      else if (th.pc === 'notify') {
+        var sl = ['D1','D2'].filter(function(x){ return st.th[x].sleeping; });
+        if (sl.length === 0) add('C notifica, mas ninguém está dormindo: a notificação não acorda ninguém');
+        else if (mode === 'while-one') {
+          var pick = sl[Math.floor(Math.random() * sl.length)];
+          st.th[pick].sleeping = false;
+          add('C chama notify(): o interpretador escolheu acordar só ' + pick + (sl.length > 1 ? ' (a outra continua dormindo)' : ''));
+        } else { sl.forEach(function(x){ st.th[x].sleeping = false; }); add('C chama notifyAll(): acordam ' + sl.join(' e ')); }
+        th.pc = 'exit';
+      }
+      else if (th.pc === 'exit') { st.lock = null; th.pc = 'done'; add('C sai e solta o lock'); }
+      return;
+    }
+    if (th.pc === 'enter') { st.lock = t; th.pc = 'test'; add(t + ' pega o lock e entra em debitar'); }
+    else if (th.pc === 'test') {
+      if (st.saldo < 50) { th.pc = 'wait'; add(t + ' testa ' + fmt(st.saldo) + ' < 50: verdadeiro'); }
+      else { th.pc = 'debit'; add(t + ' testa ' + fmt(st.saldo) + ' < 50: falso'); }
+    }
+    else if (th.pc === 'wait') { st.lock = null; th.sleeping = true; th.pc = 'reacq'; add(t + ' chama wait(): solta o lock e dorme'); }
+    else if (th.pc === 'reacq') {
+      st.lock = t;
+      if (mode === 'if-all') { th.pc = 'debit'; add(t + ' pega o lock de novo; com if, segue sem testar outra vez'); }
+      else { th.pc = 'test'; add(t + ' pega o lock de novo; com while, volta ao teste'); }
+    }
+    else if (th.pc === 'debit') {
+      st.saldo -= 50; th.pc = 'exit';
+      add(t + ' debita 50: saldo = ' + fmt(st.saldo), st.saldo < 0);
+      if (st.saldo < 0 && mode === 'if-all') hit('g2');
+    }
+    else if (th.pc === 'exit') { st.lock = null; th.pc = 'done'; add(t + ' sai e solta o lock'); }
+  }
+  function hit(g) { goals[g] = true; document.getElementById(g).classList.add('hit'); }
+  function statusOf(t) {
+    var th = st.th[t];
+    if (th.pc === 'done') return 'terminou';
+    if (th.sleeping) return 'dormindo: espera uma notificação';
+    if ((th.pc === 'enter' || th.pc === 'reacq') && st.lock !== null) return 'parada: espera o lock (com ' + st.lock + ')';
+    if (th.pc === 'reacq') return 'acordada: precisa pegar o lock de novo';
+    return st.lock === t ? 'executando, com o lock' : 'pronta';
+  }
+  function render() {
+    ['D1','D2','C'].forEach(function(t){
+      var el = document.getElementById('th-' + t), th = st.th[t];
+      var lines = t === 'C' ? cCode() : dCode(), cur = (t === 'C' ? cLine : dLine)[th.pc];
+      el.querySelector('pre.code').innerHTML = lines.map(function(l, i){ return '<span' + (i === cur ? ' class="cur"' : '') + '>' + l + '</span>'; }).join('');
+      el.querySelector('.status').textContent = statusOf(t);
+      var b = el.querySelector('button.adv');
+      var lab = t === 'C' ? ({ enter: cLabels.enter, credit: 'saldo = saldo + ' + cred, notify: mode === 'while-one' ? 'chamar notify()' : 'chamar notifyAll()', exit: cLabels.exit })[th.pc] : dLabels[th.pc];
+      b.textContent = th.pc === 'done' ? '—' : 'Avançar: ' + lab;
+      b.disabled = !canAdv(t);
+      el.classList.toggle('locked', st.lock === t);
+      el.classList.toggle('sleeping', th.sleeping);
+      el.classList.toggle('over', th.pc === 'done');
+    });
+    document.querySelectorAll('#sim .cv').forEach(function(x){ x.textContent = cred; });
+    document.getElementById('v-saldo').textContent = fmt(st.saldo);
+    document.getElementById('v-lock').textContent = st.lock ? 'com ' + st.lock : 'livre';
+    document.getElementById('log').innerHTML = log.map(function(e){ return '<li' + (e.w ? ' class="warn"' : '') + '>' + e.m + '</li>'; }).join('');
+    var lg = document.getElementById('log'); lg.scrollTop = lg.scrollHeight;
+    var r = document.getElementById('result');
+    var all = ['D1','D2','C'], left = all.filter(function(t){ return st.th[t].pc !== 'done'; });
+    var stuck = left.length > 0 && left.every(function(t){ return !canAdv(t); });
+    if (left.length === 0) {
+      r.innerHTML = 'Todas terminaram. Saldo final <strong>' + fmt(st.saldo) + '</strong>' + (st.saldo < 0 ? ': um débito além do saldo passou.' : '.');
+    } else if (stuck) {
+      var sl = left.filter(function(t){ return st.th[t].sleeping; });
+      r.innerHTML = 'Ninguém mais pode avançar. Saldo final <strong>' + fmt(st.saldo) + '</strong>; ' + sl.join(' e ') + ' dorme' + (sl.length > 1 ? 'm' : '') + ' e nenhuma outra thread vai chamar notify: espera para sempre.' +
+        (st.saldo >= 50 ? ' E repare: o saldo seria suficiente para o débito.' : '');
+      if (mode === 'while-all' && cred === 60 && st.saldo === 10 && sl.length === 1) hit('g1');
+      if (mode === 'while-one' && cred === 100 && st.saldo === 50 && sl.length === 1) hit('g3');
+    } else r.textContent = '';
+  }
+  function reset() {
+    st = { saldo: 0, lock: null, th: { D1: { pc:'enter', sleeping:false }, D2: { pc:'enter', sleeping:false }, C: { pc:'enter', sleeping:false } } };
+    log = [];
+    document.querySelectorAll('#sim .mode').forEach(function(b){ b.classList.toggle('ok', b.dataset.mode === mode); });
+    document.querySelectorAll('#sim .cred').forEach(function(b){ b.classList.toggle('ok', +b.dataset.v === cred); });
+    render();
+  }
+  ['D1','D2','C'].forEach(function(t){
+    document.querySelector('#th-' + t + ' button.adv').addEventListener('click', function(){ if (canAdv(t)) { advance(t); render(); } });
+  });
+  document.querySelectorAll('#sim .mode').forEach(function(b){ b.addEventListener('click', function(){ mode = b.dataset.mode; reset(); }); });
+  document.querySelectorAll('#sim .cred').forEach(function(b){ b.addEventListener('click', function(){ cred = +b.dataset.v; reset(); }); });
+  document.getElementById('reset').addEventListener('click', reset);
+  reset();
+
+  // ---------- Quiz ----------
+  function buildQuiz(container, Q, scoreEl) {
+    var answered = 0, right = 0;
+    Q.forEach(function(q, qi){
+      var d = document.createElement('div'); d.className = 'q';
+      d.innerHTML = '<p class="stem"><strong>' + (qi+1) + '.</strong> ' + q.stem + '</p>';
+      var fb = document.createElement('p'); fb.className = 'fb';
+      var done = false;
+      q.opts.forEach(function(o, oi){
+        var b = document.createElement('button'); b.className = 'opt'; b.textContent = o;
+        b.addEventListener('click', function(){
+          if (done) return; done = true; answered++;
+          if (oi === q.ans) { right++; b.classList.add('ok'); fb.className = 'fb ok'; fb.textContent = 'Certo. ' + q.why; }
+          else { b.classList.add('bad'); d.querySelectorAll('button.opt')[q.ans].classList.add('ok'); fb.className = 'fb bad'; fb.textContent = 'Não. ' + q.why; }
+          if (scoreEl) scoreEl.textContent = right + ' de ' + answered + ' corretas' + (answered === Q.length ? '. Quiz completo.' : '.');
+        });
+        d.appendChild(b);
+      });
+      d.appendChild(fb); container.appendChild(d);
+    });
+  }
+  buildQuiz(document.getElementById('quiz'), [
+    { stem: 'Qual a diferença entre a espera causada por <code>synchronized</code> e a causada por <code>wait</code>?',
+      opts: ['synchronized espera o lock; wait espera uma condição da aplicação', 'synchronized espera uma condição; wait espera o lock do objeto', 'ambos esperam o lock, mas wait também libera o processador', 'ambos esperam a condição, mas synchronized nunca libera o lock'], ans: 0,
+      why: 'Slides 29–30: com synchronized a thread espera porque outra está num método sincronizado do mesmo objeto; com wait, a própria aplicação pede a espera até uma condição que outra thread pode garantir.' },
+    { stem: 'Uma thread executa <code>wait()</code> dentro de <code>debitar</code>. O que acontece com o lock do objeto?',
+      opts: ['É liberado, e outro método sincronizado pode começar', 'Continua preso, e nenhum outro método pode começar', 'É transferido para a thread que chamou notifyAll', 'É destruído, e o objeto deixa de ser sincronizado'], ans: 0,
+      why: 'Slide 34: wait libera a restrição de sincronização. Sem isso, creditar nunca entraria e o saldo nunca aumentaria.' },
+    { stem: 'Onde <code>wait()</code> pode ser chamado?',
+      opts: ['Somente depois de uma chamada a join', 'Somente dentro do método run de Thread', 'Em qualquer método, sincronizado ou não', 'Somente dentro de um método synchronized'], ans: 3,
+      why: 'Slide 34: só pode ser chamado dentro de um método synchronized. É exatamente o erro de iniciarLeitura e iniciarEscrita na questão 7.' },
+    { stem: 'Por que o teste antes do <code>wait()</code> usa <code>while</code> e não <code>if</code>?',
+      opts: ['O if não pode ser usado dentro de métodos synchronized', 'A notificação diz que talvez dê, mas não garante nada', 'O while faz a thread esperar menos tempo pela notificação', 'O if faz o lock ser liberado antes da hora certa'], ans: 1,
+      why: 'Slide 32: a notificação avisa que talvez seja possível, mas não garante; é preciso testar de novo. Com if, a thread acordada segue sem testar.' },
+    { stem: 'Três threads estão em <code>wait()</code> no mesmo objeto. Outra thread chama <code>notify()</code>. O que acontece?',
+      opts: ['Acorda só uma, escolhida arbitrariamente pelo interpretador', 'Acordam todas as três, na ordem em que chamaram wait', 'Acorda só uma, a primeira que chamou wait no objeto', 'Nenhuma acorda até alguém chamar também notifyAll'], ans: 0,
+      why: 'Slide 35: notify acorda só uma, e a escolha é arbitrária, feita pelo interpretador. Não há promessa de ordem.' },
+    { stem: '(Revisão da lição 2) D1 está dormindo em <code>wait()</code> dentro de <code>debitar</code>. C chama <code>creditar</code>, também <code>synchronized</code>, no mesmo objeto. C precisa esperar D1?',
+      opts: ['Sim, porque debitar ainda não terminou de executar', 'Não, porque o wait de D1 liberou o lock do objeto', 'Sim, porque o lock só é solto no fim do método', 'Não, porque creditar não acessa a variável saldo'], ans: 1,
+      why: 'Slide 34: o wait libera a restrição de sincronização. Se não liberasse, C ficaria esperando D1 e D1 esperando C: as duas paradas, uma esperando pela outra.' }
+  ], document.getElementById('score'));
+
+  // ---------- Q1 parcial ----------
+  var q1 = [
+    { t: 'As threads continuam executando, mas não geram progresso útil observável pelo usuário.', a: 'L' },
+    { t: 'O sistema trava completamente, com todas as threads paradas, esperando umas pelas outras.', a: 'D' },
+    { t: 'O sistema encerra a execução por falta de memória RAM disponível.', a: '' }
+  ];
+  var q1el = document.getElementById('q1');
+  q1.forEach(function(it){
+    var d = document.createElement('div'); d.className = 'q';
+    d.innerHTML = '<p class="stem">( ) ' + it.t + '</p>';
+    var fb = document.createElement('p'); fb.className = 'fb'; var done = false;
+    [['L','L'],['D','D'],['S','S'],['em branco','']].forEach(function(o){
+      var b = document.createElement('button'); b.className = 'lbtn'; b.textContent = o[0];
+      b.addEventListener('click', function(){
+        if (done) return; done = true;
+        var ok = o[1] === it.a; b.classList.add(ok ? 'ok' : 'bad');
+        fb.className = 'fb ' + (ok ? 'ok' : 'bad');
+        fb.textContent = (ok ? 'Certo. ' : 'Não. A resposta é ' + (it.a || 'em branco') + '. ') +
+          (it.a === 'L' ? 'Slide 36: livelock = threads executando mas não gerando nada que possa ser observado pelo usuário.' :
+           it.a === 'D' ? 'Slide 36: deadlock = todas as threads paradas, uma esperando pela outra.' :
+           'Falta de memória não é nenhum dos três estados do material. A questão avisa que algumas respostas ficam em branco.');
+      });
+      d.appendChild(b);
+    });
+    d.appendChild(fb); q1el.appendChild(d);
+  });
+
+  // ---------- Q7 ----------
+  var txt = document.getElementById('q7txt'), btn = document.getElementById('q7btn');
+  txt.addEventListener('input', function(){ btn.disabled = txt.value.trim().length < 15; });
+  btn.addEventListener('click', function(){ document.getElementById('q7rev').classList.add('on'); btn.disabled = true; txt.readOnly = true; });
+})();
+</script>
+</body>
+</html>

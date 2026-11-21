@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lição 1 — Interferência e não determinismo</title>
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --rule:#d9d4c7; --accent:#8b2500; --bg:#fffdf8;
+          --ok:#1f6f3a; --bad:#9b1c1c; --soft:#f3efe4; }
+  html { background:var(--bg); }
+  body { max-width: 46rem; margin: 3rem auto 6rem; padding: 0 1.25rem; color:var(--ink);
+         font: 17px/1.6 Georgia, "Iowan Old Style", "Palatino Linotype", serif; }
+  header .kicker { color:var(--muted); font-size:.85rem; letter-spacing:.08em; text-transform:uppercase; }
+  h1 { font-weight: normal; font-size: 2.3rem; line-height:1.15; margin: .2rem 0 .4rem; letter-spacing:-.01em; }
+  .sub { color:var(--muted); font-style: italic; margin: 0 0 2.2rem; }
+  h2 { font-weight: normal; font-size: 1.4rem; margin: 2.8rem 0 .6rem; border-bottom:1px solid var(--rule); padding-bottom:.2rem; }
+  h3 { font-weight: normal; font-size: 1.1rem; margin: 1.6rem 0 .4rem; font-style: italic; }
+  p { margin: .7rem 0; }
+  .src { color:var(--muted); font-size:.82rem; }
+  .src a { color:var(--muted); }
+  a { color: var(--accent); }
+  code { font: .88em/1.4 "SF Mono", Menlo, Consolas, monospace; background:var(--soft); padding:0 .25em; border-radius:3px; }
+  pre { background:var(--soft); padding: .8rem 1rem; border-radius:4px; overflow-x:auto; font-size:.86rem; line-height:1.45; }
+  pre code { background:none; padding:0; }
+  .box { border:1px solid var(--rule); border-radius:6px; padding: 1rem 1.2rem; margin: 1.2rem 0; background:#fff; }
+  .box.recall { border-left: 4px solid var(--accent); }
+  .box.task { border-left: 4px solid #2c5282; }
+  .box.ask { background:var(--soft); border:none; }
+  nav { font-size:.9rem; color:var(--muted); margin-bottom: 2rem; }
+  nav a { margin-right: .75rem; }
+  .cols { display:grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 600px) { .cols { grid-template-columns: 1fr; } }
+  table.steps { border-collapse: collapse; width:100%; font-size:.95rem; margin:.5rem 0; }
+  table.steps td, table.steps th { padding:.3rem .5rem; border-bottom:1px solid var(--rule); text-align:left; }
+  table.steps th { font-weight:normal; color:var(--muted); font-size:.82rem; }
+  /* simulador */
+  .sim { font-family: Georgia, serif; }
+  .sim .thread { background:#fff; border:1px solid var(--rule); border-radius:6px; padding:.8rem 1rem; }
+  .sim .thread h4 { margin:0 0 .5rem; font-weight:normal; font-size:1rem; color:var(--muted); }
+  .sim button.step { display:block; width:100%; text-align:left; margin:.3rem 0; padding:.45rem .7rem;
+       font: .9rem "SF Mono", Menlo, Consolas, monospace; background:var(--soft); border:1px solid var(--rule);
+       border-radius:4px; cursor:pointer; color:var(--ink); }
+  .sim button.step:disabled { opacity:.35; cursor:default; }
+  .sim button.step.done { background:#e6efe8; border-color:#b7d1bd; opacity:.7; }
+  .sim .state { display:flex; gap:1.5rem; flex-wrap:wrap; margin:1rem 0 .4rem; font-size:1rem; }
+  .sim .state span { background:#fff; border:1px solid var(--rule); border-radius:4px; padding:.3rem .7rem; }
+  .sim .state b { font-weight:normal; color:var(--muted); }
+  .sim .trace { font: .95rem "SF Mono", Menlo, monospace; min-height:1.5rem; letter-spacing:.15em; }
+  .sim .result { margin:.6rem 0; min-height:1.6rem; }
+  .sim .goals { list-style:none; padding:0; margin:.6rem 0 0; }
+  .sim .goals li::before { content:"○ "; color:var(--muted); }
+  .sim .goals li.hit::before { content:"● "; color:var(--ok); }
+  button.plain { font: inherit; font-size:.9rem; padding:.35rem .8rem; border:1px solid var(--rule); background:#fff; border-radius:4px; cursor:pointer; }
+  /* quiz */
+  .q { margin: 1.4rem 0; }
+  .q p.stem { margin:.2rem 0 .5rem; }
+  .q button.opt { display:block; width:100%; text-align:left; font:inherit; font-size:.97rem; padding:.45rem .8rem; margin:.3rem 0;
+       background:#fff; border:1px solid var(--rule); border-radius:4px; cursor:pointer; color:var(--ink); }
+  .q button.opt:hover { background:var(--soft); }
+  .q button.opt.ok { border-color:var(--ok); background:#e6efe8; }
+  .q button.opt.bad { border-color:var(--bad); background:#f8e5e5; }
+  .q .fb { font-size:.92rem; margin:.4rem 0 0; min-height:1.2rem; }
+  .q .fb.ok { color:var(--ok); } .q .fb.bad { color:var(--bad); }
+  .score { font-style: italic; color: var(--muted); }
+  footer { margin-top:3rem; border-top:1px solid var(--rule); padding-top:1rem; font-size:.9rem; color:var(--muted); }
+  @media print { body { margin:0; max-width:none; font-size:11pt; } nav, .sim, button { display:none; } }
+</style>
+</head>
+<body>
+<nav><a href="../index.html">Início</a> <a href="../reference/mapa-do-curso.html">Mapa do curso</a> <a href="../reference/glossario.html">Glossário</a></nav>
+
+<header>
+  <div class="kicker">Lição 1 · Conceitos básicos</div>
+  <h1>Interferência e não determinismo</h1>
+  <p class="sub">Por que <code>saldo = saldo + 5</code> pode dar errado quando dois comandos rodam ao mesmo tempo. Tempo estimado: 20 minutos. Esta página contém tudo o que você precisa; as marcações "slide N" indicam só de onde cada afirmação veio.</p>
+</header>
+
+<div class="box recall">
+  <strong>Antes de ler, tente responder de memória</strong> (não vale olhar):
+  <ol>
+    <li>Quantas instruções "de verdade" executa uma atribuição como <code>saldo = saldo + 5</code>?</li>
+    <li>Se dois comandos rodam ao mesmo tempo sobre a mesma variável, o resultado é sempre o mesmo?</li>
+  </ol>
+  <p class="src">Não importa acertar; o esforço de lembrar é o que fixa a resposta certa depois.</p>
+</div>
+
+<h2>1. Sequencial é previsível</h2>
+<p>Na execução sequencial os comandos são executados um após o outro, e o resultado é sempre o mesmo. O exemplo do material: uma conta recebe um crédito de 100 e um débito de 80, e o saldo final é sempre 20.</p>
+<pre><code>Conta c = new Conta("12-3");
+c.creditar(100);
+c.debitar(80);
+System.out.print(c.getSaldo());   // sempre 20</code></pre>
+<p class="src">Fonte: <a href="../11-Concorrencia.pdf">11-Concorrencia.pdf</a>, slide 2.</p>
+
+<h2>2. Concorrente: dois comandos ao mesmo tempo</h2>
+<p>Em linguagens concorrentes, dois ou mais comandos podem ser executados ao mesmo tempo. Isso é possível de duas formas: executar cada comando em um processador diferente (<em>paralelismo</em>), ou dividir o tempo de um único processador entre os comandos, executando-os parte a parte.</p>
+<p>Esse segundo ponto é a chave: <strong>os comandos normalmente não são atômicos</strong>.</p>
+<p class="src">Fonte: 11-Concorrencia.pdf, slides 3 e 5.</p>
+
+<h2>3. Um comando tem partes</h2>
+<p>Até uma atribuição simples é executada por partes. O material mostra que <code>saldo = saldo + 5</code> executa de forma similar a esta sequência:</p>
+<pre><code>double tmp = saldo;
+tmp = tmp + 5;
+saldo = tmp;</code></pre>
+<p>Com isso, os métodos da conta ficam assim quando olhamos "por dentro". Os rótulos 1-2-3 e A-B-C são os do slide e serão usados no simulador abaixo.</p>
+<div class="cols">
+<pre><code>void creditar(double vc) {
+1  double tmpc = saldo;
+2  tmpc = tmpc + vc;
+3  saldo = tmpc;
+}</code></pre>
+<pre><code>void debitar(double vd) {
+A  double tmpd = saldo;
+B  tmpd = tmpd - vd;
+C  saldo = tmpd;
+}</code></pre>
+</div>
+<p class="src">Fonte: 11-Concorrencia.pdf, slides 6 e 10.</p>
+
+<h2>4. As partes se intercalam, e o resultado muda</h2>
+<p>Quando <code>c.creditar(100) || c.debitar(80)</code> executam concorrentemente, pode-se executar parte de um, parte de outro, arbitrariamente, até completar os dois. Também é possível executar o primeiro por completo e depois o segundo, ou vice-versa. <strong>A escolha é arbitrária, feita pelo interpretador.</strong></p>
+<p>Consequência: a execução pode gerar mais de um resultado. Isso é o <em>não determinismo</em>. O slide lista, para saldo inicial 0:</p>
+<table class="steps">
+<tr><th>Sequência</th><th>Resultado</th></tr>
+<tr><td><code>1 2 3 A B C</code></td><td>20</td></tr>
+<tr><td><code>A B C 1 2 3</code></td><td>20</td></tr>
+<tr><td><code>1 A 2 3 B C</code></td><td>−80</td></tr>
+<tr><td><code>A 1 2 B C 3</code></td><td>100</td></tr>
+</table>
+<p class="src">Fonte: 11-Concorrencia.pdf, slides 7, 8, 9 e 11.</p>
+
+<h2>5. Isso se chama interferência</h2>
+<p>A execução de um comando pode <em>interferir</em> na execução de outro. As interferências ocorrem quando os comandos compartilham (concorrem) pelos mesmos recursos: atributos, variáveis etc. Resultados não desejados podem ser gerados.</p>
+<p>Para evitar interferências indesejadas, o material diz que temos que: controlar o acesso a recursos compartilhados; proibir a realização de determinadas sequências de execução; e sincronizar as execuções (uma espera pelo término da outra). <em>Como</em> fazer isso em Java é a próxima lição.</p>
+<p class="src">Fonte: 11-Concorrencia.pdf, slides 12 e 13.</p>
+
+<h2>Prática 1 · Simulador de intercalação</h2>
+<p>Você é o interpretador. Clique nos passos na ordem que quiser (cada thread executa seus passos em ordem, mas você escolhe como intercalá-los). Saldo inicial: 0. Objetivo: produzir <strong>cada um dos três resultados</strong> do slide.</p>
+
+<div class="sim box" id="sim">
+  <div class="cols">
+    <div class="thread">
+      <h4>creditar(100)</h4>
+      <button class="step" data-t="c" data-i="0">1  tmpc = saldo</button>
+      <button class="step" data-t="c" data-i="1">2  tmpc = tmpc + 100</button>
+      <button class="step" data-t="c" data-i="2">3  saldo = tmpc</button>
+    </div>
+    <div class="thread">
+      <h4>debitar(80)</h4>
+      <button class="step" data-t="d" data-i="0">A  tmpd = saldo</button>
+      <button class="step" data-t="d" data-i="1">B  tmpd = tmpd - 80</button>
+      <button class="step" data-t="d" data-i="2">C  saldo = tmpd</button>
+    </div>
+  </div>
+  <div class="state">
+    <span><b>saldo</b> = <span id="v-saldo">0</span></span>
+    <span><b>tmpc</b> = <span id="v-tmpc">?</span></span>
+    <span><b>tmpd</b> = <span id="v-tmpd">?</span></span>
+  </div>
+  <div class="trace" id="trace"></div>
+  <div class="result" id="result"></div>
+  <button class="plain" id="reset">Reiniciar</button>
+  <ul class="goals">
+    <li id="g20">Obtenha saldo final 20</li>
+    <li id="g-80">Obtenha saldo final −80</li>
+    <li id="g100">Obtenha saldo final 100</li>
+  </ul>
+  <p class="src">Pergunta para depois: existe alguma sequência que produza um quarto valor? Tente e me conte.</p>
+</div>
+
+<h2>Prática 2 · Quiz</h2>
+<p>Responda sem consultar o texto acima. O feedback aparece na hora.</p>
+<div id="quiz"></div>
+<p class="score" id="score"></p>
+
+<h2>Prática 3 · Veja a interferência de verdade</h2>
+<div class="box task">
+<p>O arquivo <code>exemplo1.c</code> da pasta tem duas threads (<code>prog1</code> e <code>prog2</code>) que incrementam a variável global <code>shared</code> 100 vezes cada, com uma função <code>delay()</code> entre ler e gravar. Aqui está o trecho essencial (o arquivo completo tem ainda a thread <code>prog2</code>, idêntica a <code>prog1</code>, e o <code>main</code> que cria as duas com <code>pthread_create</code> e espera com <code>pthread_join</code>):</p>
+<pre><code>int shared = 0;        /* variavel compartilhada pelas threads */
+
+void delay() {
+  for (int m=0; m&lt;=LIMIT; m++) {}
+}
+
+void prog1 (int * k) { /* prog1 sera' uma das threads */
+  int j, tmp;
+  for (j=1; j&lt;=*k; j++) {       /* *k vale 100 */
+    delay();
+    tmp = shared;
+    tmp = tmp + 1;
+    delay();
+    shared = tmp;
+    delay();
+  }
+}
+/* ... prog2 igual a prog1 ... */
+int main (void) {
+  /* cria as duas threads, cada uma com k = 100, e espera as duas terminarem */
+  printf("--&gt; %d\n", shared);
+}</code></pre>
+<p>Responda, <em>antes</em> de rodar:</p>
+<ol>
+  <li>A última linha do <code>main</code> imprime <code>shared</code> com <code>printf("--&gt; %d\n", shared)</code>, ou seja, a saída termina com <code>--&gt;</code> seguido do valor final de <code>shared</code>. Se não houvesse interferência, qual número apareceria ali? (Dica: <code>shared</code> começa em 0, e cada uma das duas threads soma 1 a ele 100 vezes.)</li>
+  <li>Quais linhas de <code>prog1</code> correspondem aos passos 1, 2 e 3 do simulador?</li>
+</ol>
+<p>Agora compile e rode três vezes, a partir da pasta da disciplina:</p>
+<pre><code>cc -o exemplo1 exemplo1.c
+./exemplo1 | tail -1
+./exemplo1 | tail -1
+./exemplo1 | tail -1</code></pre>
+<p>Anote os três valores. Nesta máquina, hoje, três execuções deram 156, 139 e 127. Compare com a sua previsão e explique a diferença usando as palavras do glossário: <em>não atômico</em>, <em>intercalação</em>, <em>interferência</em>.</p>
+</div>
+
+<h2>De onde veio esta lição</h2>
+<p>Todo o conteúdo acima vem dos slides 2 a 13 de <code>11-Concorrencia.pdf</code> (Paulo Borba) e do <code>exemplo1.c</code>. Você não precisa abri-los: as marcações de slide existem só para que qualquer afirmação possa ser rastreada. Se quiser ir além do material da disciplina, o capítulo 2 do Ben-Ari (<em>Principles of Concurrent and Distributed Programming</em>, 2ª ed.), "The Concurrent Programming Abstraction", trata exatamente deste tema; é leitura opcional.</p>
+
+<div class="box ask">
+  <strong>Ficou alguma dúvida?</strong> Pergunte ao agente (seu professor neste workspace). Boas perguntas para esta lição: "por que o slide 16 diz que com <code>int</code> não precisaria sincronizar?", "qual a diferença entre race condition e interferência nos slides 16 e 19?", "mostre outra intercalação que dê 100".
+</div>
+
+<footer>
+  Próxima lição: <a href="./0002-threads-e-synchronized-em-java.html">Threads e <code>synchronized</code> em Java</a>.
+  Referências: <a href="../reference/glossario.html">Glossário</a> · <a href="../reference/mapa-do-curso.html">Mapa do curso</a>.
+</footer>
+
+<script>
+(function () {
+  // ---------- Simulador ----------
+  var st, trace, goals = {20:false, '-80':false, 100:false};
+  var ops = {
+    c: [function(){ st.tmpc = st.saldo; }, function(){ st.tmpc = st.tmpc + 100; }, function(){ st.saldo = st.tmpc; }],
+    d: [function(){ st.tmpd = st.saldo; }, function(){ st.tmpd = st.tmpd - 80; }, function(){ st.saldo = st.tmpd; }]
+  };
+  var labels = { c: ['1','2','3'], d: ['A','B','C'] };
+  var btns = Array.prototype.slice.call(document.querySelectorAll('#sim button.step'));
+  function fmt(v){ return v === null ? '?' : String(v).replace('-', '−'); }
+  function render() {
+    document.getElementById('v-saldo').textContent = fmt(st.saldo);
+    document.getElementById('v-tmpc').textContent = fmt(st.tmpc);
+    document.getElementById('v-tmpd').textContent = fmt(st.tmpd);
+    document.getElementById('trace').textContent = trace.join(' ');
+    btns.forEach(function(b){
+      var t = b.dataset.t, i = +b.dataset.i;
+      b.disabled = (i !== st.next[t]);
+      b.classList.toggle('done', i < st.next[t]);
+    });
+    var r = document.getElementById('result');
+    if (st.next.c === 3 && st.next.d === 3) {
+      var key = String(st.saldo);
+      var known = goals.hasOwnProperty(key);
+      r.innerHTML = 'Sequência <code>' + trace.join(' ') + '</code> → saldo final <strong>' + fmt(st.saldo) + '</strong>' +
+        (known ? '' : ' — um valor que não está no slide. Conte isso ao agente.');
+      if (known) { goals[key] = true; document.getElementById('g' + key).classList.add('hit'); }
+    } else { r.textContent = ''; }
+  }
+  function reset() { st = { saldo: 0, tmpc: null, tmpd: null, next: { c: 0, d: 0 } }; trace = []; render(); }
+  btns.forEach(function(b){
+    b.addEventListener('click', function(){
+      var t = b.dataset.t, i = +b.dataset.i;
+      if (i !== st.next[t]) return;
+      ops[t][i](); st.next[t]++; trace.push(labels[t][i]); render();
+    });
+  });
+  document.getElementById('reset').addEventListener('click', reset);
+  reset();
+
+  // ---------- Quiz ----------
+  var Q = [
+    { stem: 'Na sequência 1 A 2 B 3 C (saldo inicial 0), qual é o saldo final?',
+      opts: ['−80', '100', '+20', '−20'], ans: 0,
+      why: 'Passo 3 grava saldo = 100, mas C grava depois saldo = tmpd = 0 − 80 = −80. O último a gravar vence.' },
+    { stem: 'Por que um comando como saldo = saldo + 5 pode sofrer interferência?',
+      opts: ['Porque ele roda em outro processador', 'Porque ele é executado em partes', 'Porque ele usa números com decimais', 'Porque ele não retorna nenhum valor'], ans: 1,
+      why: 'Slide 6: até uma atribuição é executada por partes (tmp = saldo; tmp = tmp + 5; saldo = tmp), e as partes podem se intercalar.' },
+    { stem: 'Quem escolhe a ordem em que as partes dos comandos são intercaladas?',
+      opts: ['O programador, pela ordem escrita', 'O compilador, de forma ordenada', 'O usuário, durante toda execução', 'O interpretador, de forma arbitrária'], ans: 3,
+      why: 'Slides 8 e 9: "A escolha é arbitrária, feita pelo interpretador."' },
+    { stem: 'Segundo o material, quando ocorrem interferências?',
+      opts: ['Quando comandos compartilham os mesmos recursos', 'Quando comandos executam em processadores distintos', 'Quando comandos executam de forma sequencial', 'Quando comandos usam variáveis apenas locais'], ans: 0,
+      why: 'Slide 12: ocorrem quando os comandos compartilham (concorrem) pelos mesmos recursos (atributos, variáveis etc.).' },
+    { stem: 'Qual destas é uma das três ações que o material lista para evitar interferências indesejadas?',
+      opts: ['Executar cada comando em processador próprio', 'Proibir determinadas sequências de execução', 'Substituir variáveis globais por variáveis locais', 'Reduzir o número de comandos do programa'], ans: 1,
+      why: 'Slide 13: controlar o acesso a recursos compartilhados; proibir determinadas sequências de execução; sincronizar as execuções.' }
+  ];
+  var box = document.getElementById('quiz'), answered = 0, right = 0;
+  Q.forEach(function(q, qi){
+    var d = document.createElement('div'); d.className = 'q';
+    d.innerHTML = '<p class="stem"><strong>' + (qi+1) + '.</strong> ' + q.stem + '</p>';
+    var fb = document.createElement('p'); fb.className = 'fb';
+    var done = false;
+    q.opts.forEach(function(o, oi){
+      var b = document.createElement('button'); b.className = 'opt'; b.textContent = o;
+      b.addEventListener('click', function(){
+        if (done) return; done = true; answered++;
+        if (oi === q.ans) { right++; b.classList.add('ok'); fb.className = 'fb ok'; fb.textContent = 'Certo. ' + q.why; }
+        else { b.classList.add('bad'); d.querySelectorAll('button.opt')[q.ans].classList.add('ok'); fb.className = 'fb bad'; fb.textContent = 'Não. ' + q.why; }
+        document.getElementById('score').textContent = right + ' de ' + answered + ' corretas' + (answered === Q.length ? ' — quiz completo.' : '.');
+      });
+      d.appendChild(b);
+    });
+    d.appendChild(fb); box.appendChild(d);
+  });
+})();
+</script>
+</body>
+</html>

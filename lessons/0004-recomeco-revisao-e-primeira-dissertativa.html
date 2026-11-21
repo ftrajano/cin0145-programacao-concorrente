@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lição 4 — Recomeço: revisão e primeira dissertativa</title>
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --rule:#d9d4c7; --accent:#8b2500; --bg:#fffdf8;
+          --ok:#1f6f3a; --bad:#9b1c1c; --soft:#f3efe4; }
+  html { background:var(--bg); }
+  body { max-width: 46rem; margin: 3rem auto 6rem; padding: 0 1.25rem; color:var(--ink);
+         font: 17px/1.6 Georgia, "Iowan Old Style", "Palatino Linotype", serif; }
+  header .kicker { color:var(--muted); font-size:.85rem; letter-spacing:.08em; text-transform:uppercase; }
+  h1 { font-weight: normal; font-size: 2.3rem; line-height:1.15; margin: .2rem 0 .4rem; letter-spacing:-.01em; }
+  .sub { color:var(--muted); font-style: italic; margin: 0 0 2.2rem; }
+  h2 { font-weight: normal; font-size: 1.4rem; margin: 2.8rem 0 .6rem; border-bottom:1px solid var(--rule); padding-bottom:.2rem; }
+  p { margin: .7rem 0; }
+  .src { color:var(--muted); font-size:.82rem; }
+  a { color: var(--accent); }
+  code { font: .88em/1.4 "SF Mono", Menlo, Consolas, monospace; background:var(--soft); padding:0 .25em; border-radius:3px; }
+  pre { background:var(--soft); padding: .8rem 1rem; border-radius:4px; overflow-x:auto; font-size:.86rem; line-height:1.45; }
+  pre code { background:none; padding:0; }
+  .box { border:1px solid var(--rule); border-radius:6px; padding: 1rem 1.2rem; margin: 1.2rem 0; background:#fff; }
+  .box.recall { border-left: 4px solid var(--accent); }
+  .box.task { border-left: 4px solid #2c5282; }
+  .box.ask { background:var(--soft); border:none; }
+  .box.exam { border-left: 4px solid #8a6d00; }
+  nav { font-size:.9rem; color:var(--muted); margin-bottom: 2rem; }
+  nav a { margin-right: .75rem; }
+  .q { margin: 1.4rem 0; }
+  .q p.stem { margin:.2rem 0 .5rem; }
+  .q button.opt { display:block; width:100%; text-align:left; font:inherit; font-size:.97rem; padding:.45rem .8rem; margin:.3rem 0;
+       background:#fff; border:1px solid var(--rule); border-radius:4px; cursor:pointer; color:var(--ink); }
+  .q button.opt:hover { background:var(--soft); }
+  .q button.opt.ok { border-color:var(--ok); background:#e6efe8; }
+  .q button.opt.bad { border-color:var(--bad); background:#f8e5e5; }
+  .q .fb { font-size:.92rem; margin:.4rem 0 0; min-height:1.2rem; }
+  .fb.ok { color:var(--ok); } .fb.bad { color:var(--bad); }
+  .score { font-style: italic; color: var(--muted); }
+  table { border-collapse: collapse; width:100%; font-size:.95rem; margin:.5rem 0; }
+  td, th { padding:.35rem .5rem; border-bottom:1px solid var(--rule); text-align:left; vertical-align:top; }
+  th { font-weight:normal; color:var(--muted); font-size:.82rem; }
+  .num { display:flex; gap:.6rem; align-items:center; flex-wrap:wrap; margin:.5rem 0; }
+  .num input { font: 1rem "SF Mono", Menlo, monospace; width:6rem; padding:.3rem .5rem; border:1px solid var(--rule); border-radius:4px; }
+  button.plain { font: inherit; font-size:.9rem; padding:.35rem .8rem; border:1px solid var(--rule); background:#fff; border-radius:4px; cursor:pointer; }
+  button.plain:disabled { opacity:.4; cursor:default; }
+  textarea { width:100%; box-sizing:border-box; min-height:12rem; font: 1rem/1.5 Georgia, serif; padding:.7rem; border:1px solid var(--rule); border-radius:4px; background:#fff; color:var(--ink); }
+  .wc { font-size:.85rem; color:var(--muted); }
+  .check { display:none; }
+  .check.on { display:block; }
+  .check label { display:block; margin:.5rem 0; padding-left:1.6rem; text-indent:-1.6rem; }
+  footer { margin-top:3rem; border-top:1px solid var(--rule); padding-top:1rem; font-size:.9rem; color:var(--muted); }
+  @media print { body { margin:0; max-width:none; font-size:11pt; } nav, button, textarea { display:none; } .check { display:block; } }
+</style>
+</head>
+<body>
+<nav><a href="../index.html">Início</a> <a href="../reference/mapa-do-curso.html">Mapa do curso</a> <a href="../reference/glossario.html">Glossário</a> <a href="../reference/guia-da-prova.html">Guia das provas</a> <a href="./0003-wait-notify-e-por-que-while.html">← Lição 3</a> <a href="./0005-wait-e-notify-passo-a-passo.html">Lição 5 →</a></nav>
+
+<header>
+  <div class="kicker">Lição 4 · Retomada</div>
+  <h1>Recomeço: revisão e primeira dissertativa</h1>
+  <p class="sub">Uma revisão de memória das lições 1–3 e a primeira resposta escrita no estilo das provas antigas. Não há conteúdo novo. Tempo estimado: 20 minutos.</p>
+</header>
+
+<div class="box ask">
+<p><strong>Por que começar assim.</strong> Depois de uma pausa, parte do que você estudou parece esquecido. Não releia as lições antes: tentar lembrar agora, com esforço, fixa mais do que reler. Errar aqui é esperado e útil, porque mostra o que precisa voltar.</p>
+<p>No fim, me mande o placar do quiz e as duas respostas numéricas. Com isso eu decido se seguimos para exclusão mútua ou se refazemos algum ponto.</p>
+</div>
+
+<h2>Prática 1 · Quiz de memória</h2>
+<p>Oito perguntas misturadas das lições 1, 2 e 3. Não abra as lições antigas. Cada erro indica a seção que você deve rever.</p>
+<div id="quiz"></div>
+<p class="score" id="score"></p>
+
+<h2>Prática 2 · Você é o interpretador</h2>
+<p>Lembre como <code>creditar(100)</code> e <code>debitar(80)</code> são executados por partes, <strong>sem</strong> <code>synchronized</code>:</p>
+<pre><code>void creditar(double vc) {      void debitar(double vd) {
+1  double tmpc = saldo;          A  double tmpd = saldo;
+2  tmpc = tmpc + vc;             B  tmpd = tmpd - vd;
+3  saldo = tmpc;                 C  saldo = tmpd;
+}                               }</code></pre>
+<p>Saldo inicial 0. Qual é o saldo final em cada sequência? Faça no papel, passo a passo.</p>
+<div class="num">
+  <span><code>A 1 2 3 B C</code> &nbsp;→</span>
+  <input id="n1" inputmode="numeric" aria-label="saldo final da sequência A 1 2 3 B C">
+  <button class="plain" data-n="n1" data-ans="-80">Conferir</button>
+  <span class="fb" id="n1fb"></span>
+</div>
+<div class="num">
+  <span><code>1 A B C 2 3</code> &nbsp;→</span>
+  <input id="n2" inputmode="numeric" aria-label="saldo final da sequência 1 A B C 2 3">
+  <button class="plain" data-n="n2" data-ans="100">Conferir</button>
+  <span class="fb" id="n2fb"></span>
+</div>
+<p class="src">Padrão de execução por partes e tabela de resultados: 11-Concorrencia.pdf, slides 6, 10 e 11. As duas sequências acima foram escolhidas para esta revisão e não estão na tabela do slide.</p>
+
+<h2>Questão da prova: Prova 1, questão 1 (com resposta)</h2>
+<div class="box exam">
+<p><strong>Prova 1, questão 1 (2,0 pontos).</strong> Quais as principais dificuldades para o desenvolvimento de programas concorrentes ou distribuídos? Por que eles são mais difíceis de desenvolver que os programas sequenciais?</p>
+<p class="src">Provas-Concorrencia-antigas.pdf, Prova 1.</p>
+</div>
+<div class="box" style="border-left:4px solid var(--ok)"><p><strong>Resposta modelo (construída só com o material)</strong></p>
+<p>Num programa sequencial, os comandos são executados um após o outro e o resultado é sempre o mesmo (11, s.2). Num programa concorrente, dois ou mais comandos podem executar ao mesmo tempo, e isso traz dificuldades novas:</p>
+<ul>
+<li><strong>Comandos não são atômicos:</strong> até uma atribuição como <code>saldo = saldo + 5</code> executa por partes (ler, calcular, gravar), e as partes de comandos diferentes podem se intercalar (11, s.5–6).</li>
+<li><strong>Não determinismo:</strong> a ordem da intercalação é arbitrária, então o mesmo programa pode gerar mais de um resultado. Com <code>creditar(100) || debitar(80)</code> e saldo 0, o resultado pode ser 20, −80 ou 100 (11, s.9, 11).</li>
+<li><strong>Interferência:</strong> quando comandos compartilham recursos (atributos, variáveis), a execução de um pode interferir na do outro e gerar resultados não desejados (11, s.12).</li>
+<li><strong>Controle extra:</strong> é preciso controlar o acesso aos recursos compartilhados, proibir certas sequências de execução e sincronizar as execuções (11, s.13), o que um programa sequencial não exige.</li>
+<li><strong>Custo e novos erros:</strong> os mecanismos de sincronização diminuem a eficiência e podem complicar o código, e passam a ser possíveis o deadlock (todas as threads paradas, uma esperando pela outra) e o livelock (threads executando sem gerar nada observável) (11, s.36).</li>
+</ul>
+<p>Por isso eles são mais difíceis de desenvolver: o programador precisa raciocinar sobre todas as intercalações possíveis, e não sobre uma única sequência de execução.</p>
+<p class="src">Sobre "distribuídos": os slides de programação distribuída não trazem uma lista de dificuldades. O que dá para dizer com o material é que lá os processos não compartilham memória e só se comunicam por mensagens (07, s.3 e 9).</p></div>
+
+
+<h2>Leitura opcional</h2>
+<p>Se quiser ver os mesmos fundamentos em outra voz: Ben-Ari, <em>Principles of Concurrent and Distributed Programming</em>, 2ª ed., cap. 1 "What is Concurrent Programming?" e cap. 2, seções 2.2–2.5 (intercalação e comandos atômicos). Mapeamento em <a href="../reference/mapa-do-curso.html">Mapa do curso</a>.</p>
+
+<div class="box ask">
+<p><strong>Ficou alguma dúvida?</strong> Pergunte ao agente, seu professor neste workspace. Vale qualquer coisa: uma pergunta do quiz que pareceu ambígua, um termo esquecido, ou "por que a sequência X dá Y?".</p>
+</div>
+
+<footer><a href="../index.html">← Início</a> · Lição 4 de CIN0145. Sem conteúdo novo; tudo vem de 11-Concorrencia.pdf (lições 1–3) e de Provas-Concorrencia-antigas.pdf.</footer>
+
+<script>
+(function(){
+  var items = [
+    { stem: 'Por que <code>saldo = saldo + 5</code> pode sofrer interferência?',
+      opts: ['Porque é executado em três partes', 'Porque a variável saldo é double', 'Porque o processador soma valores errados'], ans: 0,
+      why: 'A atribuição executa como ler, calcular e gravar (11, s.6). As partes de outro comando podem entrar no meio.', rev: 'Lição 1, seção 3' },
+    { stem: 'Não determinismo significa que…',
+      opts: ['o mesmo programa pode gerar resultados diferentes', 'o programa sempre gera um resultado errado', 'o programador escolhe a ordem das partes'], ans: 0,
+      why: 'A intercalação é escolhida arbitrariamente pelo interpretador, e por isso a execução pode gerar mais de um resultado (11, s.9 e 11).', rev: 'Lição 1, seção 4' },
+    { stem: 'Uma thread chama um método <code>synchronized</code> de um objeto enquanto outra thread executa outro método <code>synchronized</code> do <em>mesmo</em> objeto. O que acontece?',
+      opts: ['A primeira espera até o lock ser liberado', 'As duas executam ao mesmo tempo sem problema', 'Java lança uma exceção e encerra a thread'], ans: 0,
+      why: 'Só um método synchronized executa em um objeto por vez; os outros esperam. Pode ser o mesmo método ou não (11, s.14 e 29). É a questão 4 da prova de 2026-1.', rev: 'Lição 2, seção 2' },
+    { stem: 'Proteger a leitura e a gravação de <code>saldo</code> em dois blocos <code>synchronized</code> separados…',
+      opts: ['evita race condition, mas permite interferência', 'evita race condition e evita interferência', 'causa race condition, mas evita interferência'], ans: 0,
+      why: 'Entre a leitura e a gravação de uma thread, a outra pode fazer um ciclo inteiro. O veredito do slide: sem race conditions, mas com interferência (11, s.19).', rev: 'Lição 2, seção 6' },
+    { stem: 'Uma thread chama <code>wait()</code> dentro de um método <code>synchronized</code>. Enquanto ela espera, o lock do objeto…',
+      opts: ['é liberado para outros métodos sincronizados', 'continua preso até o método terminar', 'é passado para a thread mais antiga'], ans: 0,
+      why: 'O wait libera a restrição de sincronização: outro método sincronizado pode começar no mesmo objeto (11, s.34). Sem isso, creditar nunca entraria para criar saldo.', rev: 'Lição 3, seção 3' },
+    { stem: 'Por que o teste antes do <code>wait()</code> usa <code>while</code> e não <code>if</code>?',
+      opts: ['A condição pode ser falsa ao acordar', 'O compilador Java não aceita if ali', 'O while libera o lock mais rápido'], ans: 0,
+      why: 'A notificação diz que talvez seja possível continuar, mas não garante. Com while a thread testa de novo; com if ela segue direto (11, s.32).', rev: 'Lição 3, seção 5' },
+    { stem: 'Qual a diferença entre <code>notify()</code> e <code>notifyAll()</code>?',
+      opts: ['notify acorda uma thread arbitrária; notifyAll acorda todas', 'notify acorda todas; notifyAll acorda uma thread arbitrária', 'notify acorda a primeira; notifyAll acorda todas'], ans: 0,
+      why: 'notifyAll acorda todas as threads esperando no objeto; notify acorda só uma, escolhida de forma arbitrária (11, s.35).', rev: 'Lição 3, seção 4' },
+    { stem: '"Threads executando, mas sem gerar nada que possa ser observado pelo usuário." Isso é:',
+      opts: ['livelock', 'deadlock', 'interferência'], ans: 0,
+      why: 'Livelock: executando sem gerar nada observável. Deadlock: todas paradas, uma esperando pela outra (11, s.36).', rev: 'Lição 3, seção 6' }
+  ];
+  function shuffle(a){ for (var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+  var root = document.getElementById('quiz'), scoreEl = document.getElementById('score');
+  var answered = 0, right = 0, misses = [];
+  shuffle(items).forEach(function(it, k){
+    var d = document.createElement('div'); d.className = 'q';
+    d.innerHTML = '<p class="stem">' + (k+1) + '. ' + it.stem + '</p>';
+    var fb = document.createElement('p'); fb.className = 'fb'; var done = false;
+    shuffle(it.opts.map(function(o,i){ return {o:o, i:i}; })).forEach(function(x){
+      var b = document.createElement('button'); b.className = 'opt'; b.textContent = x.o;
+      b.addEventListener('click', function(){
+        if (done) return; done = true; answered++;
+        var ok = x.i === it.ans; if (ok) right++; else misses.push(it.rev);
+        b.classList.add(ok ? 'ok' : 'bad');
+        fb.className = 'fb ' + (ok ? 'ok' : 'bad');
+        fb.textContent = (ok ? 'Certo. ' : 'Não. A resposta é: ' + it.opts[it.ans] + '. ') + it.why + (ok ? '' : ' Reveja: ' + it.rev + '.');
+        scoreEl.textContent = 'Placar: ' + right + ' de ' + answered + (answered === items.length
+          ? (misses.length ? '. Para rever: ' + misses.join('; ') + '. Me mande este placar.' : '. Tudo certo. Me mande este placar.')
+          : '');
+      });
+      d.appendChild(b);
+    });
+    d.appendChild(fb); root.appendChild(d);
+  });
+
+  document.querySelectorAll('button[data-n]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var id = b.getAttribute('data-n'), ans = b.getAttribute('data-ans');
+      var v = document.getElementById(id).value.replace(/\s/g,'').replace('−','-');
+      var fb = document.getElementById(id + 'fb');
+      if (v === '') { fb.className = 'fb'; fb.textContent = 'Escreva um número.'; return; }
+      var ok = Number(v) === Number(ans);
+      fb.className = 'fb ' + (ok ? 'ok' : 'bad');
+      fb.textContent = ok ? 'Certo. O resultado depende de qual gravação acontece por último.'
+                          : 'Ainda não. Anote saldo, tmpc e tmpd depois de cada passo e tente de novo.';
+    });
+  });
+})();
+</script>
+</body>
+</html>

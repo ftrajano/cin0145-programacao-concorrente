@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lição 8 — Leitores e escritores com monitor</title>
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --rule:#d9d4c7; --accent:#8b2500; --bg:#fffdf8;
+          --ok:#1f6f3a; --bad:#9b1c1c; --soft:#f3efe4; --hi:#f6e3b4; }
+  html { background:var(--bg); }
+  body { max-width: 50rem; margin: 3rem auto 6rem; padding: 0 1.25rem; color:var(--ink);
+         font: 17px/1.6 Georgia, "Iowan Old Style", "Palatino Linotype", serif; }
+  header .kicker { color:var(--muted); font-size:.85rem; letter-spacing:.08em; text-transform:uppercase; }
+  h1 { font-weight: normal; font-size: 2.3rem; line-height:1.15; margin: .2rem 0 .4rem; letter-spacing:-.01em; }
+  .sub { color:var(--muted); font-style: italic; margin: 0 0 2.2rem; }
+  h2 { font-weight: normal; font-size: 1.4rem; margin: 2.8rem 0 .6rem; border-bottom:1px solid var(--rule); padding-bottom:.2rem; }
+  p { margin: .7rem 0; }
+  .src { color:var(--muted); font-size:.82rem; }
+  a { color: var(--accent); }
+  code { font: .88em/1.4 "SF Mono", Menlo, Consolas, monospace; background:var(--soft); padding:0 .25em; border-radius:3px; }
+  pre { background:var(--soft); padding: .8rem 1rem; border-radius:4px; overflow-x:auto; font-size:.86rem; line-height:1.45; }
+  pre code { background:none; padding:0; }
+  .box { border:1px solid var(--rule); border-radius:6px; padding: 1rem 1.2rem; margin: 1.2rem 0; background:#fff; }
+  .box.recall { border-left: 4px solid var(--accent); }
+  .box.ask { background:var(--soft); border:none; }
+  .box.exam { border-left: 4px solid #8a6d00; }
+  .box.warn { border-left: 4px solid #8a6d00; background:#fffaf0; }
+  nav { font-size:.9rem; color:var(--muted); margin-bottom: 2rem; }
+  nav a { margin-right: .75rem; }
+  details summary { cursor:pointer; color:var(--accent); font-size:.92rem; }
+  .wrap { overflow-x:auto; }
+  table { border-collapse: collapse; width:100%; font-size:.9rem; margin:.5rem 0; }
+  td, th { padding:.35rem .5rem; border-bottom:1px solid var(--rule); text-align:left; vertical-align:top; }
+  th { font-weight:normal; color:var(--muted); font-size:.8rem; }
+  td.t { color:var(--muted); font-variant-numeric: tabular-nums; width:2rem; }
+  td.s { font-family: "SF Mono", Menlo, monospace; font-size:.85rem; white-space:nowrap; }
+  tr.key td { background:var(--hi); }
+  .spin { color:#2c5282; }
+  .cs { font-weight:bold; }
+  table.trace select { font: .85rem "SF Mono", Menlo, monospace; padding:.15rem .3rem; border:1px solid var(--rule); border-radius:3px; background:#fff; color:var(--ink); max-width:100%; }
+  table.trace .ok { border-color:var(--ok); background:#e6efe8; }
+  table.trace .bad { border-color:var(--bad); background:#f8e5e5; }
+  ol.props li { margin:.5rem 0; }
+  .q { margin: 1.4rem 0; }
+  .q p.stem { margin:.2rem 0 .5rem; }
+  .q button.opt { display:block; width:100%; text-align:left; font:inherit; font-size:.97rem; padding:.45rem .8rem; margin:.3rem 0;
+       background:#fff; border:1px solid var(--rule); border-radius:4px; cursor:pointer; color:var(--ink); }
+  .q button.opt:hover { background:var(--soft); }
+  .q button.opt.ok { border-color:var(--ok); background:#e6efe8; }
+  .q button.opt.bad { border-color:var(--bad); background:#f8e5e5; }
+  .fb { font-size:.92rem; margin:.4rem 0 0; min-height:1.2rem; }
+  .fb.ok { color:var(--ok); } .fb.bad { color:var(--bad); }
+  .score { font-style: italic; color: var(--muted); }
+  button.plain { font: inherit; font-size:.9rem; padding:.35rem .8rem; border:1px solid var(--rule); background:#fff; border-radius:4px; cursor:pointer; }
+  button.plain:disabled { opacity:.4; cursor:default; }
+  textarea { width:100%; box-sizing:border-box; min-height:11rem; font: 1rem/1.5 Georgia, serif; padding:.7rem; border:1px solid var(--rule); border-radius:4px; background:#fff; color:var(--ink); }
+  .wc { font-size:.85rem; color:var(--muted); }
+  .check { display:none; } .check.on { display:block; }
+  .check label { display:block; margin:.5rem 0; padding-left:1.6rem; text-indent:-1.6rem; }
+  footer { margin-top:3rem; border-top:1px solid var(--rule); padding-top:1rem; font-size:.9rem; color:var(--muted); }
+  @media print { body { margin:0; max-width:none; font-size:11pt; } nav, button, textarea, select { display:none; } .check { display:block; } }
+  table.trace input { font: .85rem "SF Mono", Menlo, monospace; width:4.5rem; padding:.15rem .3rem; border:1px solid var(--rule); border-radius:3px; background:#fff; color:var(--ink); }
+  .sleep { color:var(--muted); font-style:italic; }
+</style>
+
+</head>
+<body>
+<nav><a href="../index.html">Início</a> <a href="../reference/glossario.html">Glossário</a> <a href="../reference/guia-da-prova.html">Guia das provas</a> <a href="./0007-monitores.html">← Lição 7</a></nav>
+
+<header>
+  <div class="kicker">Lição 8 · Modo prova · Monitores</div>
+  <h1>Leitores e escritores com monitor</h1>
+  <p class="sub">O problema que caiu em três das quatro provas, com o monitor dos slides linha por linha e as duas questões antigas respondidas. Tempo estimado: 30 minutos. "s.N" = 05-monitores.pdf, salvo indicação.</p>
+</header>
+
+<div class="box recall">
+<p><strong>Aquecimento da lição 7, de memória:</strong> o que <code>signal(C)</code> faz quando a fila de C está vazia? E <code>signal_all(C)</code>?</p>
+<details><summary>Ver respostas</summary><p>Com a fila vazia, <code>signal</code> não faz nada (s.12). <code>signal_all</code> acorda todos os processos suspensos em C (s.14).</p></details>
+</div>
+
+<h2>1. O problema</h2>
+<p>Vários processos acessam os mesmos dados. Uns só leem, outros escrevem. <span class="src">s.14</span></p>
+<table>
+<tr><th>Quem</th><th>Regra</th></tr>
+<tr><td><strong>Leitores</strong></td><td>não precisam se excluir mutuamente: vários podem ler ao mesmo tempo</td></tr>
+<tr><td><strong>Escritores</strong></td><td>precisam excluir <strong>todos</strong> os outros processos, leitores e escritores</td></tr>
+</table>
+<p>É uma exclusão mútua "seletiva": nem todo mundo exclui todo mundo. Cada processo é um laço que chama o monitor antes e depois de usar os dados <span class="src">s.15–16</span>:</p>
+<pre><code>Reader() {                       Writer() {
+  while (TRUE) {                   while (TRUE) {
+    Start_Read;                      Start_Write;
+    Read_the_Data;                   Write_the_Data;
+    End_Read;                        End_Write;
+  }                                }
+}                                }</code></pre>
+
+<h2>2. O monitor dos slides</h2>
+<p>Duas variáveis de status e duas variáveis de condição <span class="src">s.16–17</span>:</p>
+<table>
+<tr><th>Variável</th><th>Significado</th></tr>
+<tr><td><code>Readers</code></td><td>número de leitores lendo agora</td></tr>
+<tr><td><code>Writing</code></td><td><code>true</code> quando um processo está escrevendo</td></tr>
+<tr><td><code>OK_to_Read</code></td><td>fila onde leitores esperam</td></tr>
+<tr><td><code>OK_to_Write</code></td><td>fila onde escritores esperam</td></tr>
+</table>
+<pre><code>Monitor Reader_Writer_Monitor {
+  int Readers = 0;
+  BOOL Writing = False;
+  Condition OK_to_Read, OK_to_Write;
+
+  void Start_Read {
+r1  while (Writing) {wait(OK_to_Read);};
+r2  Readers = Readers + 1;
+  }
+  void End_Read {
+e1  Readers = Readers - 1;
+e2  if (Readers == 0) {signal(OK_to_Write);};
+  }
+  void Start_Write {
+w1  if (Readers &gt; 0 || Writing) {wait(OK_to_Write);};    ← if, não while!
+w2  Writing = True;
+  }
+  void End_Write {
+f1  Writing := False;
+f2  signal(OK_to_Write);
+f3  signal_all(OK_to_Read);
+  }
+}</code></pre>
+<p class="src">s.17–19, copiado como está, inclusive o <code>:=</code> em f1. Este é exatamente o código da Prova 1, questão 5.</p>
+<p>Em palavras:</p>
+<ul>
+<li><strong>Start_Read:</strong> o leitor só espera se alguém está <em>escrevendo</em>. Se há outros lendo, ele entra junto.</li>
+<li><strong>End_Read:</strong> o último leitor a sair (<code>Readers == 0</code>) acorda um escritor.</li>
+<li><strong>Start_Write:</strong> o escritor espera se há alguém lendo <em>ou</em> escrevendo.</li>
+<li><strong>End_Write:</strong> acorda um escritor <em>e</em> todos os leitores que esperam.</li>
+</ul>
+
+<h2>3. Tabela resolvida: o caso normal</h2>
+<p>R1 lendo; o escritor W chega; R1 sai; R2 chega enquanto W escreve.</p>
+<div class="wrap"><table>
+<tr><th>#</th><th>O que acontece</th><th>Readers</th><th>Writing</th><th>filas</th></tr>
+<tr><td class="t">1</td><td>R1: <code>Start_Read</code>, r1 <code>Writing</code>? não; r2</td><td class="s">1</td><td class="s">F</td><td class="s">—</td></tr>
+<tr class="key"><td class="t">2</td><td>W: <code>Start_Write</code>, w1 <code>1 &gt; 0</code>? sim → <code>wait(OK_to_Write)</code></td><td class="s">1</td><td class="s">F</td><td class="s">Write: W</td></tr>
+<tr><td class="t">3</td><td>R1: <code>End_Read</code>, e1; e2 <code>Readers == 0</code>? sim → <code>signal(OK_to_Write)</code> acorda W</td><td class="s">0</td><td class="s">F</td><td class="s">—</td></tr>
+<tr><td class="t">4</td><td>W: w2 <code>Writing = True</code>, escreve</td><td class="s">0</td><td class="s">T</td><td class="s">—</td></tr>
+<tr class="key"><td class="t">5</td><td>R2: <code>Start_Read</code>, r1 <code>Writing</code>? sim → <code>wait(OK_to_Read)</code></td><td class="s">0</td><td class="s">T</td><td class="s">Read: R2</td></tr>
+<tr><td class="t">6</td><td>W: <code>End_Write</code>: f1; f2 fila de escritores vazia → nada; f3 acorda R2</td><td class="s">0</td><td class="s">F</td><td class="s">—</td></tr>
+<tr><td class="t">7</td><td>R2: volta ao r1: <code>Writing</code>? não; r2, lê</td><td class="s">1</td><td class="s">F</td><td class="s">—</td></tr>
+</table></div>
+<p>Até aqui, tudo certo: o escritor nunca esteve junto com um leitor.</p>
+
+<h2>Prática 1 · Complete a tabela: leitores que não param de chegar</h2>
+<p>R1 está lendo. W chega e espera. Agora leitores novos continuam chegando, sempre antes de o anterior sair.</p>
+<div class="wrap"><table class="trace" id="tb1">
+<tr><th>#</th><th>O que acontece</th><th>Readers</th></tr>
+<tr><td class="t">1</td><td>R1 lendo; W fez <code>wait(OK_to_Write)</code></td><td class="s">1</td></tr>
+<tr><td class="t">2</td><td>R2: <code>Start_Read</code>. r1 testa <code>Writing</code>, que é
+  <select data-ans="f" data-hint="W está esperando, não escrevendo: Writing continua False."><option value="">escolha</option><option value="t">True → espera</option><option value="f">False → entra</option></select></td><td><input data-ans="2" data-hint="R1 e R2 lendo."></td></tr>
+<tr><td class="t">3</td><td>R1: <code>End_Read</code>. e2 acorda W?
+  <select data-ans="nao" data-hint="Readers ficou 1, não 0: o if de e2 é falso, ninguém é acordado."><option value="">escolha</option><option value="sim">sim</option><option value="nao">não</option></select></td><td><input data-ans="1" data-hint="2 − 1."></td></tr>
+<tr><td class="t">4</td><td>R3: <code>Start_Read</code>, entra</td><td><input data-ans="2" data-hint="R2 e R3 lendo."></td></tr>
+<tr><td class="t">5</td><td>R2: <code>End_Read</code></td><td><input data-ans="1" data-hint="Só R3 lendo. E assim por diante."></td></tr>
+<tr><td class="t"></td><td>Se isso continuar para sempre, W entra algum dia?
+  <select data-ans="nao" data-hint="Readers nunca chega a 0, e só o último leitor a sair acorda o escritor."><option value="">escolha</option><option value="sim">sim</option><option value="nao">não</option></select>
+  Isso é
+  <select data-ans="st" data-hint="W quer entrar e nunca entra, enquanto os outros progridem: starvation (03, s.5). Não é deadlock, porque os leitores continuam conseguindo."><option value="">escolha</option><option value="dl">deadlock</option><option value="st">starvation</option><option value="lv">livelock</option></select></td><td></td></tr>
+</table></div>
+<p><button class="plain" data-check="tb1">Conferir</button> <span class="fb" id="tb1fb"></span></p>
+
+<h2>Prática 2 · Quiz de memória</h2>
+<div id="quiz"></div>
+<p class="score" id="score"></p>
+
+<h2>Questão da prova: Prova 1, questão 5 (com resposta)</h2>
+<div class="box exam">
+<p><strong>Prova 1, questão 5 (2,0 pontos).</strong> Indique se a solução abaixo para o problema dos leitores e escritores (a) garante exclusão mútua, (b) garante ausência de starvation. Justifique sua resposta e, caso haja problemas, indique sua correção.</p>
+<p>O código é o monitor da seção 2, sem nenhuma diferença.</p>
+<p class="src">Provas-Concorrencia-antigas.pdf, Prova 1.</p>
+</div>
+<div class="box" style="border-left:4px solid var(--ok)">
+<p><strong>Resposta (derivada do material; não é o gabarito oficial)</strong></p>
+<p><strong>(a) Exclusão mútua: depende do <code>if</code> em <code>Start_Write</code>.</strong> A ideia está certa: o leitor espera enquanto há escrita (r1), e o escritor espera enquanto há leitura ou escrita (w1). O problema é que w1 usa <code>if</code>, então o escritor acordado <strong>não testa a condição de novo</strong>. Se, entre o <code>signal</code> e o momento em que o escritor volta a executar, outro processo entrar no monitor, o escritor segue para w2 mesmo assim. Exemplo: o último leitor sai e faz <code>signal(OK_to_Write)</code>; antes de W voltar a executar, chega um leitor novo, vê <code>Writing</code> falso e entra (<code>Readers = 1</code>); W volta e, sem testar, faz <code>Writing = True</code>. Resultado: um escritor e um leitor ao mesmo tempo.</p>
+<p><strong>Correção:</strong> trocar o <code>if</code> de w1 por <code>while</code>, como já é feito em <code>Start_Read</code> e no produtor-consumidor (s.8–9). É a mesma regra do Java: a notificação não garante que a condição é verdadeira (11, s.32).</p>
+<p class="src">Ressalva: os slides não dizem se o processo acordado por <code>signal</code> executa imediatamente ou só depois. Se executar imediatamente, ninguém consegue entrar no meio e o <code>if</code> funciona. Na prova, vale dizer as duas coisas: "com <code>if</code>, a exclusão mútua depende de o processo acordado executar imediatamente; com <code>while</code>, fica garantida em qualquer caso".</p>
+<p><strong>(b) Ausência de starvation: não garante.</strong> Os <strong>escritores</strong> podem sofrer starvation. <code>Start_Read</code> só testa <code>Writing</code>, então um leitor novo entra mesmo com um escritor esperando. Se os leitores se revezarem sem que <code>Readers</code> chegue a 0, o escritor nunca é acordado, porque só o último leitor a sair faz <code>signal(OK_to_Write)</code> (e2). É exatamente a tabela da Prática 1. Pela definição, há starvation: o escritor quer entrar e nunca entra (03, s.5).</p>
+<p><strong>Correção (ideia):</strong> um leitor novo não deve entrar se houver escritor esperando. O monitor tem a operação certa para isso, <code>empty(C)</code> (s.12): em <code>Start_Read</code>, esperar também enquanto <code>!empty(OK_to_Write)</code>:</p>
+<pre><code>void Start_Read {
+  while (Writing || !empty(OK_to_Write)) {wait(OK_to_Read);};
+  Readers = Readers + 1;
+}</code></pre>
+<p class="src">Essa correção foi montada para esta lição, aplicando s.5 e s.12; não está nos slides. Ela dá preferência aos escritores, e com isso uma sequência contínua de escritores poderia atrasar os leitores. Uma solução totalmente justa precisa alternar a preferência entre os dois grupos ao fim de cada escrita. Na prova, o essencial é apontar quem sofre starvation, mostrar por quê, e indicar a ideia da correção.</p>
+</div>
+
+<h2>Questão da prova: Prova 2, questão 3 (com resposta)</h2>
+<div class="box exam">
+<p><strong>Prova 2, questão 3 (3,0 pontos).</strong> Descreva o problema dos leitores e escritores, e sua solução usando monitores.</p>
+</div>
+<div class="box" style="border-left:4px solid var(--ok)">
+<p><strong>Resposta modelo (construída só com o material)</strong></p>
+<p><strong>O problema.</strong> Vários processos compartilham dados. Os leitores apenas leem e não precisam se excluir mutuamente: vários podem ler ao mesmo tempo. Os escritores modificam os dados e precisam excluir todos os outros processos, leitores e escritores (05, s.14). Cada leitor executa em laço <code>Start_Read; Read_the_Data; End_Read</code>, e cada escritor <code>Start_Write; Write_the_Data; End_Write</code> (s.15–16).</p>
+<p><strong>A solução com monitor.</strong> Os procedimentos <code>Start_Read</code>, <code>End_Read</code>, <code>Start_Write</code> e <code>End_Write</code> ficam num monitor, que garante exclusão mútua implícita entre eles: as variáveis de controle nunca são alteradas por dois processos ao mesmo tempo (s.6). O monitor guarda <code>Readers</code> (número de leitores lendo) e <code>Writing</code> (verdadeiro quando alguém escreve), e tem duas variáveis de condição, <code>OK_to_Read</code> e <code>OK_to_Write</code> (s.16–17).</p>
+<ul>
+<li><code>Start_Read</code>: enquanto <code>Writing</code>, espera em <code>OK_to_Read</code>; depois incrementa <code>Readers</code>.</li>
+<li><code>End_Read</code>: decrementa <code>Readers</code>; se chegou a 0, faz <code>signal(OK_to_Write)</code> para acordar um escritor.</li>
+<li><code>Start_Write</code>: se há leitores (<code>Readers &gt; 0</code>) ou alguém escrevendo, espera em <code>OK_to_Write</code>; depois faz <code>Writing = True</code>.</li>
+<li><code>End_Write</code>: faz <code>Writing = False</code>, acorda um escritor com <code>signal(OK_to_Write)</code> e todos os leitores com <code>signal_all(OK_to_Read)</code> (s.17–19).</li>
+</ul>
+<p><code>wait(C)</code> suspende o processo na fila FIFO de C e libera a exclusão mútua do monitor, para que outros possam entrar e mudar a condição; <code>signal(C)</code> acorda o primeiro da fila (s.12).</p>
+<p><strong>Observações que valorizam a resposta:</strong> o teste de <code>Start_Write</code> deveria ser <code>while</code>, e a solução permite starvation de escritores se os leitores não pararem de chegar (ver a questão anterior).</p>
+</div>
+
+<h2>A mesma ideia em Java: 2026-1, questão 7</h2>
+<p>A questão 7 da prova de 2026-1 é este mesmo problema escrito em Java, com três erros: <code>iniciarLeitura</code> e <code>iniciarEscrita</code> chamam <code>wait()</code> sem ser <code>synchronized</code>, e <code>terminarEscrita</code> usa <code>notify()</code> em vez de <code>notifyAll()</code>. A resposta completa está na <a href="./0003-wait-notify-e-por-que-while.html">lição 3</a>. Compare: lá a resposta é "sim, tem problema" pelos mesmos motivos desta lição, ou seja, quem acorda e se testa de novo.</p>
+
+<div class="box ask">
+<p><strong>Dúvida?</strong> Pergunte ao agente. Próxima lição: semáforos e a simulação da questão 2 de 2026-1.</p>
+</div>
+
+<footer><a href="../index.html">← Início</a> · Lição 8 de CIN0145. Fonte: 05-monitores.pdf, slides 12–19.</footer>
+
+<script>
+(function(){
+  function norm(v){ return String(v).trim().replace(/\s/g,'').replace('−','-'); }
+  document.querySelectorAll('button[data-check]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var id = btn.getAttribute('data-check'), tb = document.getElementById(id), fb = document.getElementById(id + 'fb');
+      var wrong = [], blank = 0;
+      tb.querySelectorAll('[data-ans]').forEach(function(el){
+        el.classList.remove('ok','bad');
+        var v = norm(el.value); if (v === '') { blank++; return; }
+        var a = el.getAttribute('data-ans'), ok = el.tagName === 'INPUT' ? Number(v) === Number(a) : v === a;
+        el.classList.add(ok ? 'ok' : 'bad'); if (!ok) wrong.push(el.getAttribute('data-hint'));
+      });
+      if (blank) { fb.className = 'fb'; fb.textContent = 'Preencha todas (' + blank + ' vazia' + (blank > 1 ? 's' : '') + ').'; return; }
+      fb.className = 'fb ' + (wrong.length ? 'bad' : 'ok');
+      fb.textContent = wrong.length ? wrong.length + ' em vermelho. Dica: ' + wrong[0] : 'Tudo certo.';
+    });
+  });
+  function shuffle(a){ for (var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+  var items = [
+    { stem: 'No problema dos leitores e escritores, quem precisa excluir todos os outros processos?',
+      opts: ['os escritores', 'os leitores', 'os dois grupos'], ans: 0,
+      why: 'Leitores não precisam se excluir mutuamente; escritores precisam excluir todos os outros (s.14).' },
+    { stem: 'No monitor dos slides, quem acorda um escritor que está esperando?',
+      opts: ['o último leitor a sair', 'qualquer leitor que sai', 'o primeiro leitor que entra'], ans: 0,
+      why: 'End_Read só faz signal(OK_to_Write) quando Readers chega a 0 (e2).' },
+    { stem: 'Por que o <code>if</code> em <code>Start_Write</code> é um ponto fraco?',
+      opts: ['o escritor acordado não testa de novo', 'o escritor nunca chega a ser acordado', 'o if não pode ser usado em monitor'], ans: 0,
+      why: 'Com if, depois do wait ele segue direto para Writing = True, mesmo que a condição tenha mudado. Mesma regra do while em Java (11, s.32).' },
+    { stem: 'No monitor dos slides, quem pode sofrer starvation?',
+      opts: ['os escritores', 'os leitores', 'ninguém'], ans: 0,
+      why: 'Leitores novos entram mesmo com escritor esperando; se Readers nunca chega a 0, o escritor nunca é acordado.' },
+    { stem: 'A operação de monitor que permite saber se há processos esperando em C é…',
+      opts: ['empty(C)', 'signal(C)', 'minrank(C)'], ans: 0,
+      why: 'empty(C): verdadeiro se a fila de C está vazia (s.12). É a base da correção da starvation.' },
+    { stem: '<code>wait(C)</code> faz o processo…',
+      opts: ['entrar na fila de C e liberar o monitor', 'entrar na fila de C e manter o monitor', 'sair do monitor sem entrar em fila'], ans: 0,
+      why: 'Revisão da lição 7 (s.12).' }
+  ];
+  var root = document.getElementById('quiz'), scoreEl = document.getElementById('score'), answered = 0, right = 0;
+  shuffle(items).forEach(function(it, k){
+    var d = document.createElement('div'); d.className = 'q';
+    d.innerHTML = '<p class="stem">' + (k+1) + '. ' + it.stem + '</p>';
+    var fb = document.createElement('p'); fb.className = 'fb'; var done = false;
+    shuffle(it.opts.map(function(o,i){ return {o:o, i:i}; })).forEach(function(x){
+      var b = document.createElement('button'); b.className = 'opt'; b.innerHTML = x.o;
+      b.addEventListener('click', function(){
+        if (done) return; done = true; answered++; var ok = x.i === it.ans; if (ok) right++;
+        b.classList.add(ok ? 'ok' : 'bad'); fb.className = 'fb ' + (ok ? 'ok' : 'bad');
+        fb.textContent = (ok ? 'Certo. ' : 'Não. A resposta é: ' + it.opts[it.ans] + '. ') + it.why;
+        scoreEl.textContent = 'Placar: ' + right + ' de ' + answered + (answered === items.length ? '. Me mande este placar.' : '');
+      });
+      d.appendChild(b);
+    });
+    d.appendChild(fb); root.appendChild(d);
+  });
+})();
+</script>
+</body>
+</html>

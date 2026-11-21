@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lição 2 — Threads e synchronized em Java</title>
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --rule:#d9d4c7; --accent:#8b2500; --bg:#fffdf8;
+          --ok:#1f6f3a; --bad:#9b1c1c; --soft:#f3efe4; }
+  html { background:var(--bg); }
+  body { max-width: 46rem; margin: 3rem auto 6rem; padding: 0 1.25rem; color:var(--ink);
+         font: 17px/1.6 Georgia, "Iowan Old Style", "Palatino Linotype", serif; }
+  header .kicker { color:var(--muted); font-size:.85rem; letter-spacing:.08em; text-transform:uppercase; }
+  h1 { font-weight: normal; font-size: 2.3rem; line-height:1.15; margin: .2rem 0 .4rem; letter-spacing:-.01em; }
+  .sub { color:var(--muted); font-style: italic; margin: 0 0 2.2rem; }
+  h2 { font-weight: normal; font-size: 1.4rem; margin: 2.8rem 0 .6rem; border-bottom:1px solid var(--rule); padding-bottom:.2rem; }
+  p { margin: .7rem 0; }
+  .src { color:var(--muted); font-size:.82rem; }
+  a { color: var(--accent); }
+  code { font: .88em/1.4 "SF Mono", Menlo, Consolas, monospace; background:var(--soft); padding:0 .25em; border-radius:3px; }
+  pre { background:var(--soft); padding: .8rem 1rem; border-radius:4px; overflow-x:auto; font-size:.86rem; line-height:1.45; }
+  pre code { background:none; padding:0; }
+  .box { border:1px solid var(--rule); border-radius:6px; padding: 1rem 1.2rem; margin: 1.2rem 0; background:#fff; }
+  .box.recall { border-left: 4px solid var(--accent); }
+  .box.task { border-left: 4px solid #2c5282; }
+  .box.ask { background:var(--soft); border:none; }
+  .box.exam { border-left: 4px solid #8a6d00; }
+  nav { font-size:.9rem; color:var(--muted); margin-bottom: 2rem; }
+  nav a { margin-right: .75rem; }
+  .cols { display:grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 600px) { .cols { grid-template-columns: 1fr; } }
+  table { border-collapse: collapse; width:100%; font-size:.95rem; margin:.5rem 0; }
+  td, th { padding:.35rem .5rem; border-bottom:1px solid var(--rule); text-align:left; vertical-align:top; }
+  th { font-weight:normal; color:var(--muted); font-size:.82rem; }
+  /* simulador */
+  .sim .modes { display:flex; gap:.4rem; flex-wrap:wrap; margin-bottom:.8rem; }
+  .sim .modes button { font:inherit; font-size:.88rem; padding:.35rem .7rem; border:1px solid var(--rule); background:#fff; border-radius:4px; cursor:pointer; }
+  .sim .modes button.on { background:var(--ink); color:#fff; border-color:var(--ink); }
+  .sim .thread { background:#fff; border:1px solid var(--rule); border-radius:6px; padding:.8rem 1rem; }
+  .sim .thread h4 { margin:0 0 .5rem; font-weight:normal; font-size:1rem; color:var(--muted); }
+  .sim .thread.locked { border-color:var(--accent); box-shadow: inset 0 0 0 2px #f1d9d0; }
+  .sim .thread.waiting { opacity:.55; }
+  .sim button.step { display:block; width:100%; text-align:left; margin:.3rem 0; padding:.45rem .7rem;
+       font: .9rem "SF Mono", Menlo, Consolas, monospace; background:var(--soft); border:1px solid var(--rule);
+       border-radius:4px; cursor:pointer; color:var(--ink); }
+  .sim button.step:disabled { opacity:.35; cursor:default; }
+  .sim button.step.done { background:#e6efe8; border-color:#b7d1bd; opacity:.7; }
+  .sim .state { display:flex; gap:1.5rem; flex-wrap:wrap; margin:1rem 0 .4rem; font-size:1rem; }
+  .sim .state span { background:#fff; border:1px solid var(--rule); border-radius:4px; padding:.3rem .7rem; }
+  .sim .state b { font-weight:normal; color:var(--muted); }
+  .sim .trace { font: .95rem "SF Mono", Menlo, monospace; min-height:1.5rem; letter-spacing:.15em; }
+  .sim .result { margin:.6rem 0; min-height:1.6rem; }
+  .sim .note { font-size:.9rem; color:var(--muted); margin:.4rem 0 .6rem; min-height:1.2rem; }
+  .sim .goals { list-style:none; padding:0; margin:.6rem 0 0; }
+  .sim .goals li::before { content:"○ "; color:var(--muted); }
+  .sim .goals li.hit::before { content:"● "; color:var(--ok); }
+  button.plain { font: inherit; font-size:.9rem; padding:.35rem .8rem; border:1px solid var(--rule); background:#fff; border-radius:4px; cursor:pointer; }
+  /* quiz */
+  .q { margin: 1.4rem 0; }
+  .q p.stem { margin:.2rem 0 .5rem; }
+  .q button.opt { display:block; width:100%; text-align:left; font:inherit; font-size:.97rem; padding:.45rem .8rem; margin:.3rem 0;
+       background:#fff; border:1px solid var(--rule); border-radius:4px; cursor:pointer; color:var(--ink); }
+  .q button.opt:hover { background:var(--soft); }
+  .q button.opt.ok { border-color:var(--ok); background:#e6efe8; }
+  .q button.opt.bad { border-color:var(--bad); background:#f8e5e5; }
+  .q .fb { font-size:.92rem; margin:.4rem 0 0; min-height:1.2rem; }
+  .q .fb.ok { color:var(--ok); } .q .fb.bad { color:var(--bad); }
+  .score { font-style: italic; color: var(--muted); }
+  footer { margin-top:3rem; border-top:1px solid var(--rule); padding-top:1rem; font-size:.9rem; color:var(--muted); }
+  @media print { body { margin:0; max-width:none; font-size:11pt; } nav, .sim, button { display:none; } }
+</style>
+</head>
+<body>
+<nav><a href="../index.html">Início</a> <a href="../reference/mapa-do-curso.html">Mapa do curso</a> <a href="../reference/glossario.html">Glossário</a> <a href="./0001-interferencia-e-nao-determinismo.html">← Lição 1</a> <a href="./0003-wait-notify-e-por-que-while.html">Lição 3 →</a></nav>
+
+<header>
+  <div class="kicker">Lição 2 · Concorrência em Java</div>
+  <h1>Threads e <code>synchronized</code></h1>
+  <p class="sub">Como criar execução concorrente em Java e como proibir as intercalações que causam interferência. Tempo estimado: 25 minutos. A página é autocontida; as marcações "slide N" são só a origem de cada afirmação.</p>
+</header>
+
+<div class="box recall">
+  <strong>Recuperação da lição 1</strong> (de memória, antes de continuar):
+  <ol>
+    <li>Quais são as três partes em que <code>saldo = saldo + 5</code> é executado?</li>
+    <li>Com saldo inicial 0, a sequência <code>1 A 2 3 B C</code> dá que resultado? E <code>A 1 2 B C 3</code>?</li>
+    <li>Quem escolhe a ordem de intercalação?</li>
+  </ol>
+  <p class="src">Respostas no fim da página, antes do rodapé. Confira só depois de tentar.</p>
+</div>
+
+<h2>1. O remédio: proibir sequências</h2>
+<p>A lição 1 terminou com o diagnóstico: interferência acontece quando comandos compartilham recursos e suas partes se intercalam de forma ruim. O material lista o que fazer: controlar o acesso a recursos compartilhados, <strong>proibir a realização de determinadas sequências de execução</strong> e sincronizar as execuções (uma espera pelo término da outra).</p>
+<p>Em Java, a ferramenta para isso é a palavra <code>synchronized</code>.</p>
+<p class="src">11-Concorrencia.pdf, slides 13–14.</p>
+
+<h2>2. A regra do <code>synchronized</code></h2>
+<p>Duas frases resumem o mecanismo. Decore as duas, porque a prova cobra exatamente isso.</p>
+<div class="box">
+<p><strong>Só um método <code>synchronized</code> pode ser executado em um objeto por vez.</strong> Os outros ficam esperando.</p>
+<p><strong>Vários métodos não sincronizados</strong> podem ser executados, no mesmo objeto, ao mesmo tempo que um método <code>synchronized</code>.</p>
+</div>
+<p>Dito de outra forma: uma thread <em>t</em> tem que esperar por uma thread <em>u</em> quando <em>u</em> está executando um método sincronizado e <em>t</em> quer começar a executar um método sincronizado <strong>do mesmo objeto</strong>. Pode ser o mesmo método ou não.</p>
+<p class="src">11-Concorrencia.pdf, slides 14 e 29.</p>
+
+<h2>3. A conta, agora segura</h2>
+<p>Basta marcar os dois métodos. As partes 1-2-3 e A-B-C continuam existindo, mas agora não podem mais se misturar.</p>
+<pre><code>class Conta {
+  private double saldo = 0;
+
+  synchronized void creditar(double vc) {
+1   double tmpc = saldo;
+2   tmpc = tmpc + vc;
+3   saldo = tmpc;
+  }
+
+  synchronized void debitar(double vd) {
+A   double tmpd = saldo;
+B   tmpd = tmpd - vd;
+C   saldo = tmpd;
+  }
+
+  synchronized double getSaldo() { return saldo; }
+}</code></pre>
+<p>Das muitas sequências possíveis de <code>c.creditar(100) || c.debitar(80)</code>, só duas sobrevivem:</p>
+<table>
+<tr><th>Sequência</th><th>Resultado</th></tr>
+<tr><td><code>1 2 3 A B C</code></td><td>20</td></tr>
+<tr><td><code>A B C 1 2 3</code></td><td>20</td></tr>
+</table>
+<p>O programa ficou <strong>determinístico</strong>: só um resultado é possível. Note que não sabemos <em>qual</em> das duas vai acontecer, e não precisamos saber.</p>
+<p class="src">11-Concorrencia.pdf, slides 15–17.</p>
+
+<h2>4. Modificador e comando são a mesma coisa</h2>
+<p><code>synchronized</code> existe em duas formas, equivalentes:</p>
+<div class="cols">
+<pre><code>synchronized void m(...) {
+  corpo
+}</code></pre>
+<pre><code>void m(...) {
+  synchronized(this) {
+    corpo
+  }
+}</code></pre>
+</div>
+<p>O comando <code>synchronized(x) { ... }</code> impede a execução simultânea de trechos de código sincronizados <strong>no mesmo argumento</strong>. Com o modificador, o argumento é sempre <code>this</code>, o próprio objeto. É por isso que a regra da seção 2 fala em "mesmo objeto": duas contas diferentes podem executar <code>creditar</code> ao mesmo tempo sem problema.</p>
+<p class="src">11-Concorrencia.pdf, slide 18.</p>
+
+<h2>5. Um termo novo: race condition</h2>
+<p>A partir daqui o material usa a expressão <em>race condition</em>, e vale separá-la de <em>interferência</em>. Os slides não a definem; usam-na em dois comentários, e é desse uso que se tira o sentido:</p>
+<ul>
+<li>Uma thread lendo e outra gravando a mesma variável, sem nada que impeça os dois acessos de acontecerem ao mesmo tempo, é uma <strong>race condition</strong>. É um fato sobre os <em>acessos</em>.</li>
+<li><strong>Interferência</strong> é o resultado errado que pode sair disso (lição 1). É um fato sobre o <em>resultado</em>.</li>
+</ul>
+<p>Uma coisa não implica a outra, e o material mostra os dois casos:</p>
+<table>
+<tr><th>Situação</th><th>Race condition?</th><th>Interferência?</th></tr>
+<tr><td><code>getSaldo()</code> sem synchronized, se <code>saldo</code> fosse <code>int</code></td><td>sim</td><td>não</td></tr>
+<tr><td>Leitura e escrita em dois blocos synchronized separados (seção 6, a seguir)</td><td>não</td><td>sim</td></tr>
+</table>
+<p>No primeiro caso o slide diz que, com <code>int</code>, "não precisaria sincronizar: race condition que não implicaria em interferência"; como <code>saldo</code> é <code>double</code>, <code>getSaldo</code> foi marcado como <code>synchronized</code>. O segundo caso é a próxima seção.</p>
+<p>Um terceiro uso, nos slides de Go, aponta no mesmo sentido: os channels evitam "condições de corrida (race conditions) ao garantir que apenas uma goroutine acesse dados por vez". Ou seja, race condition é sobre mais de uma thread acessando o mesmo dado ao mesmo tempo.</p>
+<p class="src">11-Concorrencia.pdf, slides 16 e 19; 09c-Go.pdf, slide 6. A distinção acima é uma leitura do uso do termo nesses três slides; nenhum deles traz uma definição formal.</p>
+
+<h2>6. A armadilha: sincronizar os pedaços errados</h2>
+<p>O material mostra uma versão que <em>parece</em> segura e não é:</p>
+<pre><code>void creditar(double vc) {
+  double tmpc;
+  synchronized(this) { tmpc = saldo; }     // leitura protegida
+  tmpc = tmpc + vc;
+  synchronized(this) { saldo = tmpc; }     // escrita protegida
+}</code></pre>
+<p>Cada acesso a <code>saldo</code> está dentro de um bloco sincronizado, então nunca há duas threads lendo ou gravando <code>saldo</code> no mesmo instante. Mesmo assim, entre a leitura e a escrita de uma thread, a outra pode fazer um ciclo completo. O veredito do material: <strong>não há race conditions, mas pode haver interferências</strong>. O que precisa ser protegido é a sequência ler-calcular-gravar inteira, não cada acesso isolado.</p>
+<p class="src">11-Concorrencia.pdf, slide 19.</p>
+
+<h2>7. Como criar execução concorrente em Java</h2>
+<p>O operador <code>||</code> que usamos nas lições não existe em Java. O que existe são <strong>threads</strong>: sequências ou fluxos de execução que podem ser executados concorrentemente. Os comandos a executar são "empacotados" como objetos da classe <code>java.lang.Thread</code>.</p>
+<p>A receita tem três partes.</p>
+<p><strong>(a) Empacotar o comando.</strong> Uma subclasse de <code>Thread</code> redefine o método <code>run</code>; o corpo de <code>run</code> é o que a thread vai executar.</p>
+<div class="cols">
+<pre><code>class Credito extends Thread {
+  private Conta conta;
+  private double val;
+  Credito(Conta c, double v) {
+    conta = c; val = v;
+  }
+  public void run() {
+    conta.creditar(val);
+  }
+}</code></pre>
+<pre><code>class Debito extends Thread {
+  private Conta conta;
+  private double val;
+  Debito(Conta c, double v) {
+    conta = c; val = v;
+  }
+  public void run() {
+    conta.debitar(val);
+  }
+}</code></pre>
+</div>
+<p><strong>(b) Criar e iniciar.</strong> <code>start()</code> inicia a execução da thread. <strong>(c) Esperar.</strong> <code>join()</code> espera pelo término da thread. Assim, <code>A || B</code> corresponde a:</p>
+<pre><code>Thread a = new ThreadA(...);
+Thread b = new ThreadB(...);
+a.start(); b.start();
+try {
+  a.join(); b.join();
+} catch (InterruptedException e) { ... }</code></pre>
+<p>A frase do material para guardar: <strong>execução concorrente = criação e início de threads</strong>.</p>
+<p class="src">11-Concorrencia.pdf, slides 21–26.</p>
+
+<h2>8. Quando herdar de <code>Thread</code> é um problema</h2>
+<p>Se a classe já herda de outra, use a interface <code>Runnable</code>: implemente <code>run</code> do mesmo jeito e embrulhe o objeto em um <code>Thread</code> na hora de criar.</p>
+<div class="cols">
+<pre><code>class Debito implements Runnable {
+  private Conta conta;
+  private double val;
+  Debito(Conta c, double v) {
+    conta = c; val = v;
+  }
+  public void run() {
+    conta.debitar(val);
+  }
+}</code></pre>
+<pre><code>Thread c = new Credito(...);   // subclasse de Thread
+Thread d;
+d = new Thread(new Debito(...)); // Runnable
+c.start();
+d.start();
+try {
+  c.join(); d.join();
+} catch (InterruptedException e) { ... }</code></pre>
+</div>
+<p class="src">11-Concorrencia.pdf, slides 27–28.</p>
+
+<h2>9. Exemplo resolvido: a Conta com threads de verdade</h2>
+<p>Juntando as seções 3 e 7, este é um programa completo que compila e roda. Ele está em <code>code/0002/ContaThreads.java</code>. Para a interferência aparecer na prática, cada thread repete a operação 100 000 vezes com valor 1. Sem interferência, o saldo final é <strong>0</strong>.</p>
+<pre><code>class Conta {
+  private double saldo = 0;
+
+  synchronized void creditar(double vc) {
+    double tmpc = saldo;
+    tmpc = tmpc + vc;
+    saldo = tmpc;
+  }
+
+  synchronized void debitar(double vd) {
+    double tmpd = saldo;
+    tmpd = tmpd - vd;
+    saldo = tmpd;
+  }
+
+  synchronized double getSaldo() { return saldo; }
+}
+
+class Credito extends Thread {
+  private Conta conta;
+  private double val;
+  Credito(Conta c, double v) { conta = c; val = v; }
+  public void run() {
+    for (int i = 1; i &lt;= 100000; i++) conta.creditar(val);
+  }
+}
+
+class Debito extends Thread {
+  private Conta conta;
+  private double val;
+  Debito(Conta c, double v) { conta = c; val = v; }
+  public void run() {
+    for (int i = 1; i &lt;= 100000; i++) conta.debitar(val);
+  }
+}
+
+public class ContaThreads {
+  public static void main(String[] args) {
+    Conta c = new Conta();
+    Thread cr = new Credito(c, 1);
+    Thread db = new Debito(c, 1);
+    cr.start(); db.start();                 // creditar || debitar
+    try {
+      cr.join(); db.join();
+    } catch (InterruptedException e) {}
+    System.out.println("--&gt; saldo final: " + c.getSaldo());
+  }
+}</code></pre>
+<p>Para rodar, a partir da pasta da disciplina:</p>
+<pre><code>cd code/0002
+javac ContaThreads.java
+java ContaThreads</code></pre>
+<p>Resultados de três execuções nesta máquina, em 2026-11-09:</p>
+<table>
+<tr><th>Versão</th><th>Saldos finais</th></tr>
+<tr><td>Como está acima (com <code>synchronized</code>)</td><td>0 · 0 · 0</td></tr>
+<tr><td>Apagando <code>synchronized</code> de <code>creditar</code> e <code>debitar</code></td><td>14261 · −412 · −8897</td></tr>
+</table>
+<p>Leia o código de baixo para cima: <code>main</code> cria a conta e as duas threads, inicia as duas com <code>start()</code> e espera as duas com <code>join()</code>. Cada <code>run()</code> chama o método da conta em laço. Quem decide a intercalação é o interpretador, e sem <code>synchronized</code> as partes ler-calcular-gravar se misturam como na lição 1.</p>
+<p class="src">Conta e métodos: 11-Concorrencia.pdf, slides 15–16. Credito, Debito, start e join: slides 23–26. O laço de 100 000 repetições e o <code>main</code> completo foram escritos para este workspace.</p>
+
+<h2>Prática 1 · Simulador com lock</h2>
+<p>O mesmo simulador da lição 1, agora com três modos. Em cada modo, tente obter 20, −80 e 100. Anote o que ficou impossível e por quê.</p>
+<div class="sim box" id="sim">
+  <div class="modes">
+    <button data-mode="none" class="on">Sem synchronized</button>
+    <button data-mode="method">Métodos synchronized (seção 3)</button>
+    <button data-mode="blocks">Dois blocos separados (seção 6)</button>
+  </div>
+  <div class="note" id="modenote"></div>
+  <div class="cols">
+    <div class="thread" id="th-c">
+      <h4>creditar(100)</h4>
+      <button class="step" data-t="c" data-i="0">1  tmpc = saldo</button>
+      <button class="step" data-t="c" data-i="1">2  tmpc = tmpc + 100</button>
+      <button class="step" data-t="c" data-i="2">3  saldo = tmpc</button>
+    </div>
+    <div class="thread" id="th-d">
+      <h4>debitar(80)</h4>
+      <button class="step" data-t="d" data-i="0">A  tmpd = saldo</button>
+      <button class="step" data-t="d" data-i="1">B  tmpd = tmpd - 80</button>
+      <button class="step" data-t="d" data-i="2">C  saldo = tmpd</button>
+    </div>
+  </div>
+  <div class="state">
+    <span><b>saldo</b> = <span id="v-saldo">0</span></span>
+    <span><b>tmpc</b> = <span id="v-tmpc">?</span></span>
+    <span><b>tmpd</b> = <span id="v-tmpd">?</span></span>
+    <span><b>lock de this</b>: <span id="v-lock">livre</span></span>
+  </div>
+  <div class="trace" id="trace"></div>
+  <div class="result" id="result"></div>
+  <button class="plain" id="reset">Reiniciar</button>
+  <ul class="goals">
+    <li id="g-none">Sem synchronized: obtenha os três resultados (20, −80, 100)</li>
+    <li id="g-method">Métodos synchronized: tente −80 ou 100 e verifique que só 20 é possível</li>
+    <li id="g-blocks">Dois blocos separados: obtenha −80 ou 100 de novo</li>
+  </ul>
+</div>
+
+<h2>Prática 2 · Quiz</h2>
+<p>Sem consultar o texto. Feedback imediato.</p>
+<div id="quiz"></div>
+<p class="score" id="score"></p>
+
+<h2>Prática 3 · Altere o exemplo resolvido</h2>
+<div class="box task">
+<p>Trabalhe sobre <code>code/0002/ContaThreads.java</code> (seção 9). Em cada etapa, <strong>escreva a previsão antes de rodar</strong>: o saldo final é sempre o mesmo, ou muda de uma execução para outra? Rode cada versão três vezes.</p>
+<p><strong>Etapa 1 · Os dois blocos.</strong> Reescreva <code>creditar</code> e <code>debitar</code> sem o modificador <code>synchronized</code>, usando dois blocos <code>synchronized(this)</code>: um em volta da leitura de <code>saldo</code> e outro em volta da escrita, como na seção 6. Os resultados confirmam a frase "não há race conditions, mas pode haver interferências"?</p>
+<p><strong>Etapa 2 · Runnable e uma terceira thread.</strong> Volte à versão correta e faça duas mudanças:</p>
+<ol>
+<li>Transforme <code>Debito</code> em uma classe que <code>implements Runnable</code> (seção 8). Lembre que o <code>main</code> passa a embrulhá-la num <code>new Thread(...)</code>.</li>
+<li>Crie uma <strong>segunda</strong> thread de débito, com valor 2, e inicie e espere as três threads.</li>
+</ol>
+<p>Antes de rodar, calcule o saldo final esperado. Depois confirme que ele sai igual nas três execuções.</p>
+<p><strong>Etapa 3 · Explique.</strong> Em uma frase: por que, na etapa 2, as três threads não se atrapalham, se duas delas executam o <em>mesmo</em> método <code>debitar</code>?</p>
+<p>Quando terminar, me mande o código e os resultados para eu corrigir. Testei as duas etapas nesta máquina e elas funcionam como o esperado.</p>
+<p class="src">Extra, se quiser comparar com a lição 1: <code>code/0002/Exemplo2.java</code> é o <code>exemplo1.c</code> reescrito em Java (contador sem <code>synchronized</code>, para você acrescentar).</p>
+</div>
+
+<h2>Questão da prova: 2026-1, questão 4 (com resposta)</h2>
+<div class="box exam">
+<p><strong>Questão 4 (1 ponto).</strong> Em Java, ao executar um método <code>synchronized</code> de uma classe, o que acontece se uma thread tentar chamar outro método, também <code>synchronized</code>, da mesma classe?</p>
+<p><strong>Resposta:</strong> "O thread solicitante fica em estado de espera até que o lock do objeto seja liberado."</p>
+<p>Só um método <code>synchronized</code> executa por vez num objeto; a outra thread espera, seja o mesmo método ou outro (11, s.14 e 29). As outras alternativas: o objeto não é clonado; os métodos <em>não</em> executam ao mesmo tempo por serem diferentes; e não há exceção. Repare que a prova diz "da mesma classe" e o material diz "do mesmo objeto": a alternativa certa fala em "lock do objeto".</p>
+<div id="exam" hidden></div>
+</div>
+
+<div class="box">
+<strong>Respostas da recuperação inicial:</strong> (1) <code>tmp = saldo; tmp = tmp + 5; saldo = tmp</code>. (2) <code>1 A 2 3 B C</code> dá −80; <code>A 1 2 B C 3</code> dá 100. (3) O interpretador, de forma arbitrária.
+</div>
+
+<h2>De onde veio esta lição</h2>
+<p>Slides 13 a 29 de <code>11-Concorrencia.pdf</code> (Paulo Borba). Os programas <code>ContaThreads.java</code> e <code>Exemplo2.java</code> foram escritos para este workspace seguindo o padrão desses slides. Leitura opcional, fora do material: Ben-Ari, 2ª ed., seção 2.12 "Concurrency in Java"; Andrews, seção 5.4 "Case Study: Java".</p>
+
+<div class="box ask">
+  <strong>Ficou alguma dúvida?</strong> Pergunte ao agente. Boas perguntas: "por que duas contas diferentes podem rodar <code>creditar</code> ao mesmo tempo?", "o que acontece se eu esquecer o <code>join</code>?", "a prova diz 'da mesma classe', mas o slide diz 'do mesmo objeto'; qual a diferença?".
+</div>
+
+<footer>
+  Próxima lição: <a href="./0003-wait-notify-e-por-que-while.html"><em><code>wait</code>, <code>notify</code> e por que <code>while</code></em></a> — slides 30–36. É a base da questão 7 da prova (2,2 pontos).
+  Referências: <a href="../reference/glossario.html">Glossário</a> · <a href="../reference/mapa-do-curso.html">Mapa do curso</a> · <a href="../reference/guia-da-prova.html">Guia da prova</a>.
+</footer>
+
+<script>
+(function () {
+  // ---------- Simulador ----------
+  var mode = 'none', st, trace, lock; // lock: null | 'c' | 'd'
+  var done = { none: {20:false,'-80':false,100:false}, method: {tried:false}, blocks: {hit:false} };
+  var notes = {
+    none: 'Nenhuma proteção: qualquer intercalação é permitida (lição 1).',
+    method: 'creditar e debitar são synchronized: o primeiro passo de um método pega o lock de this; o outro método só pode começar quando o lock for liberado no último passo.',
+    blocks: 'Só a leitura (1 / A) e a escrita (3 / C) estão em blocos synchronized separados. Cada acesso isolado é protegido, mas o lock é liberado logo depois.'
+  };
+  var ops = {
+    c: [function(){ st.tmpc = st.saldo; }, function(){ st.tmpc = st.tmpc + 100; }, function(){ st.saldo = st.tmpc; }],
+    d: [function(){ st.tmpd = st.saldo; }, function(){ st.tmpd = st.tmpd - 80; }, function(){ st.saldo = st.tmpd; }]
+  };
+  var labels = { c: ['1','2','3'], d: ['A','B','C'] };
+  var btns = Array.prototype.slice.call(document.querySelectorAll('#sim button.step'));
+  function fmt(v){ return v === null ? '?' : String(v).replace('-', '−'); }
+  function canRun(t, i) {
+    if (i !== st.next[t]) return false;
+    if (mode === 'method' && lock && lock !== t) return false;
+    return true;
+  }
+  function render() {
+    document.getElementById('v-saldo').textContent = fmt(st.saldo);
+    document.getElementById('v-tmpc').textContent = fmt(st.tmpc);
+    document.getElementById('v-tmpd').textContent = fmt(st.tmpd);
+    document.getElementById('v-lock').textContent = lock ? (lock === 'c' ? 'com creditar' : 'com debitar') : 'livre';
+    document.getElementById('trace').textContent = trace.join(' ');
+    document.getElementById('modenote').textContent = notes[mode];
+    btns.forEach(function(b){
+      var t = b.dataset.t, i = +b.dataset.i;
+      b.disabled = !canRun(t, i);
+      b.classList.toggle('done', i < st.next[t]);
+    });
+    ['c','d'].forEach(function(t){
+      var el = document.getElementById('th-' + t);
+      el.classList.toggle('locked', mode === 'method' && lock === t);
+      el.classList.toggle('waiting', mode === 'method' && lock && lock !== t && st.next[t] < 3);
+    });
+    var r = document.getElementById('result');
+    if (st.next.c === 3 && st.next.d === 3) {
+      var key = String(st.saldo);
+      r.innerHTML = 'Sequência <code>' + trace.join(' ') + '</code> → saldo final <strong>' + fmt(st.saldo) + '</strong>';
+      if (mode === 'none' && done.none.hasOwnProperty(key)) {
+        done.none[key] = true;
+        if (done.none[20] && done.none['-80'] && done.none[100]) document.getElementById('g-none').classList.add('hit');
+      }
+      if (mode === 'method') { done.method.tried = true; document.getElementById('g-method').classList.add('hit');
+        r.innerHTML += ' — com métodos synchronized, só esta e a sequência espelhada são possíveis.'; }
+      if (mode === 'blocks' && (key === '-80' || key === '100')) { document.getElementById('g-blocks').classList.add('hit');
+        r.innerHTML += ' — cada acesso estava protegido, e mesmo assim houve interferência.'; }
+    } else { r.textContent = ''; }
+  }
+  function reset() { st = { saldo: 0, tmpc: null, tmpd: null, next: { c: 0, d: 0 } }; trace = []; lock = null; render(); }
+  btns.forEach(function(b){
+    b.addEventListener('click', function(){
+      var t = b.dataset.t, i = +b.dataset.i;
+      if (!canRun(t, i)) return;
+      if (mode === 'method') { if (i === 0) lock = t; }
+      ops[t][i](); st.next[t]++; trace.push(labels[t][i]);
+      if (mode === 'method' && i === 2) lock = null;
+      render();
+    });
+  });
+  document.querySelectorAll('#sim .modes button').forEach(function(mb){
+    mb.addEventListener('click', function(){
+      mode = mb.dataset.mode;
+      document.querySelectorAll('#sim .modes button').forEach(function(x){ x.classList.toggle('on', x === mb); });
+      reset();
+    });
+  });
+  document.getElementById('reset').addEventListener('click', reset);
+  reset();
+
+  // ---------- Quiz genérico ----------
+  function buildQuiz(container, Q, scoreEl) {
+    var answered = 0, right = 0;
+    Q.forEach(function(q, qi){
+      var d = document.createElement('div'); d.className = 'q';
+      d.innerHTML = '<p class="stem"><strong>' + (qi+1) + '.</strong> ' + q.stem + '</p>';
+      var fb = document.createElement('p'); fb.className = 'fb';
+      var done = false;
+      q.opts.forEach(function(o, oi){
+        var b = document.createElement('button'); b.className = 'opt'; b.textContent = o;
+        b.addEventListener('click', function(){
+          if (done) return; done = true; answered++;
+          if (oi === q.ans) { right++; b.classList.add('ok'); fb.className = 'fb ok'; fb.textContent = 'Certo. ' + q.why; }
+          else { b.classList.add('bad'); d.querySelectorAll('button.opt')[q.ans].classList.add('ok'); fb.className = 'fb bad'; fb.textContent = 'Não. ' + q.why; }
+          if (scoreEl) scoreEl.textContent = right + ' de ' + answered + ' corretas' + (answered === Q.length ? ' — quiz completo.' : '.');
+        });
+        d.appendChild(b);
+      });
+      d.appendChild(fb); container.appendChild(d);
+    });
+  }
+
+  buildQuiz(document.getElementById('quiz'), [
+    { stem: 'Uma thread está executando um método synchronized de um objeto. Outra thread chama um método <em>não</em> sincronizado do mesmo objeto. O que acontece com a segunda?',
+      opts: ['Ela espera até o método sincronizado terminar', 'Ela executa ao mesmo tempo, sem esperar', 'Ela recebe uma exceção e é encerrada', 'Ela executa somente depois do join final'], ans: 1,
+      why: 'Slide 14: vários métodos não sincronizados podem executar no mesmo objeto ao mesmo tempo que um método synchronized. Só métodos synchronized esperam uns pelos outros.' },
+    { stem: 'Com creditar e debitar marcados como synchronized, quais sequências de execução continuam possíveis?',
+      opts: ['Todas as sequências anteriores, mas sempre com resultado 20', 'Apenas 1 A 2 B 3 C e A 1 B 2 C 3', 'Nenhuma sequência, pois uma das threads bloqueia sempre', 'Apenas 1 2 3 A B C e A B C 1 2 3'], ans: 3,
+      why: 'Slide 17: só as duas sequências em que um método executa inteiro antes do outro. O programa fica determinístico: resultado 20.' },
+    { stem: 'Qual trecho é equivalente a <code>synchronized void m() { corpo }</code>?',
+      opts: ['void m() { synchronized(this) { corpo } }', 'void m() { synchronized(corpo) { this } }', 'synchronized(m) { void corpo() { this } }', 'void m() { this.synchronized { corpo } }'], ans: 0,
+      why: 'Slide 18: o modificador equivale ao comando synchronized com o próprio objeto (this) como argumento.' },
+    { stem: 'Na versão em que a leitura e a escrita de saldo ficam em dois blocos synchronized separados, o que o material afirma?',
+      opts: ['Há race conditions, mas não pode haver interferências', 'Não há race conditions nem pode haver interferências', 'Não há race conditions, mas pode haver interferências', 'Há race conditions e também pode haver interferências'], ans: 2,
+      why: 'Slide 19: os acessos individuais estão protegidos, mas a sequência ler-calcular-gravar não. Entre os dois blocos a outra thread pode agir.' },
+    { stem: 'Segundo o material, a execução concorrente em Java corresponde a quê?',
+      opts: ['Chamada e retorno de métodos', 'Criação e início de threads', 'Declaração e herança de classes', 'Compilação e execução de programas'], ans: 1,
+      why: 'Slide 22: "Execução concorrente = Criação e início de threads". Criar com new, iniciar com start().' },
+    { stem: 'Duas threads chamam creditar() ao mesmo tempo, mas em <em>objetos Conta diferentes</em>. O método é synchronized. Elas se esperam?',
+      opts: ['Sim, pois a classe inteira fica bloqueada', 'Sim, pois o método é o mesmo', 'Não, pois o lock é de cada objeto', 'Não, pois creditar não altera saldo'], ans: 2,
+      why: 'Slides 18 e 29: synchronized impede execução simultânea de trechos sincronizados no mesmo argumento (this). Objetos diferentes têm locks diferentes.' }
+  ], document.getElementById('score'));
+
+  buildQuiz(document.getElementById('exam'), [
+    { stem: '(Prova 2026-1, Q4) Em Java, ao executar um método <code>synchronized</code> de uma classe, o que acontece se uma thread tentar chamar outro método, também <code>synchronized</code>, da mesma classe?',
+      opts: ['O objeto é clonado para permitir que ambos os threads trabalhem em cópias separadas.',
+             'O thread solicitante fica em estado de espera até que o lock do objeto seja liberado.',
+             'Os métodos são executados simultaneamente pois, apesar de serem da mesma classe, são métodos diferentes.',
+             'O sistema lança uma exceção do tipo InterruptedException imediatamente.'], ans: 1,
+      why: 'Slides 14 e 29: só um método synchronized executa por vez em um objeto; a outra thread fica esperando. Pode ser o mesmo método ou não. Repare que a prova diz "da mesma classe" e o material diz "do mesmo objeto"; a alternativa correta fala em "lock do objeto".' }
+  ], null);
+})();
+</script>
+</body>
+</html>

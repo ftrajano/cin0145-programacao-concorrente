@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Programação Concorrente — CIN0145</title>
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --rule:#d9d4c7; --accent:#8b2500; --bg:#fffdf8; --soft:#f3efe4; }
+  html { background:var(--bg); }
+  body { max-width: 46rem; margin: 3rem auto 6rem; padding: 0 1.25rem; color:var(--ink);
+         font: 17px/1.6 Georgia, "Iowan Old Style", "Palatino Linotype", serif; }
+  .kicker { color:var(--muted); font-size:.85rem; letter-spacing:.08em; text-transform:uppercase; }
+  h1 { font-weight: normal; font-size: 2.3rem; line-height:1.15; margin: .2rem 0 .4rem; }
+  .sub { color:var(--muted); font-style: italic; margin: 0 0 2.2rem; }
+  h2 { font-weight: normal; font-size: 1.4rem; margin: 2.6rem 0 .6rem; border-bottom:1px solid var(--rule); padding-bottom:.2rem; }
+  a { color: var(--accent); }
+  code { font: .88em/1.4 "SF Mono", Menlo, Consolas, monospace; background:var(--soft); padding:0 .25em; border-radius:3px; }
+  ol.lessons { list-style:none; padding:0; }
+  ol.lessons li { display:grid; grid-template-columns: 2.6rem 1fr; margin: .9rem 0; }
+  ol.lessons .n { color:var(--muted); font-variant-numeric: tabular-nums; }
+  .d { color:var(--muted); font-size:.93rem; display:block; }
+  ul.refs { padding-left:1.1rem; } ul.refs li { margin:.6rem 0; }
+  footer { margin-top:3rem; border-top:1px solid var(--rule); padding-top:1rem; font-size:.9rem; color:var(--muted); }
+  @media print { body { margin:0; max-width:none; font-size:11pt; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="kicker">CIN0145 · CIn-UFPE · 2026.2</div>
+  <h1>Programação Concorrente</h1>
+  <p class="sub">Lições curtas e interativas a partir dos slides da disciplina, para resolver sem consulta, em 1 hora, provas no estilo da de 2026-1 e das provas antigas dissertativas.</p>
+</header>
+
+<h2>Lições</h2>
+<ol class="lessons">
+  <li><span class="n">0001</span><span><a href="lessons/0001-interferencia-e-nao-determinismo.html">Interferência e não determinismo</a>
+    <span class="d">Dada uma intercalação de comandos, prever o resultado e dizer se houve interferência.</span></span></li>
+  <li><span class="n">0002</span><span><a href="lessons/0002-threads-e-synchronized-em-java.html">Threads e <code>synchronized</code> em Java</a>
+    <span class="d">Criar threads com <code>start</code>/<code>join</code> e usar <code>synchronized</code> para eliminar interferência. Prova: Q4.</span></span></li>
+  <li><span class="n">0003</span><span><a href="lessons/0003-wait-notify-e-por-que-while.html"><code>wait</code>, <code>notify</code> e por que <code>while</code></a>
+    <span class="d">Fazer uma thread esperar uma condição e achar os erros de <code>wait</code>/<code>notify</code> num código Java. Prova: Q1 (parcial), Q7.</span></span></li>
+  <li><span class="n">0004</span><span><a href="lessons/0004-recomeco-revisao-e-primeira-dissertativa.html">Recomeço: revisão e primeira dissertativa</a>
+    <span class="d">Recuperar de memória as lições 1–3 e escrever uma resposta dissertativa sobre por que concorrência é difícil. Provas antigas: P1 Q1.</span></span></li>
+  <li><span class="n">0005</span><span><a href="lessons/0005-wait-e-notify-passo-a-passo.html"><code>wait</code> e <code>notify</code>, passo a passo</a>
+    <span class="d">Rastrear numa tabela o que <code>wait</code>, <code>notify</code> e <code>notifyAll</code> fazem e achar os três erros clássicos num código Java. Prova: 2026 Q1, Q7.</span></span></li>
+  <li><span class="n">0006</span><span><a href="lessons/0006-exclusao-mutua-propriedades-e-tentativa-1.html">Exclusão mútua: as propriedades e a tentativa 1</a>
+    <span class="d">Listar as cinco propriedades de uma solução, reconhecer qual foi violada numa situação e mostrar por que a tentativa 1 falha. Provas antigas: P2 Q1, P3 Q1.</span></span></li>
+  <li><span class="n">0007</span><span><a href="lessons/0007-monitores.html">Monitores</a>
+    <span class="d">Explicar o que é um monitor e suas vantagens, e rastrear <code>wait(C)</code>/<code>signal(C)</code> no produtor-consumidor. Prova: 2026 Q3; provas antigas: P3 Q1.</span></span></li>
+  <li><span class="n">0008</span><span><a href="lessons/0008-leitores-e-escritores-com-monitor.html">Leitores e escritores com monitor</a>
+    <span class="d">Explicar o monitor leitores-escritores dos slides e dizer onde ele falha (o <code>if</code> e a starvation de escritores). Provas antigas: P1 Q5, P2 Q3; ligação com 2026 Q7.</span></span></li>
+</ol>
+
+<h2>Referência</h2>
+<ul class="refs">
+  <li><a href="reference/glossario.html">Glossário</a> <span class="d">Os termos do curso com a definição dos slides e a origem de cada uma.</span></li>
+  <li><a href="reference/mapa-do-curso.html">Mapa do curso</a> <span class="d">O material da pasta, a ordem das lições e em que capítulo dos livros cada tema está.</span></li>
+  <li><a href="reference/guia-da-prova.html">Guia das provas</a> <span class="d">As questões das 4 provas (2026-1 e três antigas), os temas que mais caem e onde cada um está no material.</span></li>
+</ul>
+
+<footer>Material base: os slides da disciplina na pasta. Dúvidas sobre qualquer lição: pergunte ao agente.</footer>
+</body>
+</html>

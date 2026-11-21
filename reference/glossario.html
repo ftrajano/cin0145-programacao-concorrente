@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glossário — Programação Concorrente</title>
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --rule:#d9d4c7; --accent:#8b2500; --bg:#fffdf8; }
+  html { background:var(--bg); }
+  body { max-width: 46rem; margin: 3rem auto 6rem; padding: 0 1.25rem; color:var(--ink);
+         font: 17px/1.55 Georgia, "Iowan Old Style", "Palatino Linotype", serif; }
+  h1 { font-weight: normal; font-size: 2.2rem; margin: 0 0 .25rem; letter-spacing:-.01em; }
+  .sub { color:var(--muted); font-style: italic; margin: 0 0 2rem; }
+  h2 { font-weight: normal; font-size: 1.35rem; margin: 2.5rem 0 .5rem; border-bottom: 1px solid var(--rule); padding-bottom:.2rem; }
+  dl { margin: 0; }
+  dt { font-weight: bold; margin-top: 1.1rem; }
+  dt code { font-weight: normal; }
+  dd { margin: .15rem 0 0 0; }
+  .src { display:block; color:var(--muted); font-size: .85rem; margin-top:.15rem; }
+  code { font: .9em/1.4 "SF Mono", Menlo, Consolas, monospace; background:#f3efe4; padding:0 .25em; border-radius:3px; }
+  a { color: var(--accent); }
+  nav { font-size:.9rem; color:var(--muted); margin-bottom: 2rem; }
+  nav a { margin-right: .75rem; }
+  @media print { body { margin: 0; max-width:none; font-size: 11pt; } nav { display:none; } }
+</style>
+</head>
+<body>
+<nav><a href="../index.html">Início</a> <a href="./mapa-do-curso.html">Mapa do curso</a> <a href="../lessons/0001-interferencia-e-nao-determinismo.html">Lição 1</a></nav>
+<h1>Glossário</h1>
+<p class="sub">Vocabulário da disciplina CIN0145, com a definição <em>tal como aparece nos slides</em>. Cada verbete indica o arquivo e o slide de origem.</p>
+
+<h2>Fundamentos</h2>
+<dl>
+<dt>Execução sequencial</dt>
+<dd>Os comandos são executados em sequência, um após o outro; o resultado da execução é sempre o mesmo.
+<span class="src">11-Concorrencia.pdf, slide 2</span></dd>
+
+<dt>Execução concorrente</dt>
+<dd>Dois ou mais comandos podem ser executados ao mesmo tempo. É possível porque pode-se executar cada comando em um processador diferente (paralelismo), ou dividir o tempo de um processador para executar os vários comandos, parte a parte.
+<span class="src">11-Concorrencia.pdf, slides 3 e 5</span></dd>
+
+<dt>Paralelismo</dt>
+<dd>Executar cada um dos comandos em um processador diferente.
+<span class="src">11-Concorrencia.pdf, slide 5</span></dd>
+
+<dt>Comando não atômico</dt>
+<dd>Os comandos normalmente não são atômicos: até uma atribuição como <code>saldo = saldo + 5</code> é executada por partes, como a sequência <code>tmp = saldo; tmp = tmp + 5; saldo = tmp</code>.
+<span class="src">11-Concorrencia.pdf, slides 5–6</span></dd>
+
+<dt>Não determinismo</dt>
+<dd>A execução concorrente pode gerar mais de um resultado; depende da ordem escolhida para executar as partes dos comandos. A escolha é arbitrária, feita pelo interpretador.
+<span class="src">11-Concorrencia.pdf, slide 9</span></dd>
+
+<dt>Interferência</dt>
+<dd>A execução de um comando pode interferir na execução de outro. Ocorre quando os comandos compartilham (concorrem) pelos mesmos recursos (atributos, variáveis etc.); resultados não desejados podem ser gerados.
+<span class="src">11-Concorrencia.pdf, slide 12</span></dd>
+
+<dt>Race condition</dt>
+<dd>Duas threads acessando a mesma variável sem nada que impeça os acessos de ocorrerem ao mesmo tempo (fato sobre os <em>acessos</em>); interferência é o resultado errado (fato sobre o <em>resultado</em>). O material usa o termo sem defini-lo formalmente e mostra que um não implica o outro: race condition sem interferência (slide 16, <code>getSaldo</code> se fosse <code>int</code>) e interferência sem race conditions (slide 19, dois blocos synchronized separados). Os slides de Go dizem que channels evitam "condições de corrida (race conditions) ao garantir que apenas uma goroutine acesse dados por vez". Esta definição é uma leitura do uso nos slides.
+<span class="src">11-Concorrencia.pdf, slides 16 e 19; 09c-Go.pdf, slide 6</span></dd>
+
+<dt>Sincronização</dt>
+<dd>Para evitar interferências indesejadas: controlar o acesso a recursos compartilhados, proibir determinadas sequências de execução e sincronizar as execuções (uma espera pelo término da outra).
+<span class="src">11-Concorrencia.pdf, slide 13</span></dd>
+
+<dt>Thread</dt>
+<dd>Sequências ou fluxos de execução que podem ser executados concorrentemente; os comandos a serem executados são "empacotados" como threads (objetos de <code>java.lang.Thread</code>).
+<span class="src">11-Concorrencia.pdf, slide 21</span></dd>
+
+<dt><code>wait</code> / <code>notify</code> / <code>notifyAll</code> (Java)</dt>
+<dd><code>wait</code>: só dentro de método <code>synchronized</code>; põe a thread para esperar uma notificação e libera a restrição de sincronização (outro método sincronizado pode começar no mesmo objeto). <code>notifyAll</code> acorda todas as threads esperando por um método do objeto; <code>notify</code> acorda só uma, escolhida arbitrariamente pelo interpretador. O teste antes do <code>wait</code> usa <code>while</code>, não <code>if</code>: a notificação avisa que talvez seja possível, mas não garante.
+<span class="src">11-Concorrencia.pdf, slides 30–35</span></dd>
+
+<dt>Deadlock</dt>
+<dd>Todos os threads parados, um esperando pelo outro. Nos slides de exclusão mútua: o programa não pode entrar em deadlock — se processos tentam entrar em sua região crítica, um deles deve conseguir. Em deadlock nenhuma sequência resulta em sucesso.
+<span class="src">11-Concorrencia.pdf, slide 36; 03-ExclusaoMutua.pdf, slides 4 e 21</span></dd>
+
+<dt>Livelock</dt>
+<dd>Threads executando mas não gerando nada que possa ser observado pelo usuário. Em livelock existe uma ou mais sequências que evita que os processos entrem na região crítica.
+<span class="src">11-Concorrencia.pdf, slide 36; 03-ExclusaoMutua.pdf, slide 21</span></dd>
+
+<dt>Starvation</dt>
+<dd>Não deve haver starvation: se um processo quer entrar na região crítica, em algum momento ele entrará.
+<span class="src">03-ExclusaoMutua.pdf, slide 5</span></dd>
+</dl>
+
+<h2>Java (slides de Paulo Borba)</h2>
+<dl>
+<dt><code>synchronized</code></dt>
+<dd>Só um método <code>synchronized</code> pode ser executado em um objeto por vez; os outros ficam esperando. Vários métodos não sincronizados podem executar no mesmo objeto ao mesmo tempo que um sincronizado. O modificador equivale a <code>synchronized(this) { corpo }</code>.
+<span class="src">11-Concorrencia.pdf, slides 14 e 18</span></dd>
+
+<dt><code>wait</code></dt>
+<dd>Só pode ser chamado dentro de um método <code>synchronized</code>; coloca o thread para esperar por uma notificação; libera a restrição de sincronização. Usar <code>while</code> e não <code>if</code>: a notificação avisa que <em>talvez</em> seja possível prosseguir, mas não garante.
+<span class="src">11-Concorrencia.pdf, slides 32 e 34</span></dd>
+
+<dt><code>notify</code> / <code>notifyAll</code></dt>
+<dd><code>notifyAll</code> acorda todos os threads esperando para executar um método do objeto; <code>notify</code> acorda só um, escolhido arbitrariamente pelo interpretador.
+<span class="src">11-Concorrencia.pdf, slide 35</span></dd>
+</dl>
+
+<h2>Exclusão mútua</h2>
+<dl>
+<dt>Seção crítica / seção não crítica</dt>
+<dd>N processos executam loop infinito com uma seção crítica e uma não crítica. Exclusão mútua: instruções das regiões críticas de dois ou mais processos não podem ser executadas ao mesmo tempo.
+<span class="src">03-ExclusaoMutua.pdf, slide 2</span></dd>
+
+<dt>Pré-protocolo e pós-protocolo</dt>
+<dd>Instruções adicionais antes e depois da seção crítica: <code>loop Non_Critical_Section; Pre_Protocol; Critical_Section; Post_Protocol; end loop</code>.
+<span class="src">03-ExclusaoMutua.pdf, slide 3</span></dd>
+
+<dt>Ausência de contenção</dt>
+<dd>Se não houver contenção na região crítica, um processo que queira entrar conseguirá, com overhead mínimo. Um processo pode parar fora da região crítica sem interferir com outros.
+<span class="src">03-ExclusaoMutua.pdf, slides 4–5</span></dd>
+
+<dt>Busy waiting</dt>
+<dd>Protocolos que usam busy waiting: difíceis de projetar, compreender e provar corretos; complexos; variáveis de sincronização idênticas às outras; ineficientes.
+<span class="src">04-semaforos1.pptx.pdf, slide 2</span></dd>
+
+<dt>Algoritmo de Dekker</dt>
+<dd>Combina as flags <code>C1</code>, <code>C2</code> com a variável <code>Turn</code>; há prova de ausência de starvation.
+<span class="src">03-ExclusaoMutua.pdf, slides 22–24</span></dd>
+
+<dt>Algoritmo da padaria</dt>
+<dd>Exclusão mútua de n processos: cada processo pega um ticket e aguarda até que seu ticket seja o menor.
+<span class="src">03-ExclusaoMutua.pdf, slides 25–27</span></dd>
+
+<dt>Test-and-Set / Exchange</dt>
+<dd>Exclusão mútua assistida por hardware: load e store em uma única instrução. <code>Test_and_Set</code>: <code>Li := C; C := 1</code>. <code>Exchange(A,B)</code>: troca os valores.
+<span class="src">03-ExclusaoMutua.pdf, slides 28–30</span></dd>
+</dl>
+
+<h2>Semáforos</h2>
+<dl>
+<dt>Semáforo</dt>
+<dd>Tipo abstrato de dados com duas operações: <code>P(S)</code> (também chamada <em>wait</em>; atrasa um processo até que um evento ocorra) e <code>V(S)</code> (também chamada <em>signal</em>; sinaliza a ocorrência de um evento). <code>P(s)</code> ≡ <code>&lt;await (s &gt; 0) -&gt; s := s – 1&gt;</code>; <code>V(s)</code> ≡ <code>&lt;s := s + 1&gt;</code>.
+<span class="src">04-semaforos1.pptx.pdf, slides 5 e 8</span></dd>
+
+<dt>Invariante do semáforo</dt>
+<dd><code>s = init + nV – nP</code> e <code>s ≥ 0</code>, onde nP e nV são os números de operações P e V completadas. Para a região crítica: <code>#CS + S = 1</code>, logo <code>#CS ≤ 1</code>.
+<span class="src">04-semaforos1.pptx.pdf, slides 6–7 e 11</span></dd>
+
+<dt>Semáforo binário / genérico</dt>
+<dd>Genérico assume valores não negativos; binário assume apenas 0 ou 1.
+<span class="src">04-semaforos1.pptx.pdf, slide 9</span></dd>
+
+<dt>Blocked-set / blocked-queue / busy-wait</dt>
+<dd>Blocked-set: um sinal acorda um dos processos suspensos (starvation possível para N ≥ 3). Blocked-queue: fila FIFO, acordados na ordem (starvation impossível). Busy-wait: processos testam S em loop, teste atômico (starvation possível).
+<span class="src">04-semaforos1.pptx.pdf, slides 14–15 e 17–19</span></dd>
+
+<dt>Strongly-fair / weakly-fair</dt>
+<dd>Strongly-fair: se sinalizado infinitamente frequente, todos os processos esperando serão acordados. Weakly-fair: se mantido com valor maior que zero, todos os esperando serão atendidos.
+<span class="src">04-semaforos1.pptx.pdf, slide 16</span></dd>
+
+<dt>Produtor-consumidor</dt>
+<dd>Problema de comunicação: produtores geram dados (<code>Produce</code>) que devem ser enviados aos consumidores (<code>Consume</code>). Soluções com buffer de tamanho 1, buffer circular e múltiplos produtores/consumidores.
+<span class="src">04-semaforos1.pptx.pdf, slides 20–23</span></dd>
+
+<dt>Exclusão mútua seletiva</dt>
+<dd>Jantar dos filósofos (processos competem por conjuntos sobrepostos de variáveis compartilhadas) e leitores-escritores (combinação de acesso concorrente e exclusivo).
+<span class="src">04-semaforos1.pptx.pdf, slide 24</span></dd>
+</dl>
+
+<h2>Monitores</h2>
+<dl>
+<dt>Monitor</dt>
+<dd>Usa o conceito de ADT: processos interagem apenas por chamadas aos procedimentos do monitor. Exclusão mútua implícita entre os procedimentos; variáveis de condição para sincronização de condição.
+<span class="src">05-monitores.pdf, slides 3–5</span></dd>
+
+<dt>Variável de condição</dt>
+<dd><code>wait(C)</code>: suspende o processo em fila FIFO associada a C e libera a exclusão mútua. <code>signal(C)</code>: se a fila não está vazia, acorda o primeiro; senão não faz nada. <code>empty(C)</code>: true se a fila está vazia. Às vezes também <code>wait(C,rank)</code>, <code>minrank(C)</code>, <code>signal_all(C)</code>.
+<span class="src">05-monitores.pdf, slides 9–10</span></dd>
+
+<dt>Barbeiro que dorme</dt>
+<dd>Barbearia com duas portas e cadeiras de espera; barbeiro atende um cliente por vez e dorme se faltam clientes. Relação cliente-servidor; rendezvous. A barbearia é o monitor (<code>get_haircut</code>, <code>get_next_customer</code>, <code>finished_cut</code>).
+<span class="src">05-monitores.pdf, slides 19–23</span></dd>
+</dl>
+
+<h2>Troca de mensagens, Ada e Go</h2>
+<dl>
+<dt>Programação distribuída</dt>
+<dd>Processos se comunicam enviando mensagens entre si; não há compartilhamento de memória. Primitivas <code>send</code> e <code>receive</code> sobre canais.
+<span class="src">07-distribprog.pdf, slides 2–5</span></dd>
+
+<dt>Comunicação síncrona</dt>
+<dd>Envio da mensagem é ação atômica; participação dos dois processos; sincronização das execuções; rendezvous; o primeiro a chegar espera pelo outro. Exemplo: telefone.
+<span class="src">07-distribprog.pdf, slide 7</span></dd>
+
+<dt>Comunicação assíncrona</dt>
+<dd>Mensagem enviada sem bloqueio; recebimento com ou sem bloqueio; buffering (se o buffer estiver cheio o processo poderá ser bloqueado). Exemplo: correio. Pode ser implementada usando comunicação síncrona.
+<span class="src">07-distribprog.pdf, slide 8</span></dd>
+
+<dt>Rendezvous (Ada)</dt>
+<dd>Comunicação síncrona, sem buffers; duas tasks se encontram para se comunicar; a <em>accepting task</em> é a dona do rendezvous; a <em>calling task</em> precisa saber a identidade da accepting task e o nome do local do rendezvous. Modelo assimétrico, bom para servidores. Fluxo de dados nas duas direções.
+<span class="src">08-Ada.pdf, slides 3–4 e 9</span></dd>
+
+<dt><code>entry</code> / <code>accept</code> / <code>select</code></dt>
+<dd>Entries ficam na <em>specification</em> da task; <code>accept</code> no <em>body</em>. No <code>select</code>, as guardas <code>when</code> geram o conjunto de alternativas abertas; deve haver pelo menos uma ou um <code>else</code>; a última alternativa pode ser <code>else</code>, <code>delay T</code> ou <code>terminate</code>.
+<span class="src">08-Ada.pdf, slides 5–6 e 10–12</span></dd>
+
+<dt>Goroutine</dt>
+<dd>Threads de nível de usuário (lightweight threads) extremamente leves, gerenciadas pela runtime do Go. Criadas com <code>go</code> antes de uma função.
+<span class="src">09c-Go.pdf, slides 2 e 5</span></dd>
+
+<dt>Channel (CSP)</dt>
+<dd>Base teórica: CSP (Communicating Sequential Processes), de Tony Hoare — os processos não devem compartilhar memória para se comunicar; devem "comunicar-se para compartilhar memória". Canais bidirecionais (<code>chan</code>) ou unidirecionais (<code>chan&lt;-</code>, <code>&lt;-chan</code>); buffered channels com <code>make(chan T, n)</code>.
+<span class="src">09c-Go.pdf, slides 3, 8 e 10</span></dd>
+
+<dt>Scheduler M:N</dt>
+<dd>A runtime do Go mapeia M goroutines em N threads do sistema operacional, otimizando o uso de múltiplos núcleos.
+<span class="src">09c-Go.pdf, slide 4</span></dd>
+</dl>
+</body>
+</html>

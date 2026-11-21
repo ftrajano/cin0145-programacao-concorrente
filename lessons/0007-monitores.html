@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lição 7 — Monitores</title>
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --rule:#d9d4c7; --accent:#8b2500; --bg:#fffdf8;
+          --ok:#1f6f3a; --bad:#9b1c1c; --soft:#f3efe4; --hi:#f6e3b4; }
+  html { background:var(--bg); }
+  body { max-width: 50rem; margin: 3rem auto 6rem; padding: 0 1.25rem; color:var(--ink);
+         font: 17px/1.6 Georgia, "Iowan Old Style", "Palatino Linotype", serif; }
+  header .kicker { color:var(--muted); font-size:.85rem; letter-spacing:.08em; text-transform:uppercase; }
+  h1 { font-weight: normal; font-size: 2.3rem; line-height:1.15; margin: .2rem 0 .4rem; letter-spacing:-.01em; }
+  .sub { color:var(--muted); font-style: italic; margin: 0 0 2.2rem; }
+  h2 { font-weight: normal; font-size: 1.4rem; margin: 2.8rem 0 .6rem; border-bottom:1px solid var(--rule); padding-bottom:.2rem; }
+  p { margin: .7rem 0; }
+  .src { color:var(--muted); font-size:.82rem; }
+  a { color: var(--accent); }
+  code { font: .88em/1.4 "SF Mono", Menlo, Consolas, monospace; background:var(--soft); padding:0 .25em; border-radius:3px; }
+  pre { background:var(--soft); padding: .8rem 1rem; border-radius:4px; overflow-x:auto; font-size:.86rem; line-height:1.45; }
+  pre code { background:none; padding:0; }
+  .box { border:1px solid var(--rule); border-radius:6px; padding: 1rem 1.2rem; margin: 1.2rem 0; background:#fff; }
+  .box.recall { border-left: 4px solid var(--accent); }
+  .box.ask { background:var(--soft); border:none; }
+  .box.exam { border-left: 4px solid #8a6d00; }
+  .box.warn { border-left: 4px solid #8a6d00; background:#fffaf0; }
+  nav { font-size:.9rem; color:var(--muted); margin-bottom: 2rem; }
+  nav a { margin-right: .75rem; }
+  details summary { cursor:pointer; color:var(--accent); font-size:.92rem; }
+  .wrap { overflow-x:auto; }
+  table { border-collapse: collapse; width:100%; font-size:.9rem; margin:.5rem 0; }
+  td, th { padding:.35rem .5rem; border-bottom:1px solid var(--rule); text-align:left; vertical-align:top; }
+  th { font-weight:normal; color:var(--muted); font-size:.8rem; }
+  td.t { color:var(--muted); font-variant-numeric: tabular-nums; width:2rem; }
+  td.s { font-family: "SF Mono", Menlo, monospace; font-size:.85rem; white-space:nowrap; }
+  tr.key td { background:var(--hi); }
+  .spin { color:#2c5282; }
+  .cs { font-weight:bold; }
+  table.trace select { font: .85rem "SF Mono", Menlo, monospace; padding:.15rem .3rem; border:1px solid var(--rule); border-radius:3px; background:#fff; color:var(--ink); max-width:100%; }
+  table.trace .ok { border-color:var(--ok); background:#e6efe8; }
+  table.trace .bad { border-color:var(--bad); background:#f8e5e5; }
+  ol.props li { margin:.5rem 0; }
+  .q { margin: 1.4rem 0; }
+  .q p.stem { margin:.2rem 0 .5rem; }
+  .q button.opt { display:block; width:100%; text-align:left; font:inherit; font-size:.97rem; padding:.45rem .8rem; margin:.3rem 0;
+       background:#fff; border:1px solid var(--rule); border-radius:4px; cursor:pointer; color:var(--ink); }
+  .q button.opt:hover { background:var(--soft); }
+  .q button.opt.ok { border-color:var(--ok); background:#e6efe8; }
+  .q button.opt.bad { border-color:var(--bad); background:#f8e5e5; }
+  .fb { font-size:.92rem; margin:.4rem 0 0; min-height:1.2rem; }
+  .fb.ok { color:var(--ok); } .fb.bad { color:var(--bad); }
+  .score { font-style: italic; color: var(--muted); }
+  button.plain { font: inherit; font-size:.9rem; padding:.35rem .8rem; border:1px solid var(--rule); background:#fff; border-radius:4px; cursor:pointer; }
+  button.plain:disabled { opacity:.4; cursor:default; }
+  textarea { width:100%; box-sizing:border-box; min-height:11rem; font: 1rem/1.5 Georgia, serif; padding:.7rem; border:1px solid var(--rule); border-radius:4px; background:#fff; color:var(--ink); }
+  .wc { font-size:.85rem; color:var(--muted); }
+  .check { display:none; } .check.on { display:block; }
+  .check label { display:block; margin:.5rem 0; padding-left:1.6rem; text-indent:-1.6rem; }
+  footer { margin-top:3rem; border-top:1px solid var(--rule); padding-top:1rem; font-size:.9rem; color:var(--muted); }
+  @media print { body { margin:0; max-width:none; font-size:11pt; } nav, button, textarea, select { display:none; } .check { display:block; } }
+  table.trace input { font: .85rem "SF Mono", Menlo, monospace; width:4.5rem; padding:.15rem .3rem; border:1px solid var(--rule); border-radius:3px; background:#fff; color:var(--ink); }
+  .sleep { color:var(--muted); font-style:italic; }
+</style>
+
+</head>
+<body>
+<nav><a href="../index.html">Início</a> <a href="../reference/glossario.html">Glossário</a> <a href="../reference/guia-da-prova.html">Guia das provas</a> <a href="./0006-exclusao-mutua-propriedades-e-tentativa-1.html">← Lição 6</a> <a href="./0008-leitores-e-escritores-com-monitor.html">Lição 8 →</a></nav>
+
+<header>
+  <div class="kicker">Lição 7 · Modo prova · Monitores</div>
+  <h1>Monitores</h1>
+  <p class="sub">O mecanismo que caiu nas quatro provas: o que é, por que é melhor, e como <code>wait(C)</code> e <code>signal(C)</code> funcionam. Tempo estimado: 35 minutos. "s.N" indica a origem (05-monitores.pdf, salvo indicação).</p>
+</header>
+
+<div class="box recall">
+<p><strong>Aquecimento, de memória:</strong></p>
+<ol>
+<li>Quais são as cinco propriedades de uma solução para a exclusão mútua?</li>
+<li>Em Java, o que <code>wait()</code> faz com o lock?</li>
+</ol>
+<details><summary>Ver respostas</summary>
+<p>1. Exclusão mútua; parar fora não atrapalha; sem deadlock; sem starvation; sem contenção entra com overhead mínimo (03, s.2–5). 2. Solta o lock enquanto a thread espera (11, s.34).</p>
+</details>
+</div>
+
+<h2>1. Por que inventaram monitores</h2>
+<p>Semáforos (o tema da lição 9) também resolvem exclusão mútua, mas os slides listam os problemas deles <span class="src">s.2</span>:</p>
+<ul>
+<li>as variáveis compartilhadas são <strong>globais</strong>, e o acesso a elas fica <strong>espalhado</strong> pelo programa;</li>
+<li>para entender como elas são usadas, é preciso <strong>consultar o programa inteiro</strong>; a cada novo processo, é preciso verificar se ele as usa corretamente;</li>
+<li>a <strong>mesma estrutura</strong> é usada para duas coisas diferentes: exclusão mútua e sincronização de condição.</li>
+</ul>
+
+<h2>2. O que é um monitor</h2>
+<p>Um monitor aplica a ideia de <strong>tipo abstrato de dados (ADT)</strong>: os dados ficam escondidos e só são manipulados pelas operações que o tipo oferece. Dados e operações ficam num único lugar. <span class="src">s.3–4</span></p>
+<pre><code>monitor Nome {
+   dados compartilhados        ← ninguém de fora mexe direto
+   variáveis de condição
+   procedimento 1 { ... }      ← processos só interagem chamando estes
+   procedimento 2 { ... }
+}</code></pre>
+<p>As duas regras que fazem dele um mecanismo de concorrência <span class="src">s.6, 12</span>:</p>
+<table>
+<tr><th>Necessidade</th><th>Como o monitor resolve</th></tr>
+<tr><td><strong>Exclusão mútua</strong></td><td><strong>implícita</strong> entre os procedimentos do monitor: só um processo executa dentro do monitor por vez, sem o programador escrever nada para isso</td></tr>
+<tr><td><strong>Sincronização de condição</strong> (esperar até algo ficar verdadeiro)</td><td><strong>variáveis de condição</strong>, com <code>wait(C)</code> e <code>signal(C)</code></td></tr>
+</table>
+<p><strong>Vantagens</strong>, nas palavras dos slides <span class="src">s.5–7</span>. Esta lista responde à questão 3 de 2026-1 e à parte "monitores" de várias dissertativas:</p>
+<ul>
+<li>processos interagem <strong>apenas</strong> através de chamadas aos procedimentos do monitor;</li>
+<li>o monitor estará correto <strong>independentemente do número de processos</strong> que o usam; dá para ignorar como e onde os procedimentos são chamados;</li>
+<li><strong>exclusão mútua implícita</strong> entre os procedimentos;</li>
+<li>podem ser implementados <strong>eficientemente</strong>;</li>
+<li>permitem o desenvolvimento por <strong>equipes independentes</strong> dos processos e dos monitores;</li>
+<li><strong>facilitam</strong> o desenvolvimento e o entendimento dos programas concorrentes.</li>
+</ul>
+
+<h2>3. As operações sobre variáveis de condição</h2>
+<table>
+<tr><th>Operação</th><th>O que faz</th><th></th></tr>
+<tr><td><code>wait(C)</code></td><td>suspende o processo numa <strong>fila FIFO</strong> associada a C, e <strong>libera a exclusão mútua</strong></td><td class="src">s.12</td></tr>
+<tr><td><code>signal(C)</code></td><td>se a fila de C <strong>não está vazia</strong>, acorda o processo do <strong>início</strong> da fila; caso contrário, <strong>não faz nada</strong></td><td class="src">s.12</td></tr>
+<tr><td><code>empty(C)</code></td><td>verdadeiro se a fila de C está vazia</td><td class="src">s.12</td></tr>
+<tr><td><code>signal_all(C)</code></td><td>acorda <strong>todos</strong> os processos suspensos em C</td><td class="src">s.14</td></tr>
+<tr><td><code>wait(C, rank)</code></td><td>como <code>wait</code>, mas os processos são acordados em ordem crescente de rank (<code>minrank(C)</code> retorna o rank do primeiro da fila)</td><td class="src">s.14</td></tr>
+</table>
+<p>Guarde o detalhe de <code>signal</code>: <strong>com a fila vazia, o sinal se perde</strong>. Ele não fica guardado para quem chegar depois. Essa diferença volta na lição de semáforos.</p>
+<p class="src">Os slides dizem que signal_all, wait com rank e minrank são "disponíveis (às vezes)" (s.13–14).</p>
+
+<h2>4. Exemplo resolvido: produtor-consumidor</h2>
+<p>Um buffer com <code>N</code> posições. O produtor coloca itens (<code>Append</code>), o consumidor tira (<code>Take</code>). Quem coloca num buffer cheio espera; quem tira de um buffer vazio espera. <span class="src">s.8–10</span></p>
+<pre><code>monitor Producer_Consumer_Monitor {
+  int B[0..N-1];
+  int In_Ptr = 0;  int Out_Ptr = 0;  int Count = 0;
+  Condition Not_Full, Not_Empty;
+
+  void Append(int I) {                      void Take(int I) {
+p1  while (Count == N) {wait(Not_Full)};    c1  while (Count == 0) {wait(Not_Empty)};
+p2  B[In_Ptr] = I;                          c2  I = B[Out_Ptr];
+p3  Count = Count + 1;                      c3  Count = Count - 1;
+p4  In_Ptr = (In_Ptr + 1) % N;              c4  Out_Ptr = (Out_Ptr + 1) % N;
+p5  signal(Not_Empty);                      c5  signal(Not_Full);
+  }                                         }
+}</code></pre>
+<p>Com <code>N = 2</code>. O consumidor <strong>C</strong> chega primeiro, com o buffer vazio; depois o produtor <strong>P</strong>.</p>
+<div class="wrap"><table>
+<tr><th>#</th><th>Consumidor C</th><th>Produtor P</th><th>Count</th><th>fila Not_Empty</th></tr>
+<tr><td class="t">1</td><td>chama <code>Take</code>, entra no monitor</td><td>—</td><td class="s">0</td><td class="s">vazia</td></tr>
+<tr class="key"><td class="t">2</td><td>c1: <code>Count == 0</code>? sim → <code>wait(Not_Empty)</code>: entra na fila e <strong>libera o monitor</strong></td><td>—</td><td class="s">0</td><td class="s">C</td></tr>
+<tr><td class="t">3</td><td class="sleep">na fila</td><td>chama <code>Append</code>, entra (o monitor está livre)</td><td class="s">0</td><td class="s">C</td></tr>
+<tr><td class="t">4</td><td class="sleep">na fila</td><td>p1: <code>Count == 2</code>? não. p2–p4: guarda o item</td><td class="s">1</td><td class="s">C</td></tr>
+<tr class="key"><td class="t">5</td><td>acordado</td><td>p5: <code>signal(Not_Empty)</code>: a fila não está vazia → acorda C</td><td class="s">1</td><td class="s">vazia</td></tr>
+<tr><td class="t">6</td><td>c1 de novo: <code>Count == 0</code>? não. c2–c4: tira o item</td><td>saiu do monitor</td><td class="s">0</td><td class="s">vazia</td></tr>
+<tr class="key"><td class="t">7</td><td>c5: <code>signal(Not_Full)</code>: fila vazia → <strong>não faz nada</strong></td><td>—</td><td class="s">0</td><td class="s">vazia</td></tr>
+</table></div>
+<p class="src">Os slides não dizem se o processo acordado roda imediatamente ou só depois que quem sinalizou sai do monitor. Aqui não faz diferença: <code>signal</code> é a última linha de <code>Append</code>.</p>
+
+<h2>5. E o Java?</h2>
+<p>Compare com as lições 2–5. As peças são as mesmas:</p>
+<div class="wrap"><table>
+<tr><th>Monitor (05)</th><th>Java (11)</th></tr>
+<tr><td>exclusão mútua implícita entre os procedimentos</td><td>só um método <code>synchronized</code> por vez no mesmo objeto (s.14)</td></tr>
+<tr><td><code>wait(C)</code>: suspende e libera a exclusão mútua</td><td><code>wait()</code>: espera notificação e libera a restrição de sincronização (s.34)</td></tr>
+<tr><td><code>signal(C)</code>: acorda <strong>o primeiro</strong> da fila de C</td><td><code>notify()</code>: acorda <strong>uma, arbitrária</strong> (s.35)</td></tr>
+<tr><td><code>signal_all(C)</code></td><td><code>notifyAll()</code></td></tr>
+<tr><td><strong>várias</strong> variáveis de condição com nome (<code>Not_Full</code>, <code>Not_Empty</code>)</td><td>nenhuma com nome: <code>notifyAll</code> acorda todas as threads esperando no objeto (s.35)</td></tr>
+</table></div>
+<p class="src">Esta tabela é uma comparação feita para esta lição; nenhum slide diz literalmente "Java tem monitores". A prova de 2026-1 (questão 5) pede que você classifique Java pelos seus mecanismos.</p>
+
+<h2>Prática 1 · Complete a tabela: o produtor espera</h2>
+<p>Mesmo monitor, agora com <strong><code>N = 1</code></strong> (cabe um item só). P chama <code>Append</code> duas vezes seguidas; só depois C chama <code>Take</code>.</p>
+<div class="wrap"><table class="trace" id="tb1">
+<tr><th>#</th><th>O que acontece</th><th>Count</th></tr>
+<tr><td class="t">1</td><td>P, 1º <code>Append</code>: p1 <code>Count == 1</code>? não. p2–p4</td><td><input data-ans="1" data-hint="Count começou em 0 e p3 soma 1."></td></tr>
+<tr><td class="t">2</td><td>P: p5 <code>signal(Not_Empty)</code> com a fila de Not_Empty vazia →
+  <select data-ans="nada" data-hint="Com a fila vazia, signal não faz nada (s.12)."><option value="">escolha</option><option value="nada">não faz nada</option><option value="guarda">fica guardado para C</option><option value="acorda">acorda o próximo que chegar</option></select></td><td class="s">1</td></tr>
+<tr><td class="t">3</td><td>P, 2º <code>Append</code>: p1 <code>Count == 1</code>? sim → P entra na fila de
+  <select data-ans="nf" data-hint="Append espera em Not_Full: o buffer está cheio (linha p1)."><option value="">escolha</option><option value="nf">Not_Full</option><option value="ne">Not_Empty</option></select>
+  e o monitor fica
+  <select data-ans="livre" data-hint="wait(C) libera a exclusão mútua (s.12). Sem isso, C nunca entraria para tirar o item."><option value="">escolha</option><option value="livre">livre</option><option value="preso">preso com P</option></select></td><td class="s">1</td></tr>
+<tr><td class="t">4</td><td>C chama <code>Take</code>: c1 <code>Count == 0</code>? não. c2–c4</td><td><input data-ans="0" data-hint="c3 subtrai 1 de 1."></td></tr>
+<tr><td class="t">5</td><td>C: c5 <code>signal(Not_Full)</code> →
+  <select data-ans="p" data-hint="A fila de Not_Full tem P, então signal acorda o primeiro da fila: P."><option value="">escolha</option><option value="nada">não faz nada</option><option value="p">acorda P</option><option value="c">acorda C</option></select></td><td class="s">0</td></tr>
+<tr><td class="t">6</td><td>P volta ao p1: <code>Count == 1</code>? não. p2–p4</td><td><input data-ans="1" data-hint="O 2º item finalmente entra: 0 + 1."></td></tr>
+</table></div>
+<p><button class="plain" data-check="tb1">Conferir</button> <span class="fb" id="tb1fb"></span></p>
+
+<h2>Questão da prova: 2026-1, questão 3 (com resposta)</h2>
+<div class="box exam">
+<p><strong>Questão 3 (1 ponto).</strong> Qual é uma das principais vantagens do uso de Monitores em comparação com Semáforos?</p>
+<p><strong>Resposta:</strong> "A exclusão mútua entre os procedimentos do monitor é implícita." <span class="src">05, s.6 e s.11–12</span></p>
+<p>Por que as outras estão erradas:</p>
+<ul>
+<li>"Variáveis de condição eliminam a sinalização": é o contrário, elas <em>são</em> a sinalização (<code>signal(C)</code>).</li>
+<li>"Operam com memória distribuída": monitores são para processos que compartilham memória; sem memória compartilhada usa-se troca de mensagens (07, s.2–3).</li>
+<li>"Vários processos na seção crítica ao mesmo tempo": isso violaria a exclusão mútua.</li>
+</ul>
+<p class="src">Exemplo Prova Concorrencia 2026.pdf. Alternativas na ordem da prova.</p>
+</div>
+
+<h2>Prática 3 · Quiz de memória</h2>
+<div id="quiz"></div>
+<p class="score" id="score"></p>
+
+<h2>Questão da prova: Prova 3, questão 1 (com resposta)</h2>
+<div class="box exam">
+<p><strong>Prova 3, questão 1 (2,5 pontos).</strong> O que é o problema da exclusão mútua? Quando precisamos nos preocupar com ele? Como ele é resolvido através de Monitores?</p>
+<p class="src">Provas-Concorrencia-antigas.pdf, Prova 3. Junta a lição 6 com esta.</p>
+</div>
+<div class="box" style="border-left:4px solid var(--ok)"><p><strong>Resposta modelo (construída só com o material)</strong></p>
+<p><strong>O problema.</strong> Temos N processos, cada um executando em laço uma seção não crítica e uma seção crítica. O problema da exclusão mútua é garantir que instruções das seções críticas de dois ou mais processos não sejam executadas ao mesmo tempo (03, s.2). A solução também não pode entrar em deadlock nem causar starvation, e um processo que para fora da seção crítica não pode atrapalhar os outros (03, s.4–5).</p>
+<p><strong>Quando nos preocupar.</strong> Sempre que processos compartilham recursos, como variáveis ou atributos. Os comandos não são atômicos e as suas partes se intercalam de forma arbitrária, então um comando pode interferir no outro e gerar resultados não desejados (11, s.5, 9, 12). Exemplo: <code>creditar(100)</code> e <code>debitar(80)</code> executados ao mesmo tempo na mesma conta podem deixar o saldo em −80 ou 100 em vez de 20.</p>
+<p><strong>Com monitores.</strong> Os dados compartilhados e as operações sobre eles ficam encapsulados num monitor, como num tipo abstrato de dados; os processos só interagem chamando os procedimentos do monitor (05, s.3–5). A exclusão mútua entre esses procedimentos é <strong>implícita</strong>: só um processo executa dentro do monitor por vez, e o programador não precisa escrever pré e pós-protocolo (05, s.6). Quando um processo precisa esperar uma condição, usam-se <strong>variáveis de condição</strong>: <code>wait(C)</code> suspende o processo numa fila FIFO associada a C e libera a exclusão mútua; <code>signal(C)</code> acorda o primeiro processo da fila, ou não faz nada se ela estiver vazia (05, s.12). No produtor-consumidor, por exemplo, <code>Append</code> espera em <code>Not_Full</code> quando o buffer está cheio e <code>Take</code> faz <code>signal(Not_Full)</code> depois de retirar um item (05, s.8–9).</p></div>
+
+
+<div class="box ask">
+<p><strong>Dúvida?</strong> Pergunte ao agente. Próxima lição: o monitor leitores-escritores, que é cópia literal de uma questão de prova.</p>
+</div>
+
+<footer><a href="../index.html">← Início</a> · Lição 7 de CIN0145. Fonte: 05-monitores.pdf, slides 2–14; comparação com 11-Concorrencia.pdf.</footer>
+
+<script>
+(function(){
+  function norm(v){ return String(v).trim().replace(/\s/g,'').replace('−','-'); }
+  document.querySelectorAll('button[data-check]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var id = btn.getAttribute('data-check'), tb = document.getElementById(id), fb = document.getElementById(id + 'fb');
+      var wrong = [], blank = 0;
+      tb.querySelectorAll('[data-ans]').forEach(function(el){
+        el.classList.remove('ok','bad');
+        var v = norm(el.value); if (v === '') { blank++; return; }
+        var a = el.getAttribute('data-ans'), ok = el.tagName === 'INPUT' ? Number(v) === Number(a) : v === a;
+        el.classList.add(ok ? 'ok' : 'bad'); if (!ok) wrong.push(el.getAttribute('data-hint'));
+      });
+      if (blank) { fb.className = 'fb'; fb.textContent = 'Preencha todas (' + blank + ' vazia' + (blank > 1 ? 's' : '') + ').'; return; }
+      fb.className = 'fb ' + (wrong.length ? 'bad' : 'ok');
+      fb.textContent = wrong.length ? wrong.length + ' em vermelho. Dica: ' + wrong[0] : 'Tudo certo.';
+    });
+  });
+
+  function mcq(el, it, onDone, keepOrder){
+    var fb = document.createElement('p'); fb.className = 'fb'; var done = false;
+    var list = it.opts.map(function(o,i){ return {o:o, i:i}; }); if (!keepOrder) shuffle(list);
+    list.forEach(function(x){
+      var b = document.createElement('button'); b.className = 'opt'; b.textContent = x.o;
+      b.addEventListener('click', function(){
+        if (done) return; done = true; var ok = x.i === it.ans;
+        b.classList.add(ok ? 'ok' : 'bad'); fb.className = 'fb ' + (ok ? 'ok' : 'bad');
+        fb.textContent = (ok ? 'Certo. ' : 'Não. A resposta é: ' + it.opts[it.ans] + '. ') + it.why;
+        if (onDone) onDone(ok);
+      });
+      el.appendChild(b);
+    });
+    el.appendChild(fb);
+  }
+  function shuffle(a){ for (var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+
+  var items = [
+    { stem: 'Num monitor, a exclusão mútua entre os procedimentos é…',
+      opts: ['garantida pelo próprio monitor, implicitamente', 'feita com um semáforo em cada procedimento', 'responsabilidade de quem chama os procedimentos'], ans: 0,
+      why: 'Exclusão mútua implícita entre procedimentos do monitor (s.6).' },
+    { stem: '<code>signal(C)</code> quando a fila de C está vazia…',
+      opts: ['não faz nada', 'fica guardado para depois', 'acorda o próximo que chegar'], ans: 0,
+      why: 'Se a fila não está vazia, acorda o primeiro; caso contrário não faz nada (s.12).' },
+    { stem: '<code>wait(C)</code> faz o processo…',
+      opts: ['entrar na fila de C e liberar o monitor', 'entrar na fila de C e manter o monitor', 'sair do monitor sem entrar em fila nenhuma'], ans: 0,
+      why: 'Suspende o processo numa fila FIFO associada a C e libera a exclusão mútua (s.12).' },
+    { stem: 'Variáveis de condição servem para…',
+      opts: ['sincronização de condição entre processos', 'exclusão mútua entre os procedimentos', 'guardar os dados compartilhados do monitor'], ans: 0,
+      why: 'Exclusão mútua já é implícita; variáveis de condição são para sincronização de condição (s.6, 12).' },
+    { stem: 'Em Java, <code>notify()</code> acorda…',
+      opts: ['uma thread escolhida arbitrariamente', 'a primeira thread da fila', 'todas as threads do objeto'], ans: 0,
+      why: 'notify acorda uma, arbitrária (11, s.35). Diferente de signal(C) do monitor, que acorda o primeiro da fila FIFO (05, s.12).' },
+    { stem: 'Na tentativa 1 (variável <code>Turn</code>), se P1 para na seção não crítica…',
+      opts: ['P2 não consegue mais entrar', 'P2 entra e sai normalmente', 'os dois entram ao mesmo tempo'], ans: 0,
+      why: 'Só P1 passaria a vez; P2 fica preso. Falha na ausência de contenção (03, s.9). Revisão da lição 6.' }
+  ];
+  var root = document.getElementById('quiz'), scoreEl = document.getElementById('score'), answered = 0, right = 0;
+  shuffle(items).forEach(function(it, k){
+    var d = document.createElement('div'); d.className = 'q';
+    d.innerHTML = '<p class="stem">' + (k+1) + '. ' + it.stem + '</p>';
+    mcq(d, it, function(ok){ answered++; if (ok) right++; scoreEl.textContent = 'Placar: ' + right + ' de ' + answered + (answered === items.length ? '. Me mande este placar.' : ''); });
+    root.appendChild(d);
+  });
+})();
+</script>
+</body>
+</html>

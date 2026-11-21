@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mapa do curso — Programação Concorrente</title>
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --rule:#d9d4c7; --accent:#8b2500; --bg:#fffdf8; }
+  html { background:var(--bg); }
+  body { max-width: 46rem; margin: 3rem auto 6rem; padding: 0 1.25rem; color:var(--ink);
+         font: 17px/1.55 Georgia, "Iowan Old Style", "Palatino Linotype", serif; }
+  h1 { font-weight: normal; font-size: 2.2rem; margin: 0 0 .25rem; }
+  .sub { color:var(--muted); font-style: italic; margin: 0 0 2rem; }
+  h2 { font-weight: normal; font-size: 1.35rem; margin: 2.5rem 0 .5rem; border-bottom: 1px solid var(--rule); padding-bottom:.2rem; }
+  table { border-collapse: collapse; width:100%; font-size:.95rem; }
+  th, td { text-align:left; vertical-align:top; padding:.5rem .4rem; border-bottom:1px solid var(--rule); }
+  th { font-weight: normal; color:var(--muted); font-size:.85rem; }
+  td:first-child { white-space: nowrap; }
+  ol li { margin:.4rem 0; }
+  .muted { color:var(--muted); }
+  code { font: .9em/1.4 "SF Mono", Menlo, Consolas, monospace; background:#f3efe4; padding:0 .25em; border-radius:3px; }
+  a { color: var(--accent); }
+  nav { font-size:.9rem; color:var(--muted); margin-bottom: 2rem; }
+  nav a { margin-right: .75rem; }
+  @media print { body { margin:0; max-width:none; font-size:11pt; } nav { display:none; } }
+</style>
+</head>
+<body>
+<nav><a href="../index.html">Início</a> <a href="./glossario.html">Glossário</a> <a href="./guia-da-prova.html">Guia da prova</a> <a href="../lessons/0001-interferencia-e-nao-determinismo.html">Lição 1</a></nav>
+<h1>Mapa do curso</h1>
+<p class="sub">O que existe no material da pasta, e em que ordem estudar. A numeração dos arquivos é a da disciplina; a trilha abaixo é a deste workspace.</p>
+
+<h2>Material disponível</h2>
+<table>
+<tr><th>Arquivo</th><th>Tema</th><th>Conteúdo principal</th></tr>
+<tr><td><code>11-Concorrencia.pdf</code></td><td>Conceitos básicos (Java)</td><td>Sequencial vs. concorrente; comandos por partes; não determinismo; interferência; <code>synchronized</code>; <code>Thread</code>/<code>Runnable</code>; <code>wait</code>/<code>notify</code>; deadlock, livelock.</td></tr>
+<tr><td><code>03-ExclusaoMutua.pdf</code></td><td>Exclusão mútua</td><td>Seção crítica, pré/pós-protocolo; 4 tentativas e suas falhas; Dekker; padaria; Test-and-Set, Exchange.</td></tr>
+<tr><td><code>04-semaforos1.pptx.pdf</code></td><td>Semáforos (parte 1)</td><td>P/V, invariante, tipos e fairness; produtor-consumidor; jantar dos filósofos.</td></tr>
+<tr><td><code>05-monitores.pdf</code></td><td>Monitores</td><td>ADT, exclusão mútua implícita, variáveis de condição; leitores-escritores; emulação de semáforos; barbeiro que dorme.</td></tr>
+<tr><td><code>07-distribprog.pdf</code></td><td>Troca de mensagens</td><td>send/receive, canais; síncrono vs. assíncrono; identificação e criação de processos; filtros, clientes, servidores, peers.</td></tr>
+<tr><td><code>08-Ada.pdf</code></td><td>Ada (rendezvous)</td><td>Tasks, entry/accept, select com guardas; buffer; polling; arrays de tasks; ponte para Go.</td></tr>
+<tr><td><code>09c-Go.pdf</code></td><td>Go</td><td>Goroutines, channels (CSP), scheduler M:N, canais unidirecionais e buffered, select.</td></tr>
+<tr><td><code>exemplo1.c</code></td><td>Código</td><td>Duas pthreads incrementando <code>shared</code> sem sincronização.</td></tr>
+</table>
+<p class="muted">Lacunas: não há arquivos 01, 02, 06, 09a, 09b, 10 na pasta.</p>
+
+<h2>Trilha de lições</h2>
+<p>Ordem revisada em 2026-11-03 após a prova de 2026-1 (ver <a href="./guia-da-prova.html">Guia da prova</a>): fundamentos e Java primeiro, porque valem mais pontos e são pré-requisito; depois a numeração dos slides.</p>
+<ol>
+<li><a href="../lessons/0001-interferencia-e-nao-determinismo.html">Interferência e não determinismo</a> — <code>11</code>, slides 2–13; <code>exemplo1.c</code>.</li>
+<li><a href="../lessons/0002-threads-e-synchronized-em-java.html">Threads e <code>synchronized</code> em Java</a> — <code>11</code>, slides 13–29; <code>code/0002/Exemplo2.java</code>. <em>Prova: Q4.</em></li>
+<li><a href="../lessons/0003-wait-notify-e-por-que-while.html"><code>wait</code>, <code>notify</code> e por que <code>while</code></a> — <code>11</code>, slides 29–36; <code>code/0003/Conta3.java</code>. <em>Prova: Q1 (parcial), Q7.</em></li>
+<li class="muted">O problema da exclusão mútua e as tentativas 1–4 — <code>03</code>, slides 2–21. <em>Prova: Q1.</em></li>
+<li class="muted">Dekker, padaria e suporte de hardware — <code>03</code>, slides 22–30.</li>
+<li class="muted">Semáforos: P, V e o invariante — <code>04</code>, slides 2–19. <em>Prova: Q2.</em></li>
+<li class="muted">Produtor-consumidor e jantar dos filósofos — <code>04</code>, slides 20–29.</li>
+<li class="muted">Monitores e variáveis de condição; leitores-escritores — <code>05</code>. <em>Prova: Q3, Q7.</em></li>
+<li class="muted">Troca de mensagens: síncrono vs. assíncrono — <code>07</code>. <em>Prova: Q5.</em></li>
+<li class="muted">Ada: rendezvous e <code>select</code> — <code>08</code>. <em>Prova: Q5.</em></li>
+<li class="muted">Go: goroutines e channels — <code>09c</code>.</li>
+<li class="muted">Erlang e Linda — <strong>sem material na pasta</strong>. <em>Prova: Q5, Q6.</em></li>
+<li class="muted">Simulado: a prova de 2026-1 completa, sem consulta.</li>
+</ol>
+<p class="muted">Itens em cinza ainda não têm lição. A ordem pode mudar conforme a missão e os registros de aprendizado.</p>
+
+<h2>Leitura nos livros da bibliografia</h2>
+<p class="muted">Única informação externa ao material, autorizada pelo usuário: em que capítulo dos livros cada tema está. Ben-Ari = <em>Principles of Concurrent and Distributed Programming</em>, 2ª ed.; Andrews = <em>Foundations of Multithreaded, Parallel, and Distributed Programming</em>; Sottile = <em>Introduction to Concurrency in Programming Languages</em>. Para Ben-Ari caps. 6–13 e para Sottile só os títulos de capítulo foram confirmados.</p>
+<table>
+<tr><th>Tema (slides)</th><th>Ben-Ari</th><th>Andrews</th><th>Sottile</th></tr>
+<tr><td>Fundamentos: intercalação, atomicidade, interferência (<code>11</code>, 2–13)</td><td>Cap. 1 "What is Concurrent Programming?"; cap. 2 "The Concurrent Programming Abstraction" (2.2 interleaving of atomic statements, 2.4 arbitrary interleaving, 2.5 atomic statements)</td><td>1.1 The Essence of Concurrent Programming; 2.4 Atomic Actions and Await Statements; 2.7 Techniques for Avoiding Interference</td><td>Cap. 2 "Concepts in Concurrency"</td></tr>
+<tr><td>Java: threads, <code>synchronized</code>, <code>wait</code>/<code>notify</code> (<code>11</code>, 14–36)</td><td>2.12 Concurrency in Java</td><td>5.4 Case Study: Java</td><td>Cap. 7 "Modern Languages and Concurrency Constructs" (pelo título)</td></tr>
+<tr><td>Exclusão mútua: tentativas 1–4, Dekker (<code>03</code>, 2–24)</td><td>Cap. 3 "The Critical Section Problem" (3.3–3.9)</td><td>3.1 The Critical Section Problem; 3.2 Spin Locks</td><td>Cap. 3 "Concurrency Control" (pelo título)</td></tr>
+<tr><td>Padaria, Test-and-Set, Exchange (<code>03</code>, 25–30)</td><td>5.1–5.2 The bakery algorithm; 3.10 Complex atomic statements</td><td>3.2 Spin Locks; 3.3 Fair Solutions</td><td>—</td></tr>
+<tr><td>Semáforos, produtor-consumidor, filósofos (<code>04</code>)</td><td>Cap. 6 "Semaphores"</td><td>Cap. 4 "Semaphores" (4.1–4.4; 4.6 Case Study: Pthreads)</td><td>—</td></tr>
+<tr><td>Monitores, leitores-escritores, barbeiro (<code>05</code>)</td><td>Cap. 7 "Monitors"</td><td>Cap. 5 "Monitors" (5.1–5.3; 5.3 Disk Scheduling)</td><td>—</td></tr>
+<tr><td>Troca de mensagens (<code>07</code>)</td><td>Cap. 8 "Channels"</td><td>Cap. 7 "Message Passing" (7.1 Asynchronous, 7.5 Synchronous, 7.6 Case Study: CSP)</td><td>—</td></tr>
+<tr><td>Ada: rendezvous, <code>select</code> (<code>08</code>)</td><td>2.11 Concurrency in Ada; cap. 8</td><td>Cap. 8 "RPC and Rendezvous" (8.2 Rendezvous; 8.6 Case Study: Ada)</td><td>—</td></tr>
+<tr><td>Go: goroutines, channels (<code>09c</code>)</td><td>Cap. 8 "Channels" (modelo)</td><td>7.6 Case Study: CSP (modelo)</td><td>Cap. 7 (pelo título)</td></tr>
+</table>
+<p class="muted">Nenhum dos três sumários tem capítulo específico sobre Go; as linhas de Go apontam para o modelo CSP/canais.</p>
+</body>
+</html>

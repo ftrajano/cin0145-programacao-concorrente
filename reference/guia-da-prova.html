@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guia das provas — Programação Concorrente</title>
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --rule:#d9d4c7; --accent:#8b2500; --bg:#fffdf8; --warn:#8a6d00; }
+  html { background:var(--bg); }
+  body { max-width: 46rem; margin: 3rem auto 6rem; padding: 0 1.25rem; color:var(--ink);
+         font: 17px/1.55 Georgia, "Iowan Old Style", "Palatino Linotype", serif; }
+  h1 { font-weight: normal; font-size: 2.2rem; margin: 0 0 .25rem; }
+  .sub { color:var(--muted); font-style: italic; margin: 0 0 2rem; }
+  h2 { font-weight: normal; font-size: 1.35rem; margin: 2.5rem 0 .5rem; border-bottom: 1px solid var(--rule); padding-bottom:.2rem; }
+  table { border-collapse: collapse; width:100%; font-size:.93rem; }
+  th, td { text-align:left; vertical-align:top; padding:.5rem .4rem; border-bottom:1px solid var(--rule); }
+  th { font-weight: normal; color:var(--muted); font-size:.85rem; }
+  .muted { color:var(--muted); }
+  .gap { color:var(--warn); }
+  code { font: .9em/1.4 "SF Mono", Menlo, Consolas, monospace; background:#f3efe4; padding:0 .25em; border-radius:3px; }
+  a { color: var(--accent); }
+  nav { font-size:.9rem; color:var(--muted); margin-bottom: 2rem; }
+  nav a { margin-right: .75rem; }
+  ul li { margin:.3rem 0; }
+  @media print { body { margin:0; max-width:none; font-size:11pt; } nav { display:none; } }
+</style>
+</head>
+<body>
+<nav><a href="../index.html">Início</a> <a href="./mapa-do-curso.html">Mapa do curso</a> <a href="./glossario.html">Glossário</a></nav>
+<h1>Guia das provas</h1>
+<p class="sub">Análise de quatro provas: a de 2026-1 e três provas antigas sem data. As respostas <em>não</em> estão aqui de propósito: as questões serão usadas como prática de recuperação quando você chegar em cada tema.</p>
+
+<p class="muted" style="font-size:.9rem">Arquivos: <a href="../Exemplo%20Prova%20Concorrencia%202026.pdf">Exemplo Prova Concorrencia 2026.pdf</a> (prof. André Santos, 8 jun. 2026, 7 questões) · <a href="../Provas-Concorrencia-antigas.pdf">Provas-Concorrencia-antigas.pdf</a> (Provas 1, 2 e 3, 13 questões, sem data nem autor).</p>
+
+<h2>Temas que mais caem</h2>
+<p>Contagem por prova (4 no total). Um tema conta uma vez por prova, mesmo que apareça em mais de uma questão.</p>
+<table>
+<tr><th>Tema</th><th>Provas</th><th>Questões</th><th>Material</th></tr>
+<tr><td><strong>Monitores</strong></td><td>4 de 4</td><td>2026 Q3, Q7 · P1 Q2, Q4, Q5 · P2 Q3 · P3 Q1</td><td><code>05</code> inteiro; Java em <code>11</code> s.29–35</td></tr>
+<tr><td><strong>Leitores e escritores</strong></td><td>3 de 4</td><td>2026 Q7 · P1 Q5 · P2 Q3</td><td><code>05</code> s.15–19; Ada em <code>08</code> s.24</td></tr>
+<tr><td><strong>Rendezvous / Ada</strong></td><td>3 de 4</td><td>2026 Q5 · P1 Q3 · P2 Q2</td><td><code>08</code> s.3–4, 9–13</td></tr>
+<tr><td><strong>Exclusão mútua e propriedades</strong> (deadlock, starvation)</td><td>3 de 4</td><td>2026 Q1 · P2 Q1, Q4 · P3 Q1, Q4</td><td><code>03</code> s.2–5; <code>11</code> s.36</td></tr>
+<tr><td>Troca de mensagens (síncrona, assíncrona, critérios)</td><td>3 de 4</td><td>2026 Q5 · P1 Q4 · P3 Q3</td><td><code>07</code> s.10–20</td></tr>
+<tr><td>Linda</td><td>2 de 4</td><td>2026 Q5 · P3 Q2</td><td><code>09b-Linda</code></td></tr>
+<tr><td>Semáforos</td><td>1 de 4</td><td>2026 Q2</td><td><code>04</code></td></tr>
+<tr><td>Erlang</td><td>1 de 4</td><td>2026 Q5, Q6</td><td><code>12-erlang-v2</code></td></tr>
+</table>
+
+<h2>Prova de 2026-1, questão por questão</h2>
+<table>
+<tr><th>Q</th><th>Pontos</th><th>O que pede</th><th>Habilidade</th><th>Onde está no material</th></tr>
+<tr><td>1</td><td>1,0</td><td>Classificar 4 descrições como livelock, deadlock, starvation ou nenhum.</td><td>Definições precisas, uma linha cada.</td><td><code>11</code> slide 36; <code>03</code> slides 4, 5, 20, 21.</td></tr>
+<tr><td>2</td><td>1,8</td><td>Dois processos com <code>wait(S); a(); signal(Q)</code> e <code>wait(Q); b(); signal(S)</code>. Para 3 inicializações, dizer se 3 sequências de chamadas são possíveis.</td><td>Simular semáforos passo a passo com o invariante <code>s = init + nV − nP ≥ 0</code>.</td><td><code>04</code> slides 5–8 (P/V, invariante), 20–21 (produtor-consumidor usa exatamente esse padrão de dois semáforos).</td></tr>
+<tr><td>3</td><td>1,0</td><td>Principal vantagem de monitores sobre semáforos (múltipla escolha).</td><td>Comparar os dois mecanismos.</td><td><code>05</code> slides 2–5 e 8 ("Diferenças").</td></tr>
+<tr><td>4</td><td>1,0</td><td>Em Java, o que acontece quando uma thread chama um método <code>synchronized</code> enquanto outro <code>synchronized</code> do mesmo objeto executa.</td><td>Semântica do lock do objeto.</td><td><code>11</code> slides 14, 18, 29.</td></tr>
+<tr><td>5</td><td>2,0</td><td>Tabela: Java, Erlang, Ada, Linda × {monitores, mensagens assíncronas, mensagens síncronas, rendezvous}.</td><td>Classificar linguagens por mecanismo.</td><td>Java: <code>11</code>, <code>05</code>. Ada: <code>08</code> slides 3–4, 9. Erlang: <code>12</code> s.3 (comunicação assíncrona). Linda: <code>09b</code> s.2–7.</td></tr>
+<tr><td>6</td><td>1,0</td><td>Erlang: o que acontece com uma mensagem que não casa com nenhum padrão do <code>receive</code>.</td><td>Semântica da mailbox.</td><td><code>12-erlang-v2</code> s.8–11 (caixa-postal e ordem de recebimento).</td></tr>
+<tr><td>7</td><td>2,2</td><td>Monitor leitores-escritores em Java com <code>wait</code>/<code>notify</code>; dizer se há problema com muitos leitores e um escritor, e corrigir.</td><td>Ler código concorrente e achar o erro.</td><td><code>11</code> slides 31–35 (<code>wait</code> só dentro de <code>synchronized</code>; <code>while</code> e não <code>if</code>; <code>notify</code> vs <code>notifyAll</code>); <code>05</code> slides 12–16 (monitor leitores-escritores).</td></tr>
+</table>
+
+<h2>Provas antigas, questão por questão</h2>
+<p>Estas provas são <strong>dissertativas</strong>: pedem "descreva", "explique por que", "justifique". A de 2026-1 é quase toda objetiva. Treine os dois formatos.</p>
+
+<h3 style="font-weight:normal">Prova 1 (5 × 2,0)</h3>
+<table>
+<tr><th>Q</th><th>O que pede</th><th>Onde está no material</th></tr>
+<tr><td>1</td><td>Principais dificuldades de programas concorrentes ou distribuídos; por que são mais difíceis que os sequenciais.</td><td><code>11</code> s.9–13 (não determinismo, interferência), s.36 (deadlock, livelock); <code>03</code> s.4–5.</td></tr>
+<tr><td>2</td><td>Estrutura e funcionamento de monitores; como o conceito é usado/implementado em C, que não tem monitores.</td><td><code>05</code> (os exemplos estão em pseudocódigo parecido com C). <span class="gap">Não há slide sobre bibliotecas de C para isso.</span></td></tr>
+<tr><td>3</td><td>Funcionamento do rendezvous; o que o servidor faz com várias solicitações ao mesmo tempo; vantagens e por quê.</td><td><code>08</code> s.3–4 (assimétrico, bom para servidores), s.7, 9, 12–13 (filas e semântica do <code>select</code>).</td></tr>
+<tr><td>4</td><td>Monitores ou troca de mensagens: que aspectos do problema levam a escolher um ou outro.</td><td><code>07</code> s.2–4 (memória compartilhada vs. distribuída), s.19 ("são equivalentes, cada uma é melhor para certos tipos de problemas").</td></tr>
+<tr><td>5</td><td>Um monitor leitores-escritores: garante exclusão mútua? Garante ausência de starvation? Justificar e corrigir.</td><td>O código é, linha a linha, o do <code>05</code> s.17–19. Conferir também <code>11</code> s.31–33 (<code>while</code> vs. <code>if</code>) e <code>03</code> s.5 (starvation).</td></tr>
+</table>
+
+<h3 style="font-weight:normal">Prova 2 (3,0 + 3,0 + 3,0 + 1,0)</h3>
+<table>
+<tr><th>Q</th><th>O que pede</th><th>Onde está no material</th></tr>
+<tr><td>1</td><td>As propriedades que uma solução concorrente deve satisfazer; quais são essenciais e quais desejáveis.</td><td><code>03</code> s.2–5 (exclusão mútua, parar fora da região crítica, sem deadlock, sem starvation, overhead mínimo sem contenção).</td></tr>
+<tr><td>2</td><td>Filósofos em linguagem distribuída (rendezvous em Ada), com um processo que controla os garfos; avaliar contra as propriedades da Q1.</td><td><code>04</code> (filósofos com semáforos); <code>08</code> s.10–13 (<code>select</code> com guardas), s.15.</td></tr>
+<tr><td>3</td><td>Descrever o problema dos leitores e escritores e a solução com monitores.</td><td><code>05</code> s.15–19.</td></tr>
+<tr><td>4</td><td>Como controlar exclusão mútua num sistema distribuído.</td><td><span class="gap">Nenhum slide trata disso diretamente.</span> Mais próximo: <code>07</code> s.9 (sem variáveis compartilhadas), <code>08</code> s.15 (rendezvous simula semáforo).</td></tr>
+</table>
+
+<h3 style="font-weight:normal">Prova 3 (4 × 2,5)</h3>
+<table>
+<tr><th>Q</th><th>O que pede</th><th>Onde está no material</th></tr>
+<tr><td>1</td><td>O que é o problema da exclusão mútua, quando importa e como monitores o resolvem.</td><td><code>03</code> s.2–3; <code>05</code> s.5, 8.</td></tr>
+<tr><td>2</td><td>Vantagens e desvantagens do modelo de Linda; como funciona.</td><td><code>09b-Linda</code> s.2–3 (espaço de tuplas, primitivas), s.7 e s.11–12 (características, vantagens, desvantagem).</td></tr>
+<tr><td>3</td><td>Classificar navegador + servidor web "segundo os critérios estudados".</td><td><code>07</code>: síncrona/assíncrona (s.10–12), identificação de processos (s.13–15), fluxo de dados (s.16), criação estática/dinâmica (s.17–18), filtros/clientes/servidores/peers (s.20).</td></tr>
+<tr><td>4</td><td>Projetar um servidor web com múltiplas threads; há problema de exclusão mútua? Por quê?</td><td>Aplicação de <code>11</code> s.12–13 (recursos compartilhados) e <code>03</code> s.2.</td></tr>
+</table>
+
+<h2>O que as quatro provas dizem sobre prioridades</h2>
+<ul>
+<li><strong>Java com <code>synchronized</code>/<code>wait</code>/<code>notify</code> vale 3,2 pontos</strong> (Q4 + Q7) e ainda aparece em Q5. Por isso a parte Java do <code>11-Concorrencia.pdf</code> fica como lição 2, antes da exclusão mútua.</li>
+<li><strong>Semáforos valem 1,8</strong> e exigem simulação passo a passo, não decoreba. A lição de semáforos terá um simulador igual ao da lição 1.</li>
+<li><strong>Erlang e Linda valem até 2,0 + parte de Q5</strong> em 2026-1, e Linda vale 2,5 na Prova 3. Material: <code>12-erlang-v2.pdf</code> e <code>09b-Linda.pdf</code> (adicionados em 2026-11-21).</li>
+<li>Q1 e Q3 são definições: o <a href="./glossario.html">glossário</a> já cobre as duas com as palavras dos slides.</li>
+<li><strong>Monitores caem em todas as provas, e leitores-escritores em três de quatro.</strong> Uma das questões (P1 Q5) copia o código do próprio slide. O monitor leitores-escritores do <code>05</code> é o código mais importante do curso.</li>
+<li><strong>As propriedades de uma solução</strong> (<code>03</code> s.2–5) valem 3,0 na Prova 2 e servem de critério em outras questões. Sabê-las de cor, com as palavras dos slides.</li>
+<li><strong>Linda reaparece</strong> (2,5 na Prova 3). Os slides de Linda e Erlang foram adicionados em 2026-11-21.</li>
+</ul>
+
+<h2>Como usar esta prova</h2>
+<ul>
+<li>Não a resolva agora. Cada lição vai terminar com a questão correspondente, para recuperação com o material fechado.</li>
+<li>Para questões dissertativas: escreva a resposta à mão ou no editor, sem consulta, e me mande. A correção compara com o que os slides dizem.</li>
+<li>Ao final da trilha, faça cada prova inteira em 1 hora, sem consulta, e me mande as respostas para correção.</li>
+</ul>
+</body>
+</html>

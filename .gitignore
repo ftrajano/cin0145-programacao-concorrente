@@ -1,0 +1,8 @@
+# arquivos pessoais de acompanhamento (não publicar)
+NOTES.md
+MISSION.md
+learning-records/
+# binários
+a.out
+*.class
+.DS_Store
