@@ -129,7 +129,7 @@
 <p class="src">Os slides dizem que signal_all, wait com rank e minrank são "disponíveis (às vezes)" (s.13–14).</p>
 
 <h2>4. Exemplo resolvido: produtor-consumidor</h2>
-<p>Um buffer com <code>N</code> posições. O produtor coloca itens (<code>Append</code>), o consumidor tira (<code>Take</code>). Quem coloca num buffer cheio espera; quem tira de um buffer vazio espera. <span class="src">s.8–10</span></p>
+<p>Um buffer com <code>N</code> posições. O produtor coloca itens (<code>Append</code>), o consumidor tira (<code>Take</code>). Quem coloca num buffer cheio espera; quem tira de um buffer vazio espera. Primeiro, o monitor <span class="src">s.8–9</span>:</p>
 <pre><code>monitor Producer_Consumer_Monitor {
   int B[0..N-1];
   int In_Ptr = 0;  int Out_Ptr = 0;  int Count = 0;
@@ -143,7 +143,24 @@ p4  In_Ptr = (In_Ptr + 1) % N;              c4  Out_Ptr = (Out_Ptr + 1) % N;
 p5  signal(Not_Empty);                      c5  signal(Not_Full);
   }                                         }
 }</code></pre>
-<p>Com <code>N = 2</code>. O consumidor <strong>C</strong> chega primeiro, com o buffer vazio; depois o produtor <strong>P</strong>.</p>
+<p>O monitor sozinho não faz nada: ele só guarda o buffer e os procedimentos. Quem os chama são dois <strong>processos</strong>, que rodam ao mesmo tempo, cada um num laço infinito <span class="src">s.10</span>:</p>
+<pre><code>Producer() {                    Consumer() {
+  int I;                          int I;
+  while (TRUE) {                  while (TRUE) {
+    Produce(I);                     Take(I);
+    Append(I);                      Consume(I);
+  }                               }
+}                               }</code></pre>
+<div class="wrap"><table>
+<tr><th>Chamada</th><th>Onde roda</th><th>O que faz</th></tr>
+<tr><td><code>Produce(I)</code></td><td>fora do monitor</td><td>fabrica um item; pode rodar em paralelo com o consumidor</td></tr>
+<tr><td><code>Append(I)</code></td><td>dentro do monitor</td><td>guarda o item no buffer; espera se estiver cheio</td></tr>
+<tr><td><code>Take(I)</code></td><td>dentro do monitor</td><td>tira um item do buffer; espera se estiver vazio</td></tr>
+<tr><td><code>Consume(I)</code></td><td>fora do monitor</td><td>usa o item; pode rodar em paralelo com o produtor</td></tr>
+</table></div>
+<p class="src">O slide mostra só o corpo dos dois processos; não mostra como eles são disparados (não há equivalente do <code>start()</code> do Java). A tabela acima é uma leitura desta lição.</p>
+<p>A notação é a dos slides: parece C, mas <code>monitor</code>, <code>Condition</code>, <code>wait</code>/<code>signal</code> e <code>int B[0..N-1]</code> (um array de N posições, índices 0 a N−1) não existem em C. <code>In_Ptr</code> é a posição da próxima gravação, <code>Out_Ptr</code> a da próxima leitura, e <code>% N</code> faz as duas voltarem a 0 depois da última posição.</p>
+<p>Agora, um trecho dessa execução, com <code>N = 2</code>. O consumidor <strong>C</strong> chega primeiro, com o buffer vazio; depois o produtor <strong>P</strong>.</p>
 <div class="wrap"><table>
 <tr><th>#</th><th>Consumidor C</th><th>Produtor P</th><th>Count</th><th>fila Not_Empty</th></tr>
 <tr><td class="t">1</td><td>chama <code>Take</code>, entra no monitor</td><td>—</td><td class="s">0</td><td class="s">vazia</td></tr>
