@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Lição 3 — wait, notify e por que while</title>
+<title>Lição 12 — wait, notify e por que while</title>
 <style>
   :root { --ink:#1a1a1a; --muted:#6b6b6b; --rule:#d9d4c7; --accent:#8b2500; --bg:#fffdf8;
           --ok:#1f6f3a; --bad:#9b1c1c; --soft:#f3efe4; }
@@ -93,16 +93,16 @@
 </style>
 </head>
 <body>
-<nav><a href="../index.html">Início</a> <a href="../reference/mapa-do-curso.html">Mapa do curso</a> <a href="../reference/glossario.html">Glossário</a> <a href="./0002-threads-e-synchronized-em-java.html">← Lição 2</a> <a href="./0004-recomeco-revisao-e-primeira-dissertativa.html">Lição 4 →</a></nav>
+<nav><a href="../index.html">Início</a> <a href="../reference/glossario.html">Glossário</a> <a href="../reference/guia-da-prova.html">Guia das provas</a> <a href="./0011-threads-e-synchronized-em-java.html">← Lição 11</a> <a href="./0013-revisao-java-e-primeira-dissertativa.html">Lição 13 →</a></nav>
 
 <header>
-  <div class="kicker">Lição 3 · Concorrência em Java</div>
+  <div class="kicker">Lição 12 · Concorrência em Java</div>
   <h1><code>wait</code>, <code>notify</code> e por que <code>while</code></h1>
   <p class="sub">Como fazer uma thread esperar até uma condição ficar verdadeira, e os dois erros que a prova cobra. Tempo estimado: 25 minutos. A página é autocontida; as marcações "slide N" indicam só a origem de cada afirmação.</p>
 </header>
 
 <div class="box recall">
-  <strong>Recuperação das lições 1 e 2</strong> (de memória, antes de continuar):
+  <strong>Recuperação das lições 10 e 11</strong> (de memória, antes de continuar):
   <ol>
     <li>Dois métodos <code>synchronized</code> do mesmo objeto: o que a regra garante?</li>
     <li>Por que proteger a leitura e a escrita de <code>saldo</code> em dois blocos <code>synchronized</code> separados não basta?</li>
@@ -113,7 +113,7 @@
 </div>
 
 <h2>1. Dois motivos diferentes para esperar</h2>
-<p>Na lição 2, uma thread <em>t</em> esperava por outra thread <em>u</em> por causa do <strong>lock</strong>: <em>u</em> estava dentro de um método sincronizado e <em>t</em> queria entrar em um método sincronizado do mesmo objeto.</p>
+<p>Na lição 11, uma thread <em>t</em> esperava por outra thread <em>u</em> por causa do <strong>lock</strong>: <em>u</em> estava dentro de um método sincronizado e <em>t</em> queria entrar em um método sincronizado do mesmo objeto.</p>
 <p>O material apresenta um segundo motivo. <em>t</em> tem que esperar por <em>u</em> quando <strong>a semântica da aplicação</strong> exige que uma operação de <em>t</em> só seja executada em condições que podem ser garantidas por uma operação de <em>u</em>. Nesse caso quem pede a espera é a própria aplicação, e a ferramenta é <code>wait</code>.</p>
 <table>
 <tr><th>Espera por</th><th>Quem decide</th><th>Ferramenta</th></tr>
@@ -219,7 +219,7 @@
 <h2>Prática 3 · Rode as três variantes em Java</h2>
 <div class="box task">
 <p><code>code/0003/Conta3.java</code> tem exatamente o cenário do simulador: D1 e D2 debitam 50 e C credita o valor passado na linha de comando. O programa imprime o que cada thread faz, o saldo final e se D1 ou D2 continuam esperando. As linhas com <code>Thread.sleep</code> e <code>isAlive</code> não estão no material; servem só para a demonstração e estão marcadas no código.</p>
-<p>O programa completo, como exemplo resolvido. Repare que <code>Conta</code> é exatamente a da seção 2, só com mensagens impressas, e que <code>Debito</code> e <code>Credito</code> seguem o padrão da lição 2.</p>
+<p>O programa completo, como exemplo resolvido. Repare que <code>Conta</code> é exatamente a da seção 2, só com mensagens impressas, e que <code>Debito</code> e <code>Credito</code> seguem o padrão da lição 11.</p>
 <pre><code>class Conta {
   private double saldo = 0;
 
@@ -352,7 +352,7 @@ java Conta3 60       # etapa 1b</code></pre>
   <div class="chk">
     <label>✓ <strong>Sim</strong>, há problema.</label>
     <label>✓ <code>iniciarLeitura</code> e <code>iniciarEscrita</code> chamam <code>wait()</code> mas não são <code>synchronized</code>. <code>wait</code> só pode ser chamado dentro de um método <code>synchronized</code> (seção 3, regra 1). <strong>Correção:</strong> acrescentar <code>synchronized</code> aos dois.</label>
-    <label>✓ Sem <code>synchronized</code>, os testes e as atualizações de <code>numeroLeitores</code> e <code>escritorAtivo</code> nesses dois métodos podem se intercalar com outras threads, o mesmo tipo de interferência da lição 1.</label>
+    <label>✓ Sem <code>synchronized</code>, os testes e as atualizações de <code>numeroLeitores</code> e <code>escritorAtivo</code> nesses dois métodos podem se intercalar com outras threads, o mesmo tipo de interferência da lição 10.</label>
     <label>✓ <code>terminarEscrita</code> usa <code>notify()</code>, que acorda só uma thread, escolhida de forma arbitrária (seção 4). Com muitos Leitores esperando, só um acorda e os outros continuam parados, mesmo podendo ler juntos. <strong>Correção:</strong> trocar por <code>notifyAll()</code>. É o objetivo 3 do simulador.</label>
     <label>✓ O que já estava certo: os dois testes usam <code>while</code> (seção 5), e <code>terminarLeitura</code> já usa <code>notifyAll</code>.</label>
   </div>
@@ -527,7 +527,7 @@ java Conta3 60       # etapa 1b</code></pre>
     { stem: 'Três threads estão em <code>wait()</code> no mesmo objeto. Outra thread chama <code>notify()</code>. O que acontece?',
       opts: ['Acorda só uma, escolhida arbitrariamente pelo interpretador', 'Acordam todas as três, na ordem em que chamaram wait', 'Acorda só uma, a primeira que chamou wait no objeto', 'Nenhuma acorda até alguém chamar também notifyAll'], ans: 0,
       why: 'Slide 35: notify acorda só uma, e a escolha é arbitrária, feita pelo interpretador. Não há promessa de ordem.' },
-    { stem: '(Revisão da lição 2) D1 está dormindo em <code>wait()</code> dentro de <code>debitar</code>. C chama <code>creditar</code>, também <code>synchronized</code>, no mesmo objeto. C precisa esperar D1?',
+    { stem: '(Revisão da lição 11) D1 está dormindo em <code>wait()</code> dentro de <code>debitar</code>. C chama <code>creditar</code>, também <code>synchronized</code>, no mesmo objeto. C precisa esperar D1?',
       opts: ['Sim, porque debitar ainda não terminou de executar', 'Não, porque o wait de D1 liberou o lock do objeto', 'Sim, porque o lock só é solto no fim do método', 'Não, porque creditar não acessa a variável saldo'], ans: 1,
       why: 'Slide 34: o wait libera a restrição de sincronização. Se não liberasse, C ficaria esperando D1 e D1 esperando C: as duas paradas, uma esperando pela outra.' }
   ], document.getElementById('score'));

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Lição 2 — Threads e synchronized em Java</title>
+<title>Lição 11 — Threads e synchronized em Java</title>
 <style>
   :root { --ink:#1a1a1a; --muted:#6b6b6b; --rule:#d9d4c7; --accent:#8b2500; --bg:#fffdf8;
           --ok:#1f6f3a; --bad:#9b1c1c; --soft:#f3efe4; }
@@ -71,16 +71,16 @@
 </style>
 </head>
 <body>
-<nav><a href="../index.html">Início</a> <a href="../reference/mapa-do-curso.html">Mapa do curso</a> <a href="../reference/glossario.html">Glossário</a> <a href="./0001-interferencia-e-nao-determinismo.html">← Lição 1</a> <a href="./0003-wait-notify-e-por-que-while.html">Lição 3 →</a></nav>
+<nav><a href="../index.html">Início</a> <a href="../reference/glossario.html">Glossário</a> <a href="../reference/guia-da-prova.html">Guia das provas</a> <a href="./0010-interferencia-e-nao-determinismo.html">← Lição 10</a> <a href="./0012-wait-notify-e-por-que-while.html">Lição 12 →</a></nav>
 
 <header>
-  <div class="kicker">Lição 2 · Concorrência em Java</div>
+  <div class="kicker">Lição 11 · Concorrência em Java</div>
   <h1>Threads e <code>synchronized</code></h1>
   <p class="sub">Como criar execução concorrente em Java e como proibir as intercalações que causam interferência. Tempo estimado: 25 minutos. A página é autocontida; as marcações "slide N" são só a origem de cada afirmação.</p>
 </header>
 
 <div class="box recall">
-  <strong>Recuperação da lição 1</strong> (de memória, antes de continuar):
+  <strong>Recuperação da lição 10</strong> (de memória, antes de continuar):
   <ol>
     <li>Quais são as três partes em que <code>saldo = saldo + 5</code> é executado?</li>
     <li>Com saldo inicial 0, a sequência <code>1 A 2 3 B C</code> dá que resultado? E <code>A 1 2 B C 3</code>?</li>
@@ -90,7 +90,7 @@
 </div>
 
 <h2>1. O remédio: proibir sequências</h2>
-<p>A lição 1 terminou com o diagnóstico: interferência acontece quando comandos compartilham recursos e suas partes se intercalam de forma ruim. O material lista o que fazer: controlar o acesso a recursos compartilhados, <strong>proibir a realização de determinadas sequências de execução</strong> e sincronizar as execuções (uma espera pelo término da outra).</p>
+<p>A lição 10 terminou com o diagnóstico: interferência acontece quando comandos compartilham recursos e suas partes se intercalam de forma ruim. O material lista o que fazer: controlar o acesso a recursos compartilhados, <strong>proibir a realização de determinadas sequências de execução</strong> e sincronizar as execuções (uma espera pelo término da outra).</p>
 <p>Em Java, a ferramenta para isso é a palavra <code>synchronized</code>.</p>
 <p class="src">11-Concorrencia.pdf, slides 13–14.</p>
 
@@ -150,7 +150,7 @@ C   saldo = tmpd;
 <p>A partir daqui o material usa a expressão <em>race condition</em>, e vale separá-la de <em>interferência</em>. Os slides não a definem; usam-na em dois comentários, e é desse uso que se tira o sentido:</p>
 <ul>
 <li>Uma thread lendo e outra gravando a mesma variável, sem nada que impeça os dois acessos de acontecerem ao mesmo tempo, é uma <strong>race condition</strong>. É um fato sobre os <em>acessos</em>.</li>
-<li><strong>Interferência</strong> é o resultado errado que pode sair disso (lição 1). É um fato sobre o <em>resultado</em>.</li>
+<li><strong>Interferência</strong> é o resultado errado que pode sair disso (lição 10). É um fato sobre o <em>resultado</em>.</li>
 </ul>
 <p>Uma coisa não implica a outra, e o material mostra os dois casos:</p>
 <table>
@@ -293,11 +293,11 @@ java ContaThreads</code></pre>
 <tr><td>Como está acima (com <code>synchronized</code>)</td><td>0 · 0 · 0</td></tr>
 <tr><td>Apagando <code>synchronized</code> de <code>creditar</code> e <code>debitar</code></td><td>14261 · −412 · −8897</td></tr>
 </table>
-<p>Leia o código de baixo para cima: <code>main</code> cria a conta e as duas threads, inicia as duas com <code>start()</code> e espera as duas com <code>join()</code>. Cada <code>run()</code> chama o método da conta em laço. Quem decide a intercalação é o interpretador, e sem <code>synchronized</code> as partes ler-calcular-gravar se misturam como na lição 1.</p>
+<p>Leia o código de baixo para cima: <code>main</code> cria a conta e as duas threads, inicia as duas com <code>start()</code> e espera as duas com <code>join()</code>. Cada <code>run()</code> chama o método da conta em laço. Quem decide a intercalação é o interpretador, e sem <code>synchronized</code> as partes ler-calcular-gravar se misturam como na lição 10.</p>
 <p class="src">Conta e métodos: 11-Concorrencia.pdf, slides 15–16. Credito, Debito, start e join: slides 23–26. O laço de 100 000 repetições e o <code>main</code> completo foram escritos para este workspace.</p>
 
 <h2>Prática 1 · Simulador com lock</h2>
-<p>O mesmo simulador da lição 1, agora com três modos. Em cada modo, tente obter 20, −80 e 100. Anote o que ficou impossível e por quê.</p>
+<p>O mesmo simulador da lição 10, agora com três modos. Em cada modo, tente obter 20, −80 e 100. Anote o que ficou impossível e por quê.</p>
 <div class="sim box" id="sim">
   <div class="modes">
     <button data-mode="none" class="on">Sem synchronized</button>
@@ -352,7 +352,7 @@ java ContaThreads</code></pre>
 <p>Antes de rodar, calcule o saldo final esperado. Depois confirme que ele sai igual nas três execuções.</p>
 <p><strong>Etapa 3 · Explique.</strong> Em uma frase: por que, na etapa 2, as três threads não se atrapalham, se duas delas executam o <em>mesmo</em> método <code>debitar</code>?</p>
 <p>Quando terminar, me mande o código e os resultados para eu corrigir. Testei as duas etapas nesta máquina e elas funcionam como o esperado.</p>
-<p class="src">Extra, se quiser comparar com a lição 1: <code>code/0002/Exemplo2.java</code> é o <code>exemplo1.c</code> reescrito em Java (contador sem <code>synchronized</code>, para você acrescentar).</p>
+<p class="src">Extra, se quiser comparar com a lição 10: <code>code/0002/Exemplo2.java</code> é o <code>exemplo1.c</code> reescrito em Java (contador sem <code>synchronized</code>, para você acrescentar).</p>
 </div>
 
 <h2>Questão da prova: 2026-1, questão 4 (com resposta)</h2>
@@ -375,7 +375,7 @@ java ContaThreads</code></pre>
 </div>
 
 <footer>
-  Próxima lição: <a href="./0003-wait-notify-e-por-que-while.html"><em><code>wait</code>, <code>notify</code> e por que <code>while</code></em></a> — slides 30–36. É a base da questão 7 da prova (2,2 pontos).
+  Próxima lição: <a href="./0012-wait-notify-e-por-que-while.html"><em><code>wait</code>, <code>notify</code> e por que <code>while</code></em></a> — slides 30–36. É a base da questão 7 da prova (2,2 pontos).
   Referências: <a href="../reference/glossario.html">Glossário</a> · <a href="../reference/mapa-do-curso.html">Mapa do curso</a> · <a href="../reference/guia-da-prova.html">Guia da prova</a>.
 </footer>
 
@@ -385,7 +385,7 @@ java ContaThreads</code></pre>
   var mode = 'none', st, trace, lock; // lock: null | 'c' | 'd'
   var done = { none: {20:false,'-80':false,100:false}, method: {tried:false}, blocks: {hit:false} };
   var notes = {
-    none: 'Nenhuma proteção: qualquer intercalação é permitida (lição 1).',
+    none: 'Nenhuma proteção: qualquer intercalação é permitida (lição 10).',
     method: 'creditar e debitar são synchronized: o primeiro passo de um método pega o lock de this; o outro método só pode começar quando o lock for liberado no último passo.',
     blocks: 'Só a leitura (1 / A) e a escrita (3 / C) estão em blocos synchronized separados. Cada acesso isolado é protegido, mas o lock é liberado logo depois.'
   };

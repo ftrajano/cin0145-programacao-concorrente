@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Lição 4 — Recomeço: revisão e primeira dissertativa</title>
+<title>Lição 13 — Revisão de Java e primeira dissertativa</title>
 <style>
   :root { --ink:#1a1a1a; --muted:#6b6b6b; --rule:#d9d4c7; --accent:#8b2500; --bg:#fffdf8;
           --ok:#1f6f3a; --bad:#9b1c1c; --soft:#f3efe4; }
@@ -54,12 +54,12 @@
 </style>
 </head>
 <body>
-<nav><a href="../index.html">Início</a> <a href="../reference/mapa-do-curso.html">Mapa do curso</a> <a href="../reference/glossario.html">Glossário</a> <a href="../reference/guia-da-prova.html">Guia das provas</a> <a href="./0003-wait-notify-e-por-que-while.html">← Lição 3</a> <a href="./0005-wait-e-notify-passo-a-passo.html">Lição 5 →</a></nav>
+<nav><a href="../index.html">Início</a> <a href="../reference/glossario.html">Glossário</a> <a href="../reference/guia-da-prova.html">Guia das provas</a> <a href="./0012-wait-notify-e-por-que-while.html">← Lição 12</a> <a href="./0014-wait-e-notify-passo-a-passo.html">Lição 14 →</a></nav>
 
 <header>
-  <div class="kicker">Lição 4 · Retomada</div>
-  <h1>Recomeço: revisão e primeira dissertativa</h1>
-  <p class="sub">Uma revisão de memória das lições 1–3 e a primeira resposta escrita no estilo das provas antigas. Não há conteúdo novo. Tempo estimado: 20 minutos.</p>
+  <div class="kicker">Lição 13 · Concorrência em Java</div>
+  <h1>Revisão de Java e primeira dissertativa</h1>
+  <p class="sub">Uma revisão de memória das lições 10–12 e a primeira resposta escrita no estilo das provas antigas. Não há conteúdo novo. Tempo estimado: 20 minutos.</p>
 </header>
 
 <div class="box ask">
@@ -68,7 +68,7 @@
 </div>
 
 <h2>Prática 1 · Quiz de memória</h2>
-<p>Oito perguntas misturadas das lições 1, 2 e 3. Não abra as lições antigas. Cada erro indica a seção que você deve rever.</p>
+<p>Oito perguntas misturadas das lições 10, 11 e 12. Não abra as lições antigas. Cada erro indica a seção que você deve rever.</p>
 <div id="quiz"></div>
 <p class="score" id="score"></p>
 
@@ -119,35 +119,35 @@
 <p><strong>Ficou alguma dúvida?</strong> Pergunte ao agente, seu professor neste workspace. Vale qualquer coisa: uma pergunta do quiz que pareceu ambígua, um termo esquecido, ou "por que a sequência X dá Y?".</p>
 </div>
 
-<footer><a href="../index.html">← Início</a> · Lição 4 de CIN0145. Sem conteúdo novo; tudo vem de 11-Concorrencia.pdf (lições 1–3) e de Provas-Concorrencia-antigas.pdf.</footer>
+<footer><a href="../index.html">← Início</a> · Lição 13 de CIN0145. Sem conteúdo novo; tudo vem de 11-Concorrencia.pdf (lições 10–12) e de Provas-Concorrencia-antigas.pdf.</footer>
 
 <script>
 (function(){
   var items = [
     { stem: 'Por que <code>saldo = saldo + 5</code> pode sofrer interferência?',
       opts: ['Porque é executado em três partes', 'Porque a variável saldo é double', 'Porque o processador soma valores errados'], ans: 0,
-      why: 'A atribuição executa como ler, calcular e gravar (11, s.6). As partes de outro comando podem entrar no meio.', rev: 'Lição 1, seção 3' },
+      why: 'A atribuição executa como ler, calcular e gravar (11, s.6). As partes de outro comando podem entrar no meio.', rev: 'Lição 10, seção 3' },
     { stem: 'Não determinismo significa que…',
       opts: ['o mesmo programa pode gerar resultados diferentes', 'o programa sempre gera um resultado errado', 'o programador escolhe a ordem das partes'], ans: 0,
-      why: 'A intercalação é escolhida arbitrariamente pelo interpretador, e por isso a execução pode gerar mais de um resultado (11, s.9 e 11).', rev: 'Lição 1, seção 4' },
+      why: 'A intercalação é escolhida arbitrariamente pelo interpretador, e por isso a execução pode gerar mais de um resultado (11, s.9 e 11).', rev: 'Lição 10, seção 4' },
     { stem: 'Uma thread chama um método <code>synchronized</code> de um objeto enquanto outra thread executa outro método <code>synchronized</code> do <em>mesmo</em> objeto. O que acontece?',
       opts: ['A primeira espera até o lock ser liberado', 'As duas executam ao mesmo tempo sem problema', 'Java lança uma exceção e encerra a thread'], ans: 0,
-      why: 'Só um método synchronized executa em um objeto por vez; os outros esperam. Pode ser o mesmo método ou não (11, s.14 e 29). É a questão 4 da prova de 2026-1.', rev: 'Lição 2, seção 2' },
+      why: 'Só um método synchronized executa em um objeto por vez; os outros esperam. Pode ser o mesmo método ou não (11, s.14 e 29). É a questão 4 da prova de 2026-1.', rev: 'Lição 11, seção 2' },
     { stem: 'Proteger a leitura e a gravação de <code>saldo</code> em dois blocos <code>synchronized</code> separados…',
       opts: ['evita race condition, mas permite interferência', 'evita race condition e evita interferência', 'causa race condition, mas evita interferência'], ans: 0,
-      why: 'Entre a leitura e a gravação de uma thread, a outra pode fazer um ciclo inteiro. O veredito do slide: sem race conditions, mas com interferência (11, s.19).', rev: 'Lição 2, seção 6' },
+      why: 'Entre a leitura e a gravação de uma thread, a outra pode fazer um ciclo inteiro. O veredito do slide: sem race conditions, mas com interferência (11, s.19).', rev: 'Lição 11, seção 6' },
     { stem: 'Uma thread chama <code>wait()</code> dentro de um método <code>synchronized</code>. Enquanto ela espera, o lock do objeto…',
       opts: ['é liberado para outros métodos sincronizados', 'continua preso até o método terminar', 'é passado para a thread mais antiga'], ans: 0,
-      why: 'O wait libera a restrição de sincronização: outro método sincronizado pode começar no mesmo objeto (11, s.34). Sem isso, creditar nunca entraria para criar saldo.', rev: 'Lição 3, seção 3' },
+      why: 'O wait libera a restrição de sincronização: outro método sincronizado pode começar no mesmo objeto (11, s.34). Sem isso, creditar nunca entraria para criar saldo.', rev: 'Lição 12, seção 3' },
     { stem: 'Por que o teste antes do <code>wait()</code> usa <code>while</code> e não <code>if</code>?',
       opts: ['A condição pode ser falsa ao acordar', 'O compilador Java não aceita if ali', 'O while libera o lock mais rápido'], ans: 0,
-      why: 'A notificação diz que talvez seja possível continuar, mas não garante. Com while a thread testa de novo; com if ela segue direto (11, s.32).', rev: 'Lição 3, seção 5' },
+      why: 'A notificação diz que talvez seja possível continuar, mas não garante. Com while a thread testa de novo; com if ela segue direto (11, s.32).', rev: 'Lição 12, seção 5' },
     { stem: 'Qual a diferença entre <code>notify()</code> e <code>notifyAll()</code>?',
       opts: ['notify acorda uma thread arbitrária; notifyAll acorda todas', 'notify acorda todas; notifyAll acorda uma thread arbitrária', 'notify acorda a primeira; notifyAll acorda todas'], ans: 0,
-      why: 'notifyAll acorda todas as threads esperando no objeto; notify acorda só uma, escolhida de forma arbitrária (11, s.35).', rev: 'Lição 3, seção 4' },
+      why: 'notifyAll acorda todas as threads esperando no objeto; notify acorda só uma, escolhida de forma arbitrária (11, s.35).', rev: 'Lição 12, seção 4' },
     { stem: '"Threads executando, mas sem gerar nada que possa ser observado pelo usuário." Isso é:',
       opts: ['livelock', 'deadlock', 'interferência'], ans: 0,
-      why: 'Livelock: executando sem gerar nada observável. Deadlock: todas paradas, uma esperando pela outra (11, s.36).', rev: 'Lição 3, seção 6' }
+      why: 'Livelock: executando sem gerar nada observável. Deadlock: todas paradas, uma esperando pela outra (11, s.36).', rev: 'Lição 12, seção 6' }
   ];
   function shuffle(a){ for (var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
   var root = document.getElementById('quiz'), scoreEl = document.getElementById('score');

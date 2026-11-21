@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Lição 6 — Exclusão mútua: as propriedades e a tentativa 1</title>
+<title>Lição 1 — Exclusão mútua: as propriedades e a tentativa 1</title>
 <style>
   :root { --ink:#1a1a1a; --muted:#6b6b6b; --rule:#d9d4c7; --accent:#8b2500; --bg:#fffdf8;
           --ok:#1f6f3a; --bad:#9b1c1c; --soft:#f3efe4; --hi:#f6e3b4; }
@@ -62,27 +62,18 @@
 </style>
 </head>
 <body>
-<nav><a href="../index.html">Início</a> <a href="../reference/glossario.html">Glossário</a> <a href="../reference/guia-da-prova.html">Guia das provas</a> <a href="./0005-wait-e-notify-passo-a-passo.html">← Lição 5</a> <a href="./0007-monitores.html">Lição 7 →</a></nav>
+<nav><a href="../index.html">Início</a> <a href="../reference/glossario.html">Glossário</a> <a href="../reference/guia-da-prova.html">Guia das provas</a> <a href="./0003-semaforos.html">Lição 3 →</a></nav>
 
 <header>
-  <div class="kicker">Lição 6 · O problema da exclusão mútua</div>
+  <div class="kicker">Lição 1 · O problema da exclusão mútua</div>
   <h1>Exclusão mútua: as propriedades e a tentativa 1</h1>
   <p class="sub">O que uma solução precisa garantir, e por que a primeira tentativa, que parece correta, falha. Tempo estimado: 25 minutos. As marcações "s.N" indicam só a origem (03-ExclusaoMutua.pdf, salvo indicação).</p>
 </header>
 
-<div class="box recall">
-<p><strong>Aquecimento da lição 5, de memória:</strong></p>
-<ol>
-<li>Uma thread "dormindo" chegou nesse estado como?</li>
-<li>Uma thread que acabou de ser acordada por <code>notifyAll()</code> já pode continuar, ou ainda falta alguma coisa?</li>
-</ol>
-<details><summary>Ver respostas</summary>
-<p>1. Ela mesma executou <code>wait()</code>, e com isso soltou o lock. 2. Ainda precisa pegar o lock de volta (e, com <code>while</code>, testar a condição de novo).</p>
-</details>
-</div>
+
 
 <h2>1. O problema</h2>
-<p>Você já conhece o sintoma: na conta da lição 1, o trecho <em>ler-calcular-gravar</em> de duas threads se misturava e o saldo saía errado. Na lição 2, a lição foi que esse trecho inteiro precisa ser executado por <strong>uma de cada vez</strong>. Esta lição dá nome a isso.</p>
+<p>Quando vários processos usam as mesmas variáveis, certos trechos do programa não podem ser executados por dois processos ao mesmo tempo, sob o risco de um interferir no outro. Esta lição dá nome a esse problema e mostra como julgar uma solução.</p>
 <p>O modelo do material: <strong>N processos</strong>, cada um num laço infinito com duas partes:</p>
 <table>
 <tr><th>Parte</th><th>O que é</th></tr>
@@ -97,8 +88,7 @@
    Critical_Section;
    Post_Protocol;       ← "saí"
 end loop;</code></pre>
-<p>A diferença em relação às lições de Java: aqui <strong>não há <code>synchronized</code> nem <code>wait</code></strong>. Os protocolos usam só variáveis comuns, lidas e gravadas pelos processos. A pergunta deste arquivo de slides é: dá para garantir exclusão mútua assim?</p>
-<p class="src">A ligação com a conta das lições 1–2 é uma leitura desta lição; os slides do 03 apresentam o problema de forma abstrata.</p>
+<p>Importante: aqui <strong>não há nenhum mecanismo especial</strong> da linguagem. Os protocolos usam só variáveis comuns, lidas e gravadas pelos processos. A pergunta deste arquivo de slides é: dá para garantir exclusão mútua assim?</p>
 
 <h2>2. As cinco propriedades</h2>
 <p>Uma solução é julgada por cinco critérios. Esta lista vale 3,0 pontos na Prova 2 (questão 1) e é usada para julgar <em>todas</em> as tentativas seguintes. <span class="src">s.2, 4, 5</span></p>
@@ -127,7 +117,7 @@ a3  /* seção crítica */              b3  /* seção crítica */
 a4  Turn = 2;                        b4  Turn = 1;
   }                                    }
 }                                    }</code></pre>
-<p>Linha a2: <code>while (Turn != 1) {};</code> é um laço <strong>vazio</strong>. Ele repete o teste sem parar até <code>Turn</code> valer 1. Atenção: isso não é <code>wait()</code>. O processo <strong>não dorme</strong>, continua executando, gastando processador só para testar. Os slides de semáforos chamam isso de <em>busy waiting</em> e dizem que é ineficiente. <span class="src">04-semaforos1.pptx.pdf, s.2</span></p>
+<p>Linha a2: <code>while (Turn != 1) {};</code> é um laço <strong>vazio</strong>. Ele repete o teste sem parar até <code>Turn</code> valer 1. O processo <strong>não é suspenso</strong>: continua executando, gastando processador só para testar. Isso se chama <em>busy waiting</em> (espera ocupada). O arquivo seguinte, de semáforos, começa justamente por aí: diz que protocolos com busy waiting são difíceis de projetar e ineficientes (Lição 3). <span class="src">04-semaforos1.pptx.pdf, s.2</span></p>
 
 <h3 style="font-weight:normal">Tabela resolvida: os dois querem entrar</h3>
 <p><code>Turn</code> começa em 1. P1 e P2 saem da seção não crítica ao mesmo tempo. Em azul, o processo está girando no laço vazio.</p>
@@ -165,7 +155,7 @@ a4  Turn = 2;                        b4  Turn = 1;
   <select data-ans="cont" data-hint="Ninguém disputa a região crítica, P2 quer entrar e não consegue porque P1 parou fora dela: é a falha 'na ausência de contenção' de s.9."><option value="">escolha</option><option value="em">exclusão mútua</option><option value="dl">sem deadlock</option><option value="st">sem starvation</option><option value="cont">sem contenção / parar fora não atrapalha</option></select></td><td></td></tr>
 </table></div>
 <p><button class="plain" data-check="tb1">Conferir</button> <span class="fb" id="tb1fb"></span></p>
-<p>Moral: a tentativa 1 obriga os processos a <strong>alternar</strong>. Se um deles não quer mais entrar, o outro fica preso. As tentativas 2, 3 e 4 (próxima lição) tentam consertar isso e quebram outras propriedades.</p>
+<p>Moral: a tentativa 1 obriga os processos a <strong>alternar</strong>. Se um deles não quer mais entrar, o outro fica preso. As tentativas 2, 3 e 4 (Lição 2) tentam consertar isso e quebram outras propriedades.</p>
 
 <h2>Prática 2 · Qual propriedade foi violada?</h2>
 <p>Cada situação abaixo quebra uma das cinco propriedades, ou nenhuma. Várias delas são exatamente o que acontece nas próximas tentativas.</p>
@@ -180,7 +170,6 @@ a4  Turn = 2;                        b4  Turn = 1;
 <p><button class="plain" data-check="tb2">Conferir</button> <span class="fb" id="tb2fb"></span></p>
 
 <h2>Prática 3 · Quiz de memória</h2>
-<p>Misturado com as lições 3 e 5.</p>
 <div id="quiz"></div>
 <p class="score" id="score"></p>
 
@@ -209,7 +198,7 @@ a4  Turn = 2;                        b4  Turn = 1;
 <p><strong>Ficou alguma dúvida?</strong> Pergunte ao agente, seu professor neste workspace. Se travar numa linha de tabela, diga qual tabela e qual <code>t</code>.</p>
 </div>
 
-<footer><a href="../index.html">← Início</a> · Lição 6 de CIN0145. Fonte: 03-ExclusaoMutua.pdf, slides 2–9.</footer>
+<footer><a href="../index.html">← Início</a> · Lição 1 de CIN0145. Fonte: 03-ExclusaoMutua.pdf, slides 2–9.</footer>
 
 <script>
 (function(){
@@ -235,23 +224,23 @@ a4  Turn = 2;                        b4  Turn = 1;
 
   var items = [
     { stem: 'Na tentativa 1, enquanto P2 executa <code>while (Turn != 2) {};</code>, P2 está…',
-      opts: ['executando o teste sem parar', 'dormindo até alguém o notificar', 'parado esperando o lock'], ans: 0,
-      why: 'O laço vazio repete o teste continuamente: busy waiting. Não há wait nem lock na tentativa 1.' },
+      opts: ['executando o teste sem parar', 'suspenso até alguém o acordar', 'parado, sem usar o processador'], ans: 0,
+      why: 'O laço vazio repete o teste continuamente: busy waiting. Na tentativa 1 não existe nenhum mecanismo que suspenda o processo.' },
     { stem: '"Se processos tentam entrar na região crítica, um deles deve conseguir." Essa é a condição de…',
       opts: ['ausência de deadlock', 'ausência de starvation', 'ausência de contenção'], ans: 0,
       why: 'Deadlock é sobre o grupo: alguém tem que conseguir (s.4). Starvation é sobre cada processo (s.5).' },
     { stem: 'A tentativa 1 falha em qual situação?',
       opts: ['quando um processo para fora', 'quando os dois querem entrar', 'quando os dois estão dentro'], ans: 0,
       why: 'Se um processo para na região não crítica, o outro não pode prosseguir (s.9). Quando os dois querem entrar, ela funciona.' },
-    { stem: 'Uma thread chama <code>wait()</code>. Enquanto ela dorme, o lock do objeto…',
-      opts: ['fica livre para outras threads', 'continua com a thread que dorme', 'passa para a thread mais antiga'], ans: 0,
-      why: 'O wait libera a restrição de sincronização (11, s.34). Revisão da lição 5.' },
-    { stem: 'Com <code>notify()</code>, quando há várias threads dormindo no mesmo objeto…',
-      opts: ['só uma acorda, escolhida arbitrariamente', 'todas acordam e testam de novo', 'nenhuma acorda até haver saldo'], ans: 0,
-      why: 'notify acorda só uma, de forma arbitrária; notifyAll acorda todas (11, s.35). Revisão da lição 5.' },
-    { stem: '"Threads executando, mas sem gerar nada observável pelo usuário." É…',
-      opts: ['livelock', 'deadlock', 'starvation'], ans: 0,
-      why: 'Livelock: executando sem progresso observável (11, s.36). Deadlock: paradas. Starvation: um processo específico nunca entra (03, s.5).' }
+    { stem: '"Um processo pode parar fora da região crítica sem interferir com os outros." Essa é a condição de…',
+      opts: ['parar fora não atrapalha', 'ausência de deadlock', 'exclusão mútua'], ans: 0,
+      why: 'É uma das "outras condições" de s.4, separada de deadlock e de starvation.' },
+    { stem: '"Instruções das regiões críticas de dois ou mais processos não podem ser executadas ao mesmo tempo." É…',
+      opts: ['exclusão mútua', 'ausência de starvation', 'ausência de deadlock'], ans: 0,
+      why: 'É a propriedade que o programa deve satisfazer (s.2).' },
+    { stem: 'Na tentativa 1, com <code>Turn = 2</code>, quem pode mudar <code>Turn</code> para 1?',
+      opts: ['P2, ao executar b4', 'P1, ao executar a2', 'ninguém: Turn é fixo'], ans: 0,
+      why: 'Só b4 grava Turn = 1, e b4 é a saída da seção crítica de P2. O laço a2 só lê Turn.' }
   ];
   function shuffle(a){ for (var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
   var root = document.getElementById('quiz'), scoreEl = document.getElementById('score'), answered = 0, right = 0;

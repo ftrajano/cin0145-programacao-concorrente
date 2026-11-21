@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Lição 8 — Leitores e escritores com monitor</title>
+<title>Lição 5 — Leitores e escritores com monitor</title>
 <style>
   :root { --ink:#1a1a1a; --muted:#6b6b6b; --rule:#d9d4c7; --accent:#8b2500; --bg:#fffdf8;
           --ok:#1f6f3a; --bad:#9b1c1c; --soft:#f3efe4; --hi:#f6e3b4; }
@@ -65,16 +65,16 @@
 
 </head>
 <body>
-<nav><a href="../index.html">Início</a> <a href="../reference/glossario.html">Glossário</a> <a href="../reference/guia-da-prova.html">Guia das provas</a> <a href="./0007-monitores.html">← Lição 7</a></nav>
+<nav><a href="../index.html">Início</a> <a href="../reference/glossario.html">Glossário</a> <a href="../reference/guia-da-prova.html">Guia das provas</a> <a href="./0004-monitores.html">← Lição 4</a> <a href="./0010-interferencia-e-nao-determinismo.html">Lição 10 →</a></nav>
 
 <header>
-  <div class="kicker">Lição 8 · Modo prova · Monitores</div>
+  <div class="kicker">Lição 5 · Modo prova · Monitores</div>
   <h1>Leitores e escritores com monitor</h1>
   <p class="sub">O problema que caiu em três das quatro provas, com o monitor dos slides linha por linha e as duas questões antigas respondidas. Tempo estimado: 30 minutos. "s.N" = 05-monitores.pdf, salvo indicação.</p>
 </header>
 
 <div class="box recall">
-<p><strong>Aquecimento da lição 7, de memória:</strong> o que <code>signal(C)</code> faz quando a fila de C está vazia? E <code>signal_all(C)</code>?</p>
+<p><strong>Aquecimento da lição 4, de memória:</strong> o que <code>signal(C)</code> faz quando a fila de C está vazia? E <code>signal_all(C)</code>?</p>
 <details><summary>Ver respostas</summary><p>Com a fila vazia, <code>signal</code> não faz nada (s.12). <code>signal_all</code> acorda todos os processos suspensos em C (s.14).</p></details>
 </div>
 
@@ -180,7 +180,7 @@ f3  signal_all(OK_to_Read);
 <div class="box" style="border-left:4px solid var(--ok)">
 <p><strong>Resposta (derivada do material; não é o gabarito oficial)</strong></p>
 <p><strong>(a) Exclusão mútua: depende do <code>if</code> em <code>Start_Write</code>.</strong> A ideia está certa: o leitor espera enquanto há escrita (r1), e o escritor espera enquanto há leitura ou escrita (w1). O problema é que w1 usa <code>if</code>, então o escritor acordado <strong>não testa a condição de novo</strong>. Se, entre o <code>signal</code> e o momento em que o escritor volta a executar, outro processo entrar no monitor, o escritor segue para w2 mesmo assim. Exemplo: o último leitor sai e faz <code>signal(OK_to_Write)</code>; antes de W voltar a executar, chega um leitor novo, vê <code>Writing</code> falso e entra (<code>Readers = 1</code>); W volta e, sem testar, faz <code>Writing = True</code>. Resultado: um escritor e um leitor ao mesmo tempo.</p>
-<p><strong>Correção:</strong> trocar o <code>if</code> de w1 por <code>while</code>, como já é feito em <code>Start_Read</code> e no produtor-consumidor (s.8–9). É a mesma regra do Java: a notificação não garante que a condição é verdadeira (11, s.32).</p>
+<p><strong>Correção:</strong> trocar o <code>if</code> de w1 por <code>while</code>, como já é feito em <code>Start_Read</code> e no produtor-consumidor (s.8–9). Com <code>while</code>, o processo acordado testa a condição de novo antes de seguir.</p>
 <p class="src">Ressalva: os slides não dizem se o processo acordado por <code>signal</code> executa imediatamente ou só depois. Se executar imediatamente, ninguém consegue entrar no meio e o <code>if</code> funciona. Na prova, vale dizer as duas coisas: "com <code>if</code>, a exclusão mútua depende de o processo acordado executar imediatamente; com <code>while</code>, fica garantida em qualquer caso".</p>
 <p><strong>(b) Ausência de starvation: não garante.</strong> Os <strong>escritores</strong> podem sofrer starvation. <code>Start_Read</code> só testa <code>Writing</code>, então um leitor novo entra mesmo com um escritor esperando. Se os leitores se revezarem sem que <code>Readers</code> chegue a 0, o escritor nunca é acordado, porque só o último leitor a sair faz <code>signal(OK_to_Write)</code> (e2). É exatamente a tabela da Prática 1. Pela definição, há starvation: o escritor quer entrar e nunca entra (03, s.5).</p>
 <p><strong>Correção (ideia):</strong> um leitor novo não deve entrar se houver escritor esperando. O monitor tem a operação certa para isso, <code>empty(C)</code> (s.12): em <code>Start_Read</code>, esperar também enquanto <code>!empty(OK_to_Write)</code>:</p>
@@ -209,14 +209,14 @@ f3  signal_all(OK_to_Read);
 <p><strong>Observações que valorizam a resposta:</strong> o teste de <code>Start_Write</code> deveria ser <code>while</code>, e a solução permite starvation de escritores se os leitores não pararem de chegar (ver a questão anterior).</p>
 </div>
 
-<h2>A mesma ideia em Java: 2026-1, questão 7</h2>
-<p>A questão 7 da prova de 2026-1 é este mesmo problema escrito em Java, com três erros: <code>iniciarLeitura</code> e <code>iniciarEscrita</code> chamam <code>wait()</code> sem ser <code>synchronized</code>, e <code>terminarEscrita</code> usa <code>notify()</code> em vez de <code>notifyAll()</code>. A resposta completa está na <a href="./0003-wait-notify-e-por-que-while.html">lição 3</a>. Compare: lá a resposta é "sim, tem problema" pelos mesmos motivos desta lição, ou seja, quem acorda e se testa de novo.</p>
+<h2>O mesmo problema em Java: 2026-1, questão 7</h2>
+<p>A questão 7 da prova de 2026-1 é este mesmo problema escrito em Java. Ela é respondida na <a href="./0012-wait-notify-e-por-que-while.html">Lição 12</a>, depois das lições de Java (arquivo 11), porque a resposta depende de <code>synchronized</code>, <code>wait()</code> e <code>notify()</code>.</p>
 
 <div class="box ask">
-<p><strong>Dúvida?</strong> Pergunte ao agente. Próxima lição: semáforos e a simulação da questão 2 de 2026-1.</p>
+<p><strong>Dúvida?</strong> Pergunte ao agente. Próximo arquivo de slides: troca de mensagens (07).</p>
 </div>
 
-<footer><a href="../index.html">← Início</a> · Lição 8 de CIN0145. Fonte: 05-monitores.pdf, slides 12–19.</footer>
+<footer><a href="../index.html">← Início</a> · Lição 5 de CIN0145. Fonte: 05-monitores.pdf, slides 12–19.</footer>
 
 <script>
 (function(){
@@ -246,7 +246,7 @@ f3  signal_all(OK_to_Read);
       why: 'End_Read só faz signal(OK_to_Write) quando Readers chega a 0 (e2).' },
     { stem: 'Por que o <code>if</code> em <code>Start_Write</code> é um ponto fraco?',
       opts: ['o escritor acordado não testa de novo', 'o escritor nunca chega a ser acordado', 'o if não pode ser usado em monitor'], ans: 0,
-      why: 'Com if, depois do wait ele segue direto para Writing = True, mesmo que a condição tenha mudado. Mesma regra do while em Java (11, s.32).' },
+      why: 'Com if, depois do wait ele segue direto para Writing = True, mesmo que a condição tenha mudado. Por isso Start_Read e o produtor-consumidor usam while (s.8–9).' },
     { stem: 'No monitor dos slides, quem pode sofrer starvation?',
       opts: ['os escritores', 'os leitores', 'ninguém'], ans: 0,
       why: 'Leitores novos entram mesmo com escritor esperando; se Readers nunca chega a 0, o escritor nunca é acordado.' },
@@ -255,7 +255,7 @@ f3  signal_all(OK_to_Read);
       why: 'empty(C): verdadeiro se a fila de C está vazia (s.12). É a base da correção da starvation.' },
     { stem: '<code>wait(C)</code> faz o processo…',
       opts: ['entrar na fila de C e liberar o monitor', 'entrar na fila de C e manter o monitor', 'sair do monitor sem entrar em fila'], ans: 0,
-      why: 'Revisão da lição 7 (s.12).' }
+      why: 'Revisão da lição 4 (s.12).' }
   ];
   var root = document.getElementById('quiz'), scoreEl = document.getElementById('score'), answered = 0, right = 0;
   shuffle(items).forEach(function(it, k){

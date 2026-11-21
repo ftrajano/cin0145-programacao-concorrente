@@ -22,6 +22,7 @@
   ul.refs { padding-left:1.1rem; } ul.refs li { margin:.6rem 0; }
   footer { margin-top:3rem; border-top:1px solid var(--rule); padding-top:1rem; font-size:.9rem; color:var(--muted); }
   @media print { body { margin:0; max-width:none; font-size:11pt; } }
+  li.todo, li.todo .d { color:#9a9a9a; }
 </style>
 </head>
 <body>
@@ -32,23 +33,38 @@
 </header>
 
 <h2>Lições</h2>
+<p class="d" style="margin-top:-.3rem">Na ordem dos arquivos de slides (03 → 04 → 05 → 07 → 08 → 09b → 09c → 11 → 12). Itens em cinza ainda não têm lição.</p>
 <ol class="lessons">
-  <li><span class="n">0001</span><span><a href="lessons/0001-interferencia-e-nao-determinismo.html">Interferência e não determinismo</a>
-    <span class="d">Dada uma intercalação de comandos, prever o resultado e dizer se houve interferência.</span></span></li>
-  <li><span class="n">0002</span><span><a href="lessons/0002-threads-e-synchronized-em-java.html">Threads e <code>synchronized</code> em Java</a>
-    <span class="d">Criar threads com <code>start</code>/<code>join</code> e usar <code>synchronized</code> para eliminar interferência. Prova: Q4.</span></span></li>
-  <li><span class="n">0003</span><span><a href="lessons/0003-wait-notify-e-por-que-while.html"><code>wait</code>, <code>notify</code> e por que <code>while</code></a>
-    <span class="d">Fazer uma thread esperar uma condição e achar os erros de <code>wait</code>/<code>notify</code> num código Java. Prova: Q1 (parcial), Q7.</span></span></li>
-  <li><span class="n">0004</span><span><a href="lessons/0004-recomeco-revisao-e-primeira-dissertativa.html">Recomeço: revisão e primeira dissertativa</a>
-    <span class="d">Recuperar de memória as lições 1–3 e escrever uma resposta dissertativa sobre por que concorrência é difícil. Provas antigas: P1 Q1.</span></span></li>
-  <li><span class="n">0005</span><span><a href="lessons/0005-wait-e-notify-passo-a-passo.html"><code>wait</code> e <code>notify</code>, passo a passo</a>
-    <span class="d">Rastrear numa tabela o que <code>wait</code>, <code>notify</code> e <code>notifyAll</code> fazem e achar os três erros clássicos num código Java. Prova: 2026 Q1, Q7.</span></span></li>
-  <li><span class="n">0006</span><span><a href="lessons/0006-exclusao-mutua-propriedades-e-tentativa-1.html">Exclusão mútua: as propriedades e a tentativa 1</a>
+  <li><span class="n">0001</span><span><a href="lessons/0001-exclusao-mutua-propriedades-e-tentativa-1.html">Exclusão mútua: as propriedades e a tentativa 1</a> <span class="d">· 03, s.2–9</span>
     <span class="d">Listar as cinco propriedades de uma solução, reconhecer qual foi violada numa situação e mostrar por que a tentativa 1 falha. Provas antigas: P2 Q1, P3 Q1.</span></span></li>
-  <li><span class="n">0007</span><span><a href="lessons/0007-monitores.html">Monitores</a>
-    <span class="d">Explicar o que é um monitor e suas vantagens, e rastrear <code>wait(C)</code>/<code>signal(C)</code> no produtor-consumidor. Prova: 2026 Q3; provas antigas: P3 Q1.</span></span></li>
-  <li><span class="n">0008</span><span><a href="lessons/0008-leitores-e-escritores-com-monitor.html">Leitores e escritores com monitor</a>
-    <span class="d">Explicar o monitor leitores-escritores dos slides e dizer onde ele falha (o <code>if</code> e a starvation de escritores). Provas antigas: P1 Q5, P2 Q3; ligação com 2026 Q7.</span></span></li>
+  <li class="todo"><span class="n">0002</span><span>Tentativas 2 a 4 e Dekker <span class="d">· 03, s.11–24</span>
+    <span class="d">A fazer.</span></span></li>
+  <li><span class="n">0003</span><span><a href="lessons/0003-semaforos.html">Semáforos: P, V e o invariante</a> <span class="d">· 04, s.2–29</span>
+    <span class="d">Simular P e V com o invariante, proteger a região crítica, rastrear o produtor-consumidor e os filósofos. Prova: 2026 Q2.</span></span></li>
+  <li><span class="n">0004</span><span><a href="lessons/0004-monitores.html">Monitores</a> <span class="d">· 05, s.2–14</span>
+    <span class="d">Explicar o que é um monitor e suas vantagens sobre semáforos, e rastrear <code>wait(C)</code>/<code>signal(C)</code> no produtor-consumidor. Prova: 2026 Q3; provas antigas: P3 Q1.</span></span></li>
+  <li><span class="n">0005</span><span><a href="lessons/0005-leitores-e-escritores-com-monitor.html">Leitores e escritores com monitor</a> <span class="d">· 05, s.14–19</span>
+    <span class="d">Explicar o monitor leitores-escritores dos slides e dizer onde ele falha (o <code>if</code> e a starvation de escritores). Provas antigas: P1 Q5, P2 Q3.</span></span></li>
+  <li class="todo"><span class="n">0006</span><span>Troca de mensagens <span class="d">· 07</span>
+    <span class="d">A fazer. Provas antigas: P1 Q4, P3 Q3.</span></span></li>
+  <li class="todo"><span class="n">0007</span><span>Ada: rendezvous e <code>select</code> <span class="d">· 08</span>
+    <span class="d">A fazer. Prova: 2026 Q5; provas antigas: P1 Q3, P2 Q2.</span></span></li>
+  <li class="todo"><span class="n">0008</span><span>Linda <span class="d">· 09b</span>
+    <span class="d">A fazer. Prova: 2026 Q5; provas antigas: P3 Q2.</span></span></li>
+  <li class="todo"><span class="n">0009</span><span>Go <span class="d">· 09c</span>
+    <span class="d">Menor prioridade: não caiu em nenhuma das 4 provas.</span></span></li>
+  <li><span class="n">0010</span><span><a href="lessons/0010-interferencia-e-nao-determinismo.html">Interferência e não determinismo</a> <span class="d">· 11, s.2–13</span>
+    <span class="d">Dada uma intercalação de comandos, prever o resultado e dizer se houve interferência.</span></span></li>
+  <li><span class="n">0011</span><span><a href="lessons/0011-threads-e-synchronized-em-java.html">Threads e <code>synchronized</code> em Java</a> <span class="d">· 11, s.13–29</span>
+    <span class="d">Criar threads com <code>start</code>/<code>join</code> e usar <code>synchronized</code> para eliminar interferência. Prova: 2026 Q4.</span></span></li>
+  <li><span class="n">0012</span><span><a href="lessons/0012-wait-notify-e-por-que-while.html"><code>wait</code>, <code>notify</code> e por que <code>while</code></a> <span class="d">· 11, s.29–36</span>
+    <span class="d">Fazer uma thread esperar uma condição e achar os erros de <code>wait</code>/<code>notify</code> num código Java. Prova: 2026 Q1, Q7.</span></span></li>
+  <li><span class="n">0013</span><span><a href="lessons/0013-revisao-java-e-primeira-dissertativa.html">Revisão de Java e primeira dissertativa</a> <span class="d">· 11</span>
+    <span class="d">Recuperar de memória as lições 10–12 e escrever uma resposta sobre por que concorrência é difícil. Provas antigas: P1 Q1.</span></span></li>
+  <li><span class="n">0014</span><span><a href="lessons/0014-wait-e-notify-passo-a-passo.html"><code>wait</code> e <code>notify</code>, passo a passo</a> <span class="d">· 11, s.29–36</span>
+    <span class="d">Rastrear numa tabela <code>wait</code>, <code>notify</code> e <code>notifyAll</code>, achar os três erros clássicos e comparar Java com monitores.</span></span></li>
+  <li class="todo"><span class="n">0015</span><span>Erlang <span class="d">· 12</span>
+    <span class="d">A fazer. Prova: 2026 Q5, Q6.</span></span></li>
 </ol>
 
 <h2>Referência</h2>
