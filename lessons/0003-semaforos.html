@@ -120,17 +120,31 @@ r4    V(S);             /* pós-protocolo */
   }
 }</code></pre>
 <p class="src">s.10. Os rótulos r1–r4 foram acrescentados por esta lição para a tabela.</p>
-<p>Passo a passo com P1 e P2. A coluna <code>#CS</code> é o número de processos na região crítica.</p>
-<div class="wrap"><table>
-<tr><th>t</th><th>P1</th><th>P2</th><th>S</th><th>#CS</th></tr>
-<tr><td class="t">1</td><td>r2: <code>P(S)</code>, S = 1 &gt; 0 → S = 0, segue</td><td>r1</td><td class="s">0</td><td class="s">0</td></tr>
-<tr class="key"><td class="t">2</td><td class="cs">r3: na região crítica</td><td>r2: <code>P(S)</code>, S = 0 → <strong>espera</strong></td><td class="s">0</td><td class="s">1</td></tr>
-<tr><td class="t">3</td><td>r4: <code>V(S)</code> → S = 1</td><td class="sleep">esperando S &gt; 0</td><td class="s">1</td><td class="s">0</td></tr>
-<tr class="key"><td class="t">4</td><td>r1</td><td>completa o <code>P(S)</code>: S = 0, entra em r3</td><td class="s">0</td><td class="s">1</td></tr>
-</table></div>
-<p>Some <code>S</code> e <code>#CS</code> em cada linha: sempre dá <strong>1</strong>. É assim que os slides provam as propriedades <span class="src">s.11–13</span>:</p>
+<p><strong>Atenção:</strong> <code>#CS</code>, <code>nP</code> e <code>nV</code> <strong>não existem no código</strong>. A única variável é <code>S</code>. As outras três são contagens que o professor faz "de fora", olhando a execução, só para provar que o código funciona <span class="src">s.6, 11</span>:</p>
 <ul>
-<li><strong>Exclusão mútua:</strong> <code>#CS = nP – nV</code> e <code>S = 1 + nV – nP</code>, logo <code>#CS + S = 1</code>. Como <code>S ≥ 0</code>, <code>#CS ≤ 1</code>.</li>
+<li><code>nP</code> = quantos <code>P(S)</code> já completaram (cada um é alguém que <strong>entrou</strong>, porque o <code>P</code> fica logo antes da região crítica);</li>
+<li><code>nV</code> = quantos <code>V(S)</code> já completaram (cada um é alguém que <strong>saiu</strong>, porque o <code>V</code> fica logo depois);</li>
+<li><code>#CS</code> = quantos processos estão <strong>dentro</strong> da região crítica agora.</li>
+</ul>
+<p>Passo a passo com P1 e P2, contando tudo:</p>
+<div class="wrap"><table>
+<tr><th>t</th><th>P1</th><th>P2</th><th>nP</th><th>nV</th><th>S</th><th>#CS</th></tr>
+<tr><td class="t">0</td><td>r1</td><td>r1</td><td class="s">0</td><td class="s">0</td><td class="s">1</td><td class="s">0</td></tr>
+<tr><td class="t">1</td><td>r2: <code>P(S)</code>, S = 1 &gt; 0 → S = 0, segue</td><td>r1</td><td class="s">1</td><td class="s">0</td><td class="s">0</td><td class="s">1</td></tr>
+<tr class="key"><td class="t">2</td><td class="cs">r3: na região crítica</td><td>r2: <code>P(S)</code>, S = 0 → <strong>espera</strong> (não completou: nP não muda)</td><td class="s">1</td><td class="s">0</td><td class="s">0</td><td class="s">1</td></tr>
+<tr><td class="t">3</td><td>r4: <code>V(S)</code> → S = 1</td><td class="sleep">esperando S &gt; 0</td><td class="s">1</td><td class="s">1</td><td class="s">1</td><td class="s">0</td></tr>
+<tr class="key"><td class="t">4</td><td>r1</td><td>completa o <code>P(S)</code>: S = 0, entra em r3</td><td class="s">2</td><td class="s">1</td><td class="s">0</td><td class="s">1</td></tr>
+</table></div>
+<p class="src">Tabela construída por esta lição a partir de s.6, 8, 10–11.</p>
+<p>Agora leia as fórmulas do slide 11 <strong>na tabela</strong>:</p>
+<ol>
+<li><strong><code>#CS = nP – nV</code></strong>: quem está dentro = quem entrou – quem saiu. Confira: em t = 4, 2 – 1 = 1.</li>
+<li><strong><code>S = 1 + nV – nP</code></strong>: é a fórmula da seção 2 (<code>s = init + nV – nP</code>) com <code>init = 1</code>. Confira: em t = 4, 1 + 1 – 2 = 0.</li>
+<li>As duas usam o mesmo <code>nP – nV</code>. Trocando: <strong><code>S = 1 – #CS</code></strong>, ou seja, <strong><code>#CS + S = 1</code></strong>. Confira: em toda linha, as duas últimas colunas somam 1.</li>
+</ol>
+<p>É assim que os slides provam as propriedades <span class="src">s.11–13</span>:</p>
+<ul>
+<li><strong>Exclusão mútua:</strong> como <code>S</code> nunca é negativo e <code>#CS + S = 1</code>, <code>#CS</code> nunca passa de 1. Nunca há dois dentro.</li>
 <li><strong>Sem deadlock:</strong> para os dois ficarem presos em <code>P(S)</code>, teríamos <code>S = 0</code> e <code>#CS = 0</code>. Mas <code>#CS + S = 1</code>: contradição.</li>
 <li><strong>Sem starvation</strong> (com 2 processos): se P1 está suspenso, <code>S = 0</code>, então pelo invariante P2 está na região crítica. Quando P2 sai, executa <code>V(S)</code>, que acorda P1.</li>
 </ul>
