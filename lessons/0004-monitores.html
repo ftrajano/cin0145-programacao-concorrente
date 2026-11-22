@@ -61,6 +61,37 @@
   @media print { body { margin:0; max-width:none; font-size:11pt; } nav, button, textarea, select { display:none; } .check { display:block; } }
   table.trace input { font: .85rem "SF Mono", Menlo, monospace; width:4.5rem; padding:.15rem .3rem; border:1px solid var(--rule); border-radius:3px; background:#fff; color:var(--ink); }
   .sleep { color:var(--muted); font-style:italic; }
+  .an { border:1px solid var(--rule); border-radius:6px; background:#fff; padding:1rem; margin:1.2rem 0; }
+  .an-stage { position:relative; height:320px; margin-bottom:.8rem; }
+  .an-mon { position:absolute; left:26%; width:48%; top:10px; height:190px; border:2px solid var(--accent); border-radius:8px; background:var(--bg); box-sizing:border-box; text-align:center; }
+  .an-mt { font: .7rem "SF Mono", Menlo, monospace; color:var(--accent); padding-top:6px; height:24px; box-sizing:border-box; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; padding-left:4px; padding-right:4px; }
+  .an-slot { height:64px; display:flex; align-items:center; justify-content:center; }
+  .an-slot span { display:inline-flex; align-items:center; justify-content:center; width:52px; height:52px; border:1.5px dashed var(--rule); border-radius:50%; font-size:.72rem; color:var(--muted); }
+  .an-buf { display:flex; justify-content:center; align-items:center; gap:4px; margin:8px 0 6px; font: .85rem "SF Mono", Menlo, monospace; }
+  .an-buf span { color:var(--muted); margin-right:4px; }
+  .an-buf b { display:inline-flex; align-items:center; justify-content:center; width:2.2rem; height:2rem; border:1px solid var(--ink); background:#fff; font-weight:normal; transition: background .4s; }
+  .an-buf b.full { background:var(--hi); }
+  .an-vars { font: .72rem "SF Mono", Menlo, monospace; color:var(--ink); padding:0 4px; }
+  .an-vars span { transition: background .4s; padding:0 2px; border-radius:2px; }
+  .an-vars span.chg, .an-buf b.chg { background:var(--hi); outline:2px solid var(--accent); }
+  .an-q { position:absolute; top:215px; height:95px; width:23%; border:1.5px solid var(--muted); border-radius:6px; box-sizing:border-box; text-align:center; transition: background .3s; }
+  .an-q span { font: .68rem "SF Mono", Menlo, monospace; color:var(--muted); display:block; padding-top:4px; }
+  .an-qe { left:26%; } .an-qf { left:51%; }
+  .an-q.flash { background:#f8e5e5; border-color:var(--bad); }
+  .an-lbl { position:absolute; top:100px; width:24%; text-align:center; font-size:.72rem; color:var(--muted); }
+  .an-lc { left:0; } .an-rc { right:0; }
+  .an-tok { position:absolute; width:44px; height:44px; margin:-22px 0 0 -22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#fff; transition: left .6s ease, top .6s ease, box-shadow .3s; z-index:2; }
+  .an-c { background:#2f5d8a; } .an-p { background:var(--ok); }
+  .an-tok.act { box-shadow:0 0 0 4px var(--hi), 0 0 0 6px var(--accent); }
+  .an-code { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:.6rem; }
+  .an-code pre { margin:0; font-size:.72rem; }
+  .an-code span.on { background:var(--hi); outline:1px solid var(--accent); }
+  .an-cap { min-height:3.2rem; margin:.8rem 0 .5rem; }
+  .an-ctl { display:flex; flex-wrap:wrap; gap:.4rem; align-items:center; }
+  .an-n { color:var(--muted); font-size:.85rem; font-variant-numeric:tabular-nums; min-width:3.5rem; text-align:center; }
+  @media (max-width: 640px) { .an-code { grid-template-columns:minmax(0,1fr); } .an { padding:.7rem; } }
+  @media print { .an-ctl { display:none; } }
+  .an-buf b.old { color:var(--muted); }
 </style>
 
 </head>
@@ -172,6 +203,50 @@ p5  signal(Not_Empty);                      c5  signal(Not_Full);
 <tr class="key"><td class="t">7</td><td>c5: <code>signal(Not_Full)</code>: fila vazia → <strong>não faz nada</strong></td><td>—</td><td class="s">0</td><td class="s">vazia</td></tr>
 </table></div>
 <p class="src">Os slides não dizem se o processo acordado roda imediatamente ou só depois que quem sinalizou sai do monitor. Aqui não faz diferença: <code>signal</code> é a última linha de <code>Append</code>.</p>
+
+<h3 style="font-weight:normal">Animação da mesma execução</h3>
+<p>A tabela acima, passo a passo. Use <strong>Próximo</strong> e <strong>Anterior</strong> (ou <strong>Reproduzir</strong>). O produtor produz o item 7.</p>
+<p class="src">Animação construída por esta lição a partir do código de s.9–10 e da tabela acima. O momento em que C volta a entrar (depois que P sai) segue a nota acima: os slides não dizem se o acordado roda antes ou depois de quem sinalizou.</p>
+<div class="an" id="an">
+  <div class="an-stage">
+    <div class="an-lbl an-lc">fora do monitor</div>
+    <div class="an-lbl an-rc">fora do monitor</div>
+    <div class="an-mon">
+      <div class="an-mt">monitor Producer_Consumer_Monitor</div>
+      <div class="an-slot"><span id="an-who">livre</span></div>
+      <div class="an-buf"><span>B</span><b id="an-b0"></b><b id="an-b1"></b></div>
+      <div class="an-vars">Count = <span id="an-count">0</span> · In_Ptr = <span id="an-inp">0</span> · Out_Ptr = <span id="an-outp">0</span></div>
+    </div>
+    <div class="an-q an-qe"><span>fila Not_Empty</span></div>
+    <div class="an-q an-qf"><span>fila Not_Full</span></div>
+    <div class="an-tok an-c" id="an-c">C</div>
+    <div class="an-tok an-p" id="an-p">P</div>
+  </div>
+  <div class="an-code">
+<pre><code><span data-l="0">void Take(int I) {</span>
+<span data-l="c1">c1  while (Count == 0) {wait(Not_Empty)};</span>
+<span data-l="c2">c2  I = B[Out_Ptr];</span>
+<span data-l="c3">c3  Count = Count - 1;</span>
+<span data-l="c4">c4  Out_Ptr = (Out_Ptr + 1) % N;</span>
+<span data-l="c5">c5  signal(Not_Full);</span>
+<span data-l="0">}</span></code></pre>
+<pre><code><span data-l="0">void Append(int I) {</span>
+<span data-l="p1">p1  while (Count == N) {wait(Not_Full)};</span>
+<span data-l="p2">p2  B[In_Ptr] = I;</span>
+<span data-l="p3">p3  Count = Count + 1;</span>
+<span data-l="p4">p4  In_Ptr = (In_Ptr + 1) % N;</span>
+<span data-l="p5">p5  signal(Not_Empty);</span>
+<span data-l="0">}</span></code></pre>
+  </div>
+  <p class="an-cap" id="an-cap"></p>
+  <div class="an-ctl">
+    <button class="plain" id="an-prev" type="button">◀ Anterior</button>
+    <span id="an-n" class="an-n"></span>
+    <button class="plain" id="an-next" type="button">Próximo ▶</button>
+    <button class="plain" id="an-play" type="button">Reproduzir</button>
+    <button class="plain" id="an-reset" type="button">Reiniciar</button>
+  </div>
+</div>
 
 <h2>5. Monitor × semáforos</h2>
 <p>O produtor-consumidor também foi resolvido com semáforos na Lição 3 (04, s.21–23). Logo depois do código do monitor, os slides resumem as diferenças <span class="src">s.11–12</span>:</p>
@@ -300,6 +375,66 @@ p5  signal(Not_Empty);                      c5  signal(Not_Full);
     root.appendChild(d);
   });
 })();
+</script>
+<script>
+(function(){
+  var root = document.getElementById('an'); if (!root) return;
+  var POS = { cout:[12,165], pout:[88,165], in:[50,68], door:[18,68], qe:[37.5,272], qf:[62.5,272] };
+  var S = [
+    {c:'cout',p:'pout',l:'',n:0,i:0,o:0,b:['',''],cap:'Início. O buffer (N = 2) está vazio: Count = 0. C e P estão fora do monitor. P está ocupado em Produce(I).'},
+    {c:'in',p:'pout',l:'0c',n:0,i:0,o:0,b:['',''],act:'c',cap:'C chama Take(I). O monitor está livre, então C entra. Agora ninguém mais entra até C sair ou esperar.'},
+    {c:'in',p:'pout',l:'c1',n:0,i:0,o:0,b:['',''],act:'c',cap:'c1: Count == 0? Sim, o buffer está vazio. C vai executar wait(Not_Empty).'},
+    {c:'qe',p:'pout',l:'c1',n:0,i:0,o:0,b:['',''],act:'c',cap:'wait(Not_Empty): C entra na fila Not_Empty e LIBERA o monitor. O monitor fica livre de novo.'},
+    {c:'qe',p:'in',l:'0p',n:0,i:0,o:0,b:['',''],act:'p',cap:'P termina Produce(I) com I = 7 e chama Append(7). O monitor está livre, então P entra.'},
+    {c:'qe',p:'in',l:'p1',n:0,i:0,o:0,b:['',''],act:'p',cap:'p1: Count == N, isto é, Count == 2? Não (Count = 0). P não espera e segue.'},
+    {c:'qe',p:'in',l:'p2',n:0,i:0,o:0,b:['7',''],act:'p',chg:['b0'],cap:'p2: B[In_Ptr] = I, ou seja, B[0] = 7.'},
+    {c:'qe',p:'in',l:'p3',n:1,i:0,o:0,b:['7',''],act:'p',chg:['count'],cap:'p3: Count = Count + 1 = 1. Agora há 1 item no buffer.'},
+    {c:'qe',p:'in',l:'p4',n:1,i:1,o:0,b:['7',''],act:'p',chg:['inp'],cap:'p4: In_Ptr = (0 + 1) % 2 = 1. A próxima gravação será em B[1].'},
+    {c:'door',p:'in',l:'p5',n:1,i:1,o:0,b:['7',''],act:'p',cap:'p5: signal(Not_Empty). A fila Not_Empty tem C, então C é acordado e sai da fila. Mas P ainda está dentro: C espera para entrar.'},
+    {c:'in',p:'pout',l:'c1',n:1,i:1,o:0,b:['7',''],act:'c',cap:'P termina Append e sai do monitor (vai produzir o próximo). C entra de novo e volta ao teste do while em c1.'},
+    {c:'in',p:'pout',l:'c1',n:1,i:1,o:0,b:['7',''],act:'c',cap:'c1 de novo: Count == 0? Não (Count = 1). C sai do while e segue: ao voltar, o teste do while é feito de novo.'},
+    {c:'in',p:'pout',l:'c2',n:1,i:1,o:0,b:['~7',''],act:'c',chg:['b0'],cap:'c2: I = B[Out_Ptr], ou seja, I = B[0] = 7. C pegou o item 7 (o valor continua escrito em B[0], mas já foi lido: aparece em cinza).'},
+    {c:'in',p:'pout',l:'c3',n:0,i:1,o:0,b:['~7',''],act:'c',chg:['count'],cap:'c3: Count = Count - 1 = 0. O buffer está vazio de novo.'},
+    {c:'in',p:'pout',l:'c4',n:0,i:1,o:1,b:['~7',''],act:'c',chg:['outp'],cap:'c4: Out_Ptr = (0 + 1) % 2 = 1. A próxima leitura será em B[1].'},
+    {c:'in',p:'pout',l:'c5',n:0,i:1,o:1,b:['~7',''],act:'c',flash:'qf',cap:'c5: signal(Not_Full). A fila Not_Full está VAZIA: o signal não faz nada e se perde (diferente de V, que somaria 1).'},
+    {c:'cout',p:'pout',l:'',n:0,i:1,o:1,b:['~7',''],cap:'C termina Take e sai do monitor com I = 7. Fora dele, executa Consume(7). Fim do trecho.'}
+  ];
+  var k = 0, timer = null;
+  var $ = function(id){ return document.getElementById(id); };
+  var tc = $('an-c'), tp = $('an-p');
+  var takeLines = root.querySelectorAll('.an-code pre')[0].querySelectorAll('span'), appLines = root.querySelectorAll('.an-code pre')[1].querySelectorAll('span');
+  function place(t, z){ t.style.left = POS[z][0] + '%'; t.style.top = POS[z][1] + 'px'; }
+  function draw(){
+    var s = S[k];
+    place(tc, s.c); place(tp, s.p);
+    tc.classList.toggle('act', s.act === 'c'); tp.classList.toggle('act', s.act === 'p');
+    $('an-who').textContent = (s.c === 'in' || s.p === 'in') ? '' : 'livre';
+    $('an-count').textContent = s.n; $('an-inp').textContent = s.i; $('an-outp').textContent = s.o;
+    [0,1].forEach(function(x){ var e = $('an-b' + x), v = s.b[x], old = v.charAt(0) === '~'; e.textContent = old ? v.slice(1) : v; e.classList.toggle('full', v !== '' && !old); e.classList.toggle('old', old); });
+    ['an-b0','an-count','an-inp','an-outp'].forEach(function(id){ $(id).classList.remove('chg'); });
+    (s.chg || []).forEach(function(c){ $({b0:'an-b0',count:'an-count',inp:'an-inp',outp:'an-outp'}[c]).classList.add('chg'); });
+    root.querySelector('.an-qf').classList.toggle('flash', s.flash === 'qf');
+    root.querySelectorAll('.an-code span').forEach(function(e){ e.classList.remove('on'); });
+    if (s.l === '0c') takeLines[0].classList.add('on');
+    else if (s.l === '0p') appLines[0].classList.add('on');
+    else if (s.l) { var e = root.querySelector('.an-code span[data-l="' + s.l + '"]'); if (e) e.classList.add('on'); }
+    $('an-cap').textContent = s.cap;
+    $('an-n').textContent = (k + 1) + ' / ' + S.length;
+    $('an-prev').disabled = k === 0; $('an-next').disabled = k === S.length - 1;
+  }
+  function stop(){ if (timer) { clearInterval(timer); timer = null; } $('an-play').textContent = 'Reproduzir'; }
+  $('an-next').addEventListener('click', function(){ stop(); if (k < S.length - 1) { k++; draw(); } });
+  $('an-prev').addEventListener('click', function(){ stop(); if (k > 0) { k--; draw(); } });
+  $('an-reset').addEventListener('click', function(){ stop(); k = 0; draw(); });
+  $('an-play').addEventListener('click', function(){
+    if (timer) { stop(); return; }
+    if (k === S.length - 1) { k = 0; draw(); }
+    $('an-play').textContent = 'Pausar';
+    timer = setInterval(function(){ if (k < S.length - 1) { k++; draw(); } else stop(); }, 2600);
+  });
+  draw();
+})();
+
 </script>
 </body>
 </html>
