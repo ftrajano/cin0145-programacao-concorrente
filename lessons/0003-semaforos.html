@@ -163,92 +163,94 @@ r4    V(S);             /* pós-protocolo */
 <p>Um problema de <strong>comunicação</strong> <span class="src">s.20</span>. Os <strong>produtores</strong> geram dados com o procedimento <code>Produce</code>, que devem ser enviados aos consumidores. Os <strong>consumidores</strong>, ao receberem um dado, fazem alguma computação com o procedimento <code>Consume</code>. O que <code>Produce</code> e <code>Consume</code> fazem por dentro não importa: importa como o dado passa de um para o outro.</p>
 <p><strong>Buffer de tamanho 1</strong> <span class="src">s.21</span>. A variável <code>B</code> guarda um valor de cada vez. O código do slide usa <strong>dois semáforos separados</strong>. Antes de vê-lo inteiro, vamos montá-lo um semáforo de cada vez.</p>
 
-<div class="box"><p><strong>Leia os nomes como contadores.</strong> <code>full</code> = <em>quantas posições estão cheias</em> (valores esperando leitura). <code>empty</code> = <em>quantas posições estão vazias</em> (vagas). Por isso <code>full = 0</code> não significa "cheio": significa "<strong>zero</strong> posições cheias". No início: <code>empty = 1</code>, <code>full = 0</code>. Depois que o produtor escreve: <code>empty = 0</code>, <code>full = 1</code>. Depois que o consumidor lê: volta a <code>empty = 1</code>, <code>full = 0</code>.</p></div>
+<div class="box"><p><strong>Nomes dos semáforos.</strong> Nesta seção eles aparecem como <code>vagas</code> (quantas posições de <code>B</code> estão livres) e <code>itens</code> (quantos valores esperam leitura). <strong>No slide 21 e na prova</strong> eles se chamam <code>empty</code> e <code>full</code>: <code>empty</code> = número de posições vazias, <code>full</code> = número de posições cheias. Use o botão para alternar.</p>
+<p><button class="plain nmtoggle" type="button">Mostrar nomes do slide (empty, full)</button></p></div>
 <p class="src">Os passos 1–3 abaixo são uma construção desta lição para chegar ao código de s.21; não estão nos slides.</p>
-<p><strong>Passo 1: só o <code>full</code>.</strong> Primeiro um problema só: o consumidor não pode ler <code>B</code> antes de o produtor escrever.</p>
-<pre><code>sem_t full = 0;
+<p><strong>Passo 1: só o semáforo <code><span class="nm" data-a="itens" data-b="full">itens</span></code>.</strong> Primeiro um problema só: o consumidor não pode ler <code>B</code> antes de o produtor escrever.</p>
+<pre><code>sem_t <span class="nm" data-a="itens" data-b="full">itens</span> = 0;
 
 Produtor:              Consumidor:
-  B = 7;                 P(full);   ← espera
-  V(full);               m = B;</code></pre>
+  B = 7;                 P(<span class="nm" data-a="itens" data-b="full">itens</span>);   ← espera
+  V(<span class="nm" data-a="itens" data-b="full">itens</span>);              m = B;</code></pre>
 <ul>
-<li><code>full</code> começa em <strong>0</strong>. Se o consumidor chegar primeiro, faz <code>P(full)</code> com 0 e <strong>fica parado</strong>.</li>
-<li>O produtor escreve <code>B = 7</code> e faz <code>V(full)</code>: agora <code>full</code> = 1.</li>
+<li><code><span class="nm" data-a="itens" data-b="full">itens</span></code> começa em <strong>0</strong>. Se o consumidor chegar primeiro, faz <code>P(<span class="nm" data-a="itens" data-b="full">itens</span>)</code> com 0 e <strong>fica parado</strong>.</li>
+<li>O produtor escreve <code>B = 7</code> e faz <code>V(<span class="nm" data-a="itens" data-b="full">itens</span>)</code>: agora <code><span class="nm" data-a="itens" data-b="full">itens</span></code> = 1.</li>
 <li>O consumidor sai da espera e lê <code>B</code>: leu 7, o valor certo.</li>
 </ul>
 <p>Até aqui: <strong>o consumidor espera, o produtor libera.</strong></p>
 
 <p><strong>Passo 2: o problema que sobra.</strong> O produtor nunca espera ninguém. Ele pode fazer:</p>
-<pre><code>B = 7;  V(full);
-B = 8;  V(full);   ← apagou o 7 antes de o consumidor ler!</code></pre>
+<pre><code>B = 7;  V(<span class="nm" data-a="itens" data-b="full">itens</span>);
+B = 8;  V(<span class="nm" data-a="itens" data-b="full">itens</span>);   ← apagou o 7 antes de o consumidor ler!</code></pre>
 
-<p><strong>Passo 3: o segundo semáforo, <code>empty</code>.</strong> A mesma ideia do passo 1, só que <strong>ao contrário</strong>: agora o produtor espera e o consumidor libera.</p>
-<pre><code>sem_t empty = 1;
+<p><strong>Passo 3: o segundo semáforo, <code><span class="nm" data-a="vagas" data-b="empty">vagas</span></code>.</strong> A mesma ideia do passo 1, só que <strong>ao contrário</strong>: agora o produtor espera e o consumidor libera.</p>
+<pre><code>sem_t <span class="nm" data-a="vagas" data-b="empty">vagas</span> = 1;
 
 Produtor:              Consumidor:
-  P(empty);  ← espera    m = B;
-  B = 8;                 V(empty);  ← libera</code></pre>
+  P(<span class="nm" data-a="vagas" data-b="empty">vagas</span>);  ← espera    m = B;
+  B = 8;                 V(<span class="nm" data-a="vagas" data-b="empty">vagas</span>);  ← libera</code></pre>
 <ul>
-<li><code>empty</code> começa em <strong>1</strong>: na primeira vez <code>B</code> está vazio, então o produtor pode escrever direto.</li>
-<li>Depois de escrever, <code>empty</code> fica 0. Na próxima vez, o produtor <strong>fica parado</strong> até o consumidor ler e fazer <code>V(empty)</code>.</li>
+<li><code><span class="nm" data-a="vagas" data-b="empty">vagas</span></code> começa em <strong>1</strong>: na primeira vez <code>B</code> está vazio, então o produtor pode escrever direto.</li>
+<li>Depois de escrever, <code><span class="nm" data-a="vagas" data-b="empty">vagas</span></code> fica 0. Na próxima vez, o produtor <strong>fica parado</strong> até o consumidor ler e fazer <code>V(<span class="nm" data-a="vagas" data-b="empty">vagas</span>)</code>.</li>
 </ul>
 
 <p><strong>Juntando os passos 1 e 3</strong>, sai o código do slide:</p>
 <div class="wrap"><table>
 <tr><th>Semáforo</th><th>Começa em</th><th>Quem espera (faz P)</th><th>Quem libera (faz V)</th><th>Responde a</th></tr>
-<tr><td><code>full</code></td><td>0</td><td>Consumidor</td><td>Produtor</td><td>"<code>B</code> tem valor novo para ler?"</td></tr>
-<tr><td><code>empty</code></td><td>1</td><td>Produtor</td><td>Consumidor</td><td>"<code>B</code> está livre para escrever?"</td></tr>
+<tr><td><code><span class="nm" data-a="itens" data-b="full">itens</span></code></td><td>0</td><td>Consumidor</td><td>Produtor</td><td>"<code>B</code> tem valor novo para ler?"</td></tr>
+<tr><td><code><span class="nm" data-a="vagas" data-b="empty">vagas</span></code></td><td>1</td><td>Produtor</td><td>Consumidor</td><td>"<code>B</code> está livre para escrever?"</td></tr>
 </table></div>
 <p>Compare com a região crítica (seção 3): lá havia <strong>um</strong> semáforo, e o <strong>mesmo</strong> processo fazia P e V nele. Aqui há duas esperas diferentes (produtor espera vaga, consumidor espera valor), por isso são dois semáforos, e cada um é esperado por um processo e liberado pelo outro.</p>
 <pre><code>int B;
-sem_t empty = 1;
-sem_t full  = 0;
+sem_t <span class="nm" data-a="vagas" data-b="empty">vagas</span> = 1;
+sem_t <span class="nm" data-a="itens" data-b="full">itens</span> = 0;
 
 void Producer {                 void Consumer {
   int m;                          int m;
   while (TRUE) {                  while (TRUE) {
-p1  Produce(m);                 c1  P(full);
-p2  P(empty);                   c2  m = B;
-p3  B = m;                      c3  V(empty);
-p4  V(full);                    c4  Consume(m);
+p1  Produce(m);                 c1  P(<span class="nm" data-a="itens" data-b="full">itens</span>);
+p2  P(<span class="nm" data-a="vagas" data-b="empty">vagas</span>);                   c2  m = B;
+p3  B = m;                      c3  V(<span class="nm" data-a="vagas" data-b="empty">vagas</span>);
+p4  V(<span class="nm" data-a="itens" data-b="full">itens</span>);                   c4  Consume(m);
   }                               }
 }                               }</code></pre>
 <p class="src">Rótulos p1–p4 e c1–c4 acrescentados por esta lição.</p>
 <p>Exemplo resolvido. O consumidor chega primeiro; o produtor produz 7 e depois 9.</p>
 <div class="wrap"><table>
-<tr><th>t</th><th>Produtor</th><th>Consumidor</th><th>empty</th><th>full</th><th>B</th></tr>
-<tr class="key"><td class="t">1</td><td>—</td><td>c1: <code>P(full)</code>, full = 0 → <strong>espera</strong></td><td class="s">1</td><td class="s">0</td><td class="s">—</td></tr>
-<tr><td class="t">2</td><td>p1: produz 7; p2: <code>P(empty)</code>, 1 &gt; 0 → empty = 0</td><td class="sleep">esperando full &gt; 0</td><td class="s">0</td><td class="s">0</td><td class="s">—</td></tr>
-<tr><td class="t">3</td><td>p3: <code>B = 7</code>; p4: <code>V(full)</code> → full = 1</td><td class="sleep">esperando</td><td class="s">0</td><td class="s">1</td><td class="s">7</td></tr>
-<tr class="key"><td class="t">4</td><td>p1: produz 9</td><td>completa c1: full = 0; c2: <code>m = 7</code></td><td class="s">0</td><td class="s">0</td><td class="s">7</td></tr>
-<tr class="key"><td class="t">5</td><td>p2: <code>P(empty)</code>, empty = 0 → <strong>espera</strong></td><td>c3: <code>V(empty)</code> → empty = 1</td><td class="s">1</td><td class="s">0</td><td class="s">7</td></tr>
-<tr><td class="t">6</td><td>completa p2: empty = 0; p3: <code>B = 9</code></td><td>c4: consome 7</td><td class="s">0</td><td class="s">0</td><td class="s">9</td></tr>
+<tr><th>t</th><th>Produtor</th><th>Consumidor</th><th><span class="nm" data-a="vagas" data-b="empty">vagas</span></th><th><span class="nm" data-a="itens" data-b="full">itens</span></th><th>B</th></tr>
+<tr class="key"><td class="t">1</td><td>—</td><td>c1: <code>P(<span class="nm" data-a="itens" data-b="full">itens</span>)</code>, <span class="nm" data-a="itens" data-b="full">itens</span> = 0 → <strong>espera</strong></td><td class="s">1</td><td class="s">0</td><td class="s">—</td></tr>
+<tr><td class="t">2</td><td>p1: produz 7; p2: <code>P(<span class="nm" data-a="vagas" data-b="empty">vagas</span>)</code>, 1 &gt; 0 → <span class="nm" data-a="vagas" data-b="empty">vagas</span> = 0</td><td class="sleep">esperando <span class="nm" data-a="itens" data-b="full">itens</span> &gt; 0</td><td class="s">0</td><td class="s">0</td><td class="s">—</td></tr>
+<tr><td class="t">3</td><td>p3: <code>B = 7</code>; p4: <code>V(<span class="nm" data-a="itens" data-b="full">itens</span>)</code> → <span class="nm" data-a="itens" data-b="full">itens</span> = 1</td><td class="sleep">esperando</td><td class="s">0</td><td class="s">1</td><td class="s">7</td></tr>
+<tr class="key"><td class="t">4</td><td>p1: produz 9</td><td>completa c1: <span class="nm" data-a="itens" data-b="full">itens</span> = 0; c2: <code>m = 7</code></td><td class="s">0</td><td class="s">0</td><td class="s">7</td></tr>
+<tr class="key"><td class="t">5</td><td>p2: <code>P(<span class="nm" data-a="vagas" data-b="empty">vagas</span>)</code>, <span class="nm" data-a="vagas" data-b="empty">vagas</span> = 0 → <strong>espera</strong></td><td>c3: <code>V(<span class="nm" data-a="vagas" data-b="empty">vagas</span>)</code> → <span class="nm" data-a="vagas" data-b="empty">vagas</span> = 1</td><td class="s">1</td><td class="s">0</td><td class="s">7</td></tr>
+<tr><td class="t">6</td><td>completa p2: <span class="nm" data-a="vagas" data-b="empty">vagas</span> = 0; p3: <code>B = 9</code></td><td>c4: consome 7</td><td class="s">0</td><td class="s">0</td><td class="s">9</td></tr>
 </table></div>
-<p>Em t5 o produtor <strong>não consegue</strong> gravar 9 por cima do 7 antes de o consumidor ler: <code>empty</code> só volta a 1 depois de c2–c3.</p>
+<p>Em t5 o produtor <strong>não consegue</strong> gravar 9 por cima do 7 antes de o consumidor ler: <code><span class="nm" data-a="vagas" data-b="empty">vagas</span></code> só volta a 1 depois de c2–c3.</p>
 
 <p><strong>Buffer circular de tamanho n</strong> <span class="src">s.22</span>: o mesmo esquema com um array.</p>
 <pre><code>int B[n];  int front = 0;  int rear = 0;
-sem_t empty = n;  sem_t full = 0;
+sem_t <span class="nm" data-a="vagas" data-b="empty">vagas</span> = n;  sem_t <span class="nm" data-a="itens" data-b="full">itens</span> = 0;
 
-Producer:  Produce(m); P(empty); B[rear] = m;  rear = (rear + 1) % n;   V(full);
-Consumer:  P(full);  m = B[front]; front = (front + 1) % n;  V(empty); Consume(m);</code></pre>
-<p><code>empty</code> começa em <code>n</code> (n lugares livres). <code>rear</code> é a posição da próxima gravação, <code>front</code> a da próxima leitura, e <code>% n</code> faz as duas voltarem a 0 depois da última posição.</p>
-<p><strong>Vários produtores e consumidores</strong> <span class="src">s.23</span>: dois produtores poderiam gravar ao mesmo tempo em <code>B[rear]</code>. Por isso o slide acrescenta <code>mutexD</code> (em volta da gravação) e <code>mutexF</code> (em volta da leitura): <code>P(empty); P(mutexD); …; V(mutexD); V(full);</code>.</p>
+Producer:  Produce(m); P(<span class="nm" data-a="vagas" data-b="empty">vagas</span>); B[rear] = m;  rear = (rear + 1) % n;   V(<span class="nm" data-a="itens" data-b="full">itens</span>);
+Consumer:  P(<span class="nm" data-a="itens" data-b="full">itens</span>);  m = B[front]; front = (front + 1) % n;  V(<span class="nm" data-a="vagas" data-b="empty">vagas</span>); Consume(m);</code></pre>
+<p><code><span class="nm" data-a="vagas" data-b="empty">vagas</span></code> começa em <code>n</code> (n lugares livres). <code>rear</code> é a posição da próxima gravação, <code>front</code> a da próxima leitura, e <code>% n</code> faz as duas voltarem a 0 depois da última posição.</p>
+<p><strong>Vários produtores e consumidores</strong> <span class="src">s.23</span>: dois produtores poderiam gravar ao mesmo tempo em <code>B[rear]</code>. Por isso o slide acrescenta <code>mutexD</code> (em volta da gravação) e <code>mutexF</code> (em volta da leitura): <code>P(<span class="nm" data-a="vagas" data-b="empty">vagas</span>); P(mutexD); …; V(mutexD); V(<span class="nm" data-a="itens" data-b="full">itens</span>);</code>.</p>
 <div class="box warn"><p><strong>Atenção ao slide 23.</strong> Ele declara <code>sem_t mutexD = 0; sem_t mutexF = 0;</code>. Pela definição de <code>P</code> (s.8), com valor 0 o primeiro <code>P(mutexD)</code> esperaria para sempre, porque nenhum <code>V(mutexD)</code> acontece antes. Para servir de exclusão mútua, como o <code>S = 1</code> do s.10, o valor inicial teria de ser 1. Provavelmente é um erro de digitação; confirme com o professor.</p></div>
 
 <h2>Prática 1 · Complete: o produtor chega primeiro</h2>
+<p><button class="plain nmtoggle" type="button">Mostrar nomes do slide (empty, full)</button></p>
 <p>Buffer de tamanho 1 (s.21). O produtor produz o item A, depois o item B. Só então o consumidor começa.</p>
 <div class="wrap"><table class="trace" id="tb1">
-<tr><th>t</th><th>O que acontece</th><th>empty</th><th>full</th></tr>
-<tr><td class="t">1</td><td>Produtor, p2: <code>P(empty)</code> com empty = 1</td><td><input data-ans="0" data-hint="1 > 0, então P subtrai 1."></td><td class="s">0</td></tr>
-<tr><td class="t">2</td><td>Produtor, p3: <code>B = A</code>; p4: <code>V(full)</code></td><td class="s">0</td><td><input data-ans="1" data-hint="V sempre soma 1: 0 + 1."></td></tr>
-<tr><td class="t">3</td><td>Produtor produz B; p2: <code>P(empty)</code> com empty = 0 →
-  <select data-ans="esp" data-hint="P só completa com s > 0. empty = 0, então o produtor espera."><option value="">escolha</option><option value="esp">espera</option><option value="seg">segue e grava</option></select></td><td class="s">0</td><td class="s">1</td></tr>
-<tr><td class="t">4</td><td>Consumidor, c1: <code>P(full)</code></td><td class="s">0</td><td><input data-ans="0" data-hint="full = 1 > 0, então P subtrai 1."></td></tr>
+<tr><th>t</th><th>O que acontece</th><th><span class="nm" data-a="vagas" data-b="empty">vagas</span></th><th><span class="nm" data-a="itens" data-b="full">itens</span></th></tr>
+<tr><td class="t">1</td><td>Produtor, p2: <code>P(<span class="nm" data-a="vagas" data-b="empty">vagas</span>)</code> com <span class="nm" data-a="vagas" data-b="empty">vagas</span> = 1</td><td><input data-ans="0" data-hint="1 > 0, então P subtrai 1."></td><td class="s">0</td></tr>
+<tr><td class="t">2</td><td>Produtor, p3: <code>B = A</code>; p4: <code>V(<span class="nm" data-a="itens" data-b="full">itens</span>)</code></td><td class="s">0</td><td><input data-ans="1" data-hint="V sempre soma 1: 0 + 1."></td></tr>
+<tr><td class="t">3</td><td>Produtor produz B; p2: <code>P(<span class="nm" data-a="vagas" data-b="empty">vagas</span>)</code> com <span class="nm" data-a="vagas" data-b="empty">vagas</span> = 0 →
+  <select data-ans="esp" data-hint="P só completa com s > 0. <span class="nm" data-a="vagas" data-b="empty">vagas</span> = 0, então o produtor espera."><option value="">escolha</option><option value="esp">espera</option><option value="seg">segue e grava</option></select></td><td class="s">0</td><td class="s">1</td></tr>
+<tr><td class="t">4</td><td>Consumidor, c1: <code>P(<span class="nm" data-a="itens" data-b="full">itens</span>)</code></td><td class="s">0</td><td><input data-ans="0" data-hint="itens = 1 > 0, então P subtrai 1."></td></tr>
 <tr><td class="t">5</td><td>Consumidor, c2: <code>m = B</code> lê o
   <select data-ans="a" data-hint="O produtor ainda não gravou o B: está parado em p2 desde t3. B ainda guarda A."><option value="">escolha</option><option value="a">item A</option><option value="b">item B</option></select></td><td class="s">0</td><td class="s">0</td></tr>
-<tr><td class="t">6</td><td>Consumidor, c3: <code>V(empty)</code> → empty = 1, e o produtor
-  <select data-ans="comp" data-hint="Agora empty > 0, então o P(empty) que estava esperando pode completar, subtraindo 1."><option value="">escolha</option><option value="comp">completa o P(empty)</option><option value="cont">continua esperando</option></select>; empty fica</td><td><input data-ans="0" data-hint="O produtor completou P(empty): 1 − 1."></td><td class="s">0</td></tr>
+<tr><td class="t">6</td><td>Consumidor, c3: <code>V(<span class="nm" data-a="vagas" data-b="empty">vagas</span>)</code> → <span class="nm" data-a="vagas" data-b="empty">vagas</span> = 1, e o produtor
+  <select data-ans="comp" data-hint="Agora vagas > 0, então o P(<span class="nm" data-a="vagas" data-b="empty">vagas</span>) que estava esperando pode completar, subtraindo 1."><option value="">escolha</option><option value="comp">completa o P(<span class="nm" data-a="vagas" data-b="empty">vagas</span>)</option><option value="cont">continua esperando</option></select>; <span class="nm" data-a="vagas" data-b="empty">vagas</span> fica</td><td><input data-ans="0" data-hint="O produtor completou P(vagas): 1 − 1."></td><td class="s">0</td></tr>
 </table></div>
 <p><button class="plain" data-check="tb1">Conferir</button> <span class="fb" id="tb1fb"></span></p>
 
@@ -359,6 +361,17 @@ while (true) {         while (true) {
 
 <script>
 (function(){
+  (function(){
+    var slide=false, btns=document.querySelectorAll('.nmtoggle');
+    function apply(){
+      document.querySelectorAll('.nm').forEach(function(e){ e.textContent=e.getAttribute(slide?'data-b':'data-a'); });
+      btns.forEach(function(b){ b.textContent = slide ? 'Mostrar nomes didáticos (vagas, itens)' : 'Mostrar nomes do slide (empty, full)'; });
+    }
+    try { slide = localStorage.getItem('l3-nomes') === 'slide'; } catch(e){}
+    btns.forEach(function(b){ b.addEventListener('click', function(){ slide=!slide; try{localStorage.setItem('l3-nomes', slide?'slide':'did');}catch(e){} apply(); }); });
+    apply();
+  })();
+
   function norm(v){ return String(v).trim().replace(/\s/g,'').replace('−','-'); }
   document.querySelectorAll('button[data-check]').forEach(function(btn){
     btn.addEventListener('click', function(){
