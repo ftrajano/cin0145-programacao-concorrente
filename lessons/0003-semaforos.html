@@ -161,7 +161,44 @@ r4    V(S);             /* pós-protocolo */
 
 <h2>5. Produtor-consumidor</h2>
 <p>Um problema de <strong>comunicação</strong> <span class="src">s.20</span>. Os <strong>produtores</strong> geram dados com o procedimento <code>Produce</code>, que devem ser enviados aos consumidores. Os <strong>consumidores</strong>, ao receberem um dado, fazem alguma computação com o procedimento <code>Consume</code>. O que <code>Produce</code> e <code>Consume</code> fazem por dentro não importa: importa como o dado passa de um para o outro.</p>
-<p><strong>Buffer de tamanho 1</strong> <span class="src">s.21</span>. Dois semáforos: <code>empty</code> conta lugares livres, <code>full</code> conta itens guardados.</p>
+<p><strong>Buffer de tamanho 1</strong> <span class="src">s.21</span>. A variável <code>B</code> guarda um valor de cada vez. O código do slide usa <strong>dois semáforos separados</strong>. Antes de vê-lo inteiro, vamos montá-lo um semáforo de cada vez.</p>
+
+<p class="src">Os passos 1–3 abaixo são uma construção desta lição para chegar ao código de s.21; não estão nos slides.</p>
+<p><strong>Passo 1: só o <code>full</code>.</strong> Primeiro um problema só: o consumidor não pode ler <code>B</code> antes de o produtor escrever.</p>
+<pre><code>sem_t full = 0;
+
+Produtor:              Consumidor:
+  B = 7;                 P(full);   ← espera
+  V(full);               m = B;</code></pre>
+<ul>
+<li><code>full</code> começa em <strong>0</strong>. Se o consumidor chegar primeiro, faz <code>P(full)</code> com 0 e <strong>fica parado</strong>.</li>
+<li>O produtor escreve <code>B = 7</code> e faz <code>V(full)</code>: agora <code>full</code> = 1.</li>
+<li>O consumidor sai da espera e lê <code>B</code>: leu 7, o valor certo.</li>
+</ul>
+<p>Até aqui: <strong>o consumidor espera, o produtor libera.</strong></p>
+
+<p><strong>Passo 2: o problema que sobra.</strong> O produtor nunca espera ninguém. Ele pode fazer:</p>
+<pre><code>B = 7;  V(full);
+B = 8;  V(full);   ← apagou o 7 antes de o consumidor ler!</code></pre>
+
+<p><strong>Passo 3: o segundo semáforo, <code>empty</code>.</strong> A mesma ideia do passo 1, só que <strong>ao contrário</strong>: agora o produtor espera e o consumidor libera.</p>
+<pre><code>sem_t empty = 1;
+
+Produtor:              Consumidor:
+  P(empty);  ← espera    m = B;
+  B = 8;                 V(empty);  ← libera</code></pre>
+<ul>
+<li><code>empty</code> começa em <strong>1</strong>: na primeira vez <code>B</code> está vazio, então o produtor pode escrever direto.</li>
+<li>Depois de escrever, <code>empty</code> fica 0. Na próxima vez, o produtor <strong>fica parado</strong> até o consumidor ler e fazer <code>V(empty)</code>.</li>
+</ul>
+
+<p><strong>Juntando os passos 1 e 3</strong>, sai o código do slide:</p>
+<div class="wrap"><table>
+<tr><th>Semáforo</th><th>Começa em</th><th>Quem espera (faz P)</th><th>Quem libera (faz V)</th><th>Responde a</th></tr>
+<tr><td><code>full</code></td><td>0</td><td>Consumidor</td><td>Produtor</td><td>"<code>B</code> tem valor novo para ler?"</td></tr>
+<tr><td><code>empty</code></td><td>1</td><td>Produtor</td><td>Consumidor</td><td>"<code>B</code> está livre para escrever?"</td></tr>
+</table></div>
+<p>Compare com a região crítica (seção 3): lá havia <strong>um</strong> semáforo, e o <strong>mesmo</strong> processo fazia P e V nele. Aqui há duas esperas diferentes (produtor espera vaga, consumidor espera valor), por isso são dois semáforos, e cada um é esperado por um processo e liberado pelo outro.</p>
 <pre><code>int B;
 sem_t empty = 1;
 sem_t full  = 0;
