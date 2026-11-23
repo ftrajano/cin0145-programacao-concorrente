@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lição 8 — Linda</title>
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --rule:#d9d4c7; --accent:#8b2500; --bg:#fffdf8;
+          --ok:#1f6f3a; --bad:#9b1c1c; --soft:#f3efe4; --hi:#f6e3b4; }
+  html { background:var(--bg); }
+  body { max-width: 50rem; margin: 3rem auto 6rem; padding: 0 1.25rem; color:var(--ink);
+         font: 17px/1.6 Georgia, "Iowan Old Style", "Palatino Linotype", serif; }
+  header .kicker { color:var(--muted); font-size:.85rem; letter-spacing:.08em; text-transform:uppercase; }
+  h1 { font-weight: normal; font-size: 2.3rem; line-height:1.15; margin: .2rem 0 .4rem; letter-spacing:-.01em; }
+  .sub { color:var(--muted); font-style: italic; margin: 0 0 2.2rem; }
+  h2 { font-weight: normal; font-size: 1.4rem; margin: 2.8rem 0 .6rem; border-bottom:1px solid var(--rule); padding-bottom:.2rem; }
+  p { margin: .7rem 0; }
+  .src { color:var(--muted); font-size:.82rem; }
+  a { color: var(--accent); }
+  code { font: .88em/1.4 "SF Mono", Menlo, Consolas, monospace; background:var(--soft); padding:0 .25em; border-radius:3px; }
+  pre { background:var(--soft); padding: .8rem 1rem; border-radius:4px; overflow-x:auto; font-size:.86rem; line-height:1.45; }
+  pre code { background:none; padding:0; }
+  .box { border:1px solid var(--rule); border-radius:6px; padding: 1rem 1.2rem; margin: 1.2rem 0; background:#fff; }
+  .box.recall { border-left: 4px solid var(--accent); }
+  .box.ask { background:var(--soft); border:none; }
+  .box.exam { border-left: 4px solid #8a6d00; }
+  .box.warn { border-left: 4px solid #8a6d00; background:#fffaf0; }
+  nav { font-size:.9rem; color:var(--muted); margin-bottom: 2rem; }
+  nav a { margin-right: .75rem; }
+  details summary { cursor:pointer; color:var(--accent); font-size:.92rem; }
+  .wrap { overflow-x:auto; }
+  table { border-collapse: collapse; width:100%; font-size:.9rem; margin:.5rem 0; }
+  td, th { padding:.35rem .5rem; border-bottom:1px solid var(--rule); text-align:left; vertical-align:top; }
+  th { font-weight:normal; color:var(--muted); font-size:.8rem; }
+  td.t { color:var(--muted); font-variant-numeric: tabular-nums; width:2rem; }
+  td.s { font-family: "SF Mono", Menlo, monospace; font-size:.85rem; white-space:nowrap; }
+  tr.key td { background:var(--hi); }
+  .spin { color:#2c5282; }
+  .cs { font-weight:bold; }
+  table.trace select { font: .85rem "SF Mono", Menlo, monospace; padding:.15rem .3rem; border:1px solid var(--rule); border-radius:3px; background:#fff; color:var(--ink); max-width:100%; }
+  table.trace .ok { border-color:var(--ok); background:#e6efe8; }
+  table.trace .bad { border-color:var(--bad); background:#f8e5e5; }
+  ol.props li { margin:.5rem 0; }
+  .q { margin: 1.4rem 0; }
+  .q p.stem { margin:.2rem 0 .5rem; }
+  .q button.opt { display:block; width:100%; text-align:left; font:inherit; font-size:.97rem; padding:.45rem .8rem; margin:.3rem 0;
+       background:#fff; border:1px solid var(--rule); border-radius:4px; cursor:pointer; color:var(--ink); }
+  .q button.opt:hover { background:var(--soft); }
+  .q button.opt.ok { border-color:var(--ok); background:#e6efe8; }
+  .q button.opt.bad { border-color:var(--bad); background:#f8e5e5; }
+  .fb { font-size:.92rem; margin:.4rem 0 0; min-height:1.2rem; }
+  .fb.ok { color:var(--ok); } .fb.bad { color:var(--bad); }
+  .score { font-style: italic; color: var(--muted); }
+  button.plain { font: inherit; font-size:.9rem; padding:.35rem .8rem; border:1px solid var(--rule); background:#fff; border-radius:4px; cursor:pointer; }
+  button.plain:disabled { opacity:.4; cursor:default; }
+  textarea { width:100%; box-sizing:border-box; min-height:11rem; font: 1rem/1.5 Georgia, serif; padding:.7rem; border:1px solid var(--rule); border-radius:4px; background:#fff; color:var(--ink); }
+  .wc { font-size:.85rem; color:var(--muted); }
+  .check { display:none; } .check.on { display:block; }
+  .check label { display:block; margin:.5rem 0; padding-left:1.6rem; text-indent:-1.6rem; }
+  footer { margin-top:3rem; border-top:1px solid var(--rule); padding-top:1rem; font-size:.9rem; color:var(--muted); }
+  @media print { body { margin:0; max-width:none; font-size:11pt; } nav, button, textarea, select { display:none; } .check { display:block; } }
+  table.trace input { font: .85rem "SF Mono", Menlo, monospace; width:4.5rem; padding:.15rem .3rem; border:1px solid var(--rule); border-radius:3px; background:#fff; color:var(--ink); }
+  .sleep { color:var(--muted); font-style:italic; }
+</style>
+</head>
+<body>
+<nav><a href="../index.html">Início</a> <a href="../reference/glossario.html">Glossário</a> <a href="../reference/guia-da-prova.html">Guia das provas</a> <a href="./0007-ada-rendezvous-e-select.html">← Lição 7</a> <a href="./0010-interferencia-e-nao-determinismo.html">Lição 10 →</a></nav>
+
+<header>
+  <div class="kicker">Lição 8 · Linda (arquivo 09b)</div>
+  <h1>Linda: o espaço de tuplas</h1>
+  <p class="sub">Um jeito diferente de se comunicar: em vez de mandar uma mensagem para alguém, você deixa uma tupla num espaço comum, e quem quiser a pega. Primitivas, casamento de padrões, o exemplo da multiplicação de matrizes e as respostas de P3 Q2 e da coluna Linda de 2026 Q5. Tempo estimado: 35 minutos. "s.N" indica o slide de 09b-Linda.pdf.</p>
+</header>
+
+<div class="box recall">
+<p><strong>Aquecimento das Lições 6 e 7, de memória:</strong></p>
+<ol>
+<li>No rendezvous de Ada, quem precisa saber o nome de quem?</li>
+<li>Na comunicação assíncrona, quem envia espera o receptor?</li>
+</ol>
+<details><summary>Ver respostas</summary>
+<p>1. A calling task precisa saber o nome da accepting task (08, s.3). 2. Não: envio sem bloqueio, salvo buffer cheio (07, s.11).</p>
+</details>
+</div>
+
+<h2>1. A ideia: um espaço de tuplas</h2>
+<p>Os slides apresentam Linda em quatro itens <span class="src">s.2</span>:</p>
+<ul>
+<li><strong>Independência de tempo e espaço</strong>;</li>
+<li>um <strong>espaço de tuplas</strong> (TS, <em>tuple space</em>);</li>
+<li><strong>tuplas</strong>: sequências de dados com tipos;</li>
+<li><strong>casamento de padrões</strong> nas assinaturas das tuplas.</li>
+</ul>
+<p>Uma tupla é uma lista de valores entre parênteses. A <strong>assinatura</strong> é a lista dos tipos <span class="src">s.2</span>:</p>
+<div class="wrap"><table>
+<tr><th>Tupla</th><th>Assinatura</th></tr>
+<tr><td><code>(1, 'A')</code></td><td><code>(integer, character)</code></td></tr>
+<tr><td><code>(1, 2)</code></td><td><code>(integer, integer)</code></td></tr>
+<tr><td><code>('A', 1)</code></td><td><code>(character, integer)</code></td></tr>
+</table></div>
+<p>Repare que <code>(1, 'A')</code> e <code>('A', 1)</code> têm assinaturas <strong>diferentes</strong>: a ordem dos tipos importa.</p>
+<p>Compare com a Lição 6: lá, uma mensagem ia por um canal de um processo para outro. Aqui, ninguém manda nada <strong>para</strong> ninguém: os processos põem tuplas no TS e tiram tuplas do TS. Quem pôs não precisa saber quem vai tirar.</p>
+<p class="src">A comparação com a Lição 6 é desta lição, a partir de s.2 e s.7.</p>
+
+<h2>2. As primitivas</h2>
+<p>O slide lista cinco primitivas, mas <strong>só explica uma</strong> <span class="src">s.3</span>:</p>
+<div class="wrap"><table>
+<tr><th>Primitiva</th><th>O que o slide diz</th><th>O que dá para deduzir dos exemplos</th></tr>
+<tr><td><code>Output(T)</code></td><td>—</td><td>põe a tupla T no TS (no Exemplo 1, o <code>Input</code> recebe o que o <code>Output</code> pôs)</td></tr>
+<tr><td><code>Input(T)</code></td><td><strong>remove</strong> a tupla T, <strong>suspende</strong> se não houver casamento do padrão</td><td>—</td></tr>
+<tr><td><code>Read(T)</code></td><td>—</td><td>lê uma tupla <strong>sem remover</strong>: na multiplicação de matrizes, cada linha é lida por vários workers (seção 5)</td></tr>
+<tr><td><code>Try_Input(T)</code></td><td>—</td><td>não explicado</td></tr>
+<tr><td><code>Try_Read(T)</code></td><td>—</td><td>não explicado</td></tr>
+</table></div>
+<p class="src">A terceira coluna é dedução desta lição a partir de s.4 e s.9–10. Sobre <code>Try_Input</code> e <code>Try_Read</code>, os slides não dizem nada além do nome; o nome sugere uma "tentativa" que não suspende, como o <code>else</code> do <code>select</code> em Ada (08, s.14), mas isso não está no material. Confirme com o professor.</p>
+
+<h2>3. Casamento de padrões</h2>
+<p><strong>Exemplo 1</strong> <span class="src">s.4</span>:</p>
+<pre><code>Output(1, 'A');
+Input(I: Integer; C: Character);</code></pre>
+<p>No <code>Input</code>, <code>I: Integer</code> e <code>C: Character</code> não são valores, são <strong>variáveis com tipo</strong>: o padrão é "qualquer tupla <code>(integer, character)</code>". A tupla <code>(1, 'A')</code> casa; o <code>Input</code> a remove do TS e preenche <code>I = 1</code>, <code>C = 'A'</code>.</p>
+<p><strong>Exemplo 2</strong>: um padrão pode misturar valores fixos e variáveis <span class="src">s.5</span>. A string identifica o tipo de pedido, o inteiro identifica a tarefa, o nome identifica o ID do processo:</p>
+<pre><code>Input("job", J: Job_ID; 24)        -- proc 24 espera para servir
+Output("job", 17, 24)              -- envia pedido ao proc 24
+Output("job", 17, P: Process_ID)   -- envia pedido a qualquer processo</code></pre>
+<ul>
+<li>No <code>Input</code>, <code>"job"</code> e <code>24</code> são <strong>fixos</strong>: só casa uma tupla que começa com <code>"job"</code> e termina com <code>24</code>. <code>J</code> é preenchido com o que vier no meio.</li>
+<li>O primeiro <code>Output</code> cria <code>("job", 17, 24)</code>: casa com o processo 24.</li>
+<li>O segundo <code>Output</code> deixa o último campo como variável, e o slide diz que isso "envia pedido a qualquer processo".</li>
+</ul>
+<p class="src">s.5. A leitura de "fixo" e "variável" é desta lição, a partir dos comentários do slide.</p>
+
+<p><strong>Exemplo RPC</strong> <span class="src">s.6</span>: uma chamada de procedimento remoto feita só com tuplas.</p>
+<pre><code>Cliente (processo 24):
+  Output("Proc", 24, 65, 'X');     -- nome do procedimento, quem chama, dois parâmetros
+  Input(24, B: Boolean);           -- espera a resposta endereçada a 24
+
+Servidor:
+  Input("Proc", Caller: Process_ID; I: Integer; C: Character);
+  Proc(I, C, B);
+  Output(Caller, B);               -- devolve a resposta para quem chamou</code></pre>
+<p>O cliente identifica a si mesmo dentro da tupla (<code>24</code>) para que a resposta volte para ele. O servidor não precisa saber de antemão quem vai chamar.</p>
+<p class="src">Os comentários do código são desta lição; o slide descreve os campos: string com o nome do procedimento remoto, nome do processo que chama, dois parâmetros de entrada (inteiro e caracter). O slide 6 não diz que o cliente é o processo 24; isso é deduzido de <code>Input(24, …)</code>.</p>
+
+<h2>Prática 1 · Casa ou suspende?</h2>
+<p>O TS contém exatamente: <code>(1, 'A')</code>, <code>("job", 17, 24)</code>, <code>(2, 3)</code>. As operações abaixo rodam <strong>em sequência</strong>, cada uma vendo o TS deixado pela anterior.</p>
+<div class="wrap"><table class="trace" id="tb1">
+<tr><th>#</th><th>Operação</th><th>Resultado</th></tr>
+<tr><td class="t">1</td><td><code>Input(X: Integer; Y: Integer)</code></td>
+<td><select data-ans="23" data-hint="Assinatura (integer, integer): só (2, 3) casa."><option value="">escolha</option><option value="1a">remove (1,'A')</option><option value="23">remove (2,3)</option><option value="job">remove ("job",17,24)</option><option value="susp">suspende</option></select></td></tr>
+<tr><td class="t">2</td><td><code>Input("job", J: Job_ID; 25)</code></td>
+<td><select data-ans="susp" data-hint="O último campo é fixo em 25, e a tupla tem 24: não casa. Input suspende se não houver casamento (s.3)."><option value="">escolha</option><option value="1a">remove (1,'A')</option><option value="23">remove (2,3)</option><option value="job">remove ("job",17,24)</option><option value="susp">suspende</option></select></td></tr>
+<tr><td class="t">3</td><td><code>Input(I: Integer; C: Character)</code></td>
+<td><select data-ans="1a" data-hint="Assinatura (integer, character): (1, 'A') casa."><option value="">escolha</option><option value="1a">remove (1,'A')</option><option value="23">remove (2,3)</option><option value="job">remove ("job",17,24)</option><option value="susp">suspende</option></select></td></tr>
+<tr><td class="t">4</td><td><code>Input(I: Integer; C: Character)</code> de novo</td>
+<td><select data-ans="susp" data-hint="(1,'A') já foi removida na linha 3. Não há outra tupla (integer, character)."><option value="">escolha</option><option value="1a">remove (1,'A')</option><option value="23">remove (2,3)</option><option value="job">remove ("job",17,24)</option><option value="susp">suspende</option></select></td></tr>
+<tr><td class="t">5</td><td><code>Input("job", J: Job_ID; 24)</code></td>
+<td><select data-ans="job" data-hint="&quot;job&quot; e 24 batem; J recebe 17."><option value="">escolha</option><option value="1a">remove (1,'A')</option><option value="23">remove (2,3)</option><option value="job">remove ("job",17,24)</option><option value="susp">suspende</option></select></td></tr>
+</table></div>
+<p><button class="plain" data-check="tb1" type="button">Conferir</button></p>
+<p class="fb" id="tb1fb"></p>
+
+<h2>4. Características</h2>
+<p>O slide 7 resume: <strong>independência de nomes de processos</strong> e <strong>independência da existência dos processos</strong> <span class="src">s.7</span>.</p>
+<ul>
+<li><strong>Nomes:</strong> quem faz <code>Output</code> não precisa saber o nome de quem fará <code>Input</code> (no Exemplo 2, "envia pedido a qualquer processo").</li>
+<li><strong>Existência:</strong> a tupla fica no TS mesmo que o processo que vai pegá-la ainda nem exista. Junto com s.2, é a "independência de tempo": quem põe e quem tira não precisam estar ativos ao mesmo tempo.</li>
+</ul>
+<p class="src">As explicações dos dois itens são desta lição, a partir de s.2, s.5 e s.7.</p>
+
+<h2>5. Exemplo: multiplicação de matrizes</h2>
+<p>O cliente põe as linhas da matriz 1 e as colunas da matriz 2 no TS, mais um contador de jobs. Vários <strong>workers</strong> (servidores) calculam os 9 elementos do resultado <span class="src">s.8–10</span>.</p>
+<pre><code>-- cliente
+Output('A', 1, (1,2,3));    -- linhas da matriz 1
+Output('A', 2, (4,5,6));
+Output('A', 3, (7,8,9));
+Output('B', 1, (1,0,2));    -- colunas da matriz 2
+Output('B', 2, (1,2,1));
+Output('B', 3, (1,1,1));
+Output("Next", 1);          -- contador do proximo job
+for I in 1..3 loop
+  for J in 1..3 loop
+    Input('C', I, J: Integer; C: Integer);
+  end loop;
+end loop;
+
+-- cada worker
+task body Worker is
+begin
+  loop
+    Input("Next", Element);
+    Output("Next", Element + 1);
+    exit when Element &gt; 3*3;
+    I := (Element - 1) / 3 + 1;
+    J := (Element - 1) mod 3 + 1;
+    Row_Tuple := Read('A', I, V1);
+    Col_Tuple := Read('B', J, V2);
+    X := Inner_Product(V1, V2);
+    Output('C', I, J, X);
+  end loop;
+end Worker;</code></pre>
+<p class="src">s.9–10, com a indentação desta lição.</p>
+<p><strong>Como funciona, passo a passo</strong> (leitura desta lição do código):</p>
+<ol>
+<li><strong>O contador <code>("Next", k)</code> distribui os jobs.</strong> Um worker faz <code>Input("Next", Element)</code>: <strong>remove</strong> a tupla, então nenhum outro worker pega o mesmo número. Logo em seguida devolve <code>("Next", Element + 1)</code> para o próximo. Enquanto a tupla está fora do TS, outro worker que tente <code>Input("Next", …)</code> suspende. É exclusão mútua feita com uma tupla.</li>
+<li><strong>O número do job vira linha e coluna.</strong> Os 9 jobs são os 9 elementos do resultado, numerados linha por linha. <code>/</code> é divisão inteira (descarta o resto); <code>mod</code> é o resto.</li>
+<li><strong><code>Read</code>, não <code>Input</code>, para as linhas e colunas.</strong> A linha 1 é usada pelos jobs 1, 2 e 3. Se o primeiro worker a <strong>removesse</strong>, os outros suspenderiam para sempre.</li>
+<li><strong>O resultado volta como tupla <code>('C', I, J, X)</code>.</strong> O cliente pega os 9 com <code>Input</code>; cada <code>Input</code> espera até o seu elemento ficar pronto.</li>
+<li><strong>Fim:</strong> quando <code>Element &gt; 9</code>, o worker sai do loop. Como ele devolveu <code>("Next", Element + 1)</code> antes de sair, os outros workers também encontram um número maior que 9 e saem.</li>
+</ol>
+
+<div class="box warn"><p><strong>Atenção aos números do slide 8.</strong> O slide mostra <code>[1 2 3; 4 5 6; 7 8 9] × [1 0 2; 0 1 2; 1 0 0] = [4 2 16; 10 5 18; 16 8 30]</code>. Calculando linha 1 × coluna 3: 1·2 + 2·2 + 3·0 = <strong>6</strong>, não 16 (os outros 8 elementos batem). E as colunas que o cliente põe no TS em s.9, <code>(1,0,2)</code>, <code>(1,2,1)</code>, <code>(1,1,1)</code>, não são as colunas dessa matriz (que seriam <code>(1,0,1)</code>, <code>(0,1,0)</code>, <code>(2,2,0)</code>). Parecem erros de digitação; o funcionamento do algoritmo não muda.</p></div>
+
+<h2>Prática 2 · Job → linha e coluna</h2>
+<p>Use <code>I := (Element − 1) / 3 + 1</code> e <code>J := (Element − 1) mod 3 + 1</code>, com divisão inteira.</p>
+<div class="wrap"><table class="trace" id="tb2">
+<tr><th>Element</th><th>I</th><th>J</th></tr>
+<tr><td class="s">1</td><td class="s">1</td><td class="s">1</td></tr>
+<tr><td class="s">2</td><td><input data-ans="1" data-hint="(2−1)/3 = 0, + 1 = 1."></td><td><input data-ans="2" data-hint="(2−1) mod 3 = 1, + 1 = 2."></td></tr>
+<tr><td class="s">5</td><td><input data-ans="2" data-hint="(5−1)/3 = 4/3 = 1 (inteira), + 1 = 2."></td><td><input data-ans="2" data-hint="4 mod 3 = 1, + 1 = 2."></td></tr>
+<tr><td class="s">7</td><td><input data-ans="3" data-hint="6/3 = 2, + 1 = 3."></td><td><input data-ans="1" data-hint="6 mod 3 = 0, + 1 = 1."></td></tr>
+<tr><td class="s">9</td><td><input data-ans="3" data-hint="8/3 = 2, + 1 = 3."></td><td><input data-ans="3" data-hint="8 mod 3 = 2, + 1 = 3."></td></tr>
+</table></div>
+<p><button class="plain" data-check="tb2" type="button">Conferir</button></p>
+<p class="fb" id="tb2fb"></p>
+
+<h2>6. Vantagens e desvantagens</h2>
+<div class="wrap"><table>
+<tr><th>Do slide <span class="src">s.11–12</span></th><th>No exemplo das matrizes (leitura desta lição)</th></tr>
+<tr><td><strong>Vantagem:</strong> independência da quantidade de workers</td><td>o mesmo código funciona com 1, 2 ou 9 workers; nenhum precisa saber quantos existem</td></tr>
+<tr><td><strong>Vantagem:</strong> independência da performance</td><td>um worker mais rápido simplesmente pega mais jobs do contador</td></tr>
+<tr><td><strong>Vantagem:</strong> expressividade</td><td>as mesmas poucas primitivas fazem pedido a um processo, pedido a qualquer um, RPC e divisão de trabalho (s.4–10)</td></tr>
+<tr><td><strong>Vantagem:</strong> flexibilidade</td><td>dá para acrescentar ou retirar workers sem mudar o cliente</td></tr>
+<tr><td><strong>Desvantagem:</strong> eficiência</td><td>o slide não explica. Uma leitura possível: toda comunicação passa pelo TS e por um casamento de padrões, em vez de ir direto de um processo a outro. Não está no material.</td></tr>
+</table></div>
+
+<h2>Questão da prova: 2026-1, questão 5, coluna Linda (com resposta)</h2>
+<div class="wrap"><table>
+<tr><th>Característica</th><th>Linda</th><th>Por quê</th></tr>
+<tr><td>Monitores</td><td>não</td><td>os slides de Linda não falam de monitores</td></tr>
+<tr><td>Mensagens assíncronas</td><td><strong>sim</strong></td><td>quem faz <code>Output</code> não espera ninguém, e a tupla fica no TS até alguém pegar: independência de tempo e da existência dos processos (s.2, 7)</td></tr>
+<tr><td>Mensagens síncronas</td><td>não</td><td>não há encontro entre os dois processos</td></tr>
+<tr><td>Rendezvous</td><td>não</td><td>idem</td></tr>
+</table></div>
+<p class="src">Os slides de Linda não usam as palavras "síncrona" e "assíncrona". A classificação é desta lição, aplicando as definições de 07, s.10–11, às características de s.2 e s.7. A coluna Ada está na Lição 7; Java e Erlang, nas Lições 11 e 15.</p>
+
+<h2>Questão da prova: P3, questão 2 (com resposta)</h2>
+<div class="box"><p><em>"Quais as vantagens e desvantagens do modelo de programação oferecido pela linguagem Linda? Descreva como ela funciona."</em></p></div>
+<p><strong>Resposta modelo:</strong></p>
+<ol>
+<li><strong>Como funciona.</strong> Os processos se comunicam por um <strong>espaço de tuplas</strong> (TS) compartilhado. Tuplas são sequências de dados com tipos. <code>Output</code> põe uma tupla no TS; <code>Input</code> remove uma tupla que case com um padrão e suspende se nenhuma casar; <code>Read</code> lê sem remover; há também <code>Try_Input</code> e <code>Try_Read</code>. O casamento é pela assinatura (os tipos) e pelos campos fixos do padrão: <code>Input("job", J: Job_ID; 24)</code> pega só pedidos <code>"job"</code> para o processo 24 e preenche <code>J</code>. Com isso se faz RPC (o cliente põe o pedido com seu ID e espera uma tupla com esse ID) e divisão de trabalho (vários workers tirando jobs de um contador no TS, como na multiplicação de matrizes) (s.2–10).</li>
+<li><strong>Vantagens</strong> (s.7, 11): independência de tempo e espaço, de nomes e da existência dos processos (quem envia não precisa saber quem recebe, nem se ele já existe); independência da quantidade de workers e da performance (mais workers ou workers mais rápidos simplesmente pegam mais jobs); expressividade (poucas primitivas para vários padrões de comunicação); flexibilidade (workers entram e saem sem mudar o resto).</li>
+<li><strong>Desvantagem</strong> (s.12): <strong>eficiência</strong>.</li>
+</ol>
+<p class="src">Os parênteses com exemplos são desta lição; os itens são dos slides citados. O <code>Read</code> "sem remover" é dedução do exemplo das matrizes (seção 5).</p>
+
+<h2>Prática 3 · Quiz de memória</h2>
+<div id="quiz"></div>
+<p class="score" id="score"></p>
+
+<h2>Leitura opcional</h2>
+<p>O mapeamento autorizado de capítulos (<a href="../reference/mapa-do-curso.html">Mapa do curso</a>) ainda não tem uma linha para Linda. Se quiser, peça ao agente para procurar o capítulo correspondente nos livros da bibliografia.</p>
+
+<div class="box ask">
+<p><strong>Dúvida?</strong> Pergunte ao agente, seu professor neste workspace. Próxima lição: Go (arquivo 09c), a de menor prioridade, ou pule para o Java (Lição 10) e o Erlang (Lição 15).</p>
+</div>
+
+<footer><a href="../index.html">← Início</a> · Lição 8 de CIN0145. Fonte: 09b-Linda.pdf, slides 2–12.</footer>
+
+<script>
+(function(){
+  function norm(v){ return String(v).trim().replace(/\s/g,'').replace('−','-'); }
+  document.querySelectorAll('button[data-check]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var id = btn.getAttribute('data-check'), tb = document.getElementById(id), fb = document.getElementById(id + 'fb');
+      var wrong = [], blank = 0;
+      tb.querySelectorAll('[data-ans]').forEach(function(el){
+        el.classList.remove('ok','bad');
+        var v = norm(el.value); if (v === '') { blank++; return; }
+        var a = el.getAttribute('data-ans'), ok = el.tagName === 'INPUT' ? Number(v) === Number(a) : v === a;
+        el.classList.add(ok ? 'ok' : 'bad'); if (!ok) wrong.push(el.getAttribute('data-hint'));
+      });
+      if (blank) { fb.className = 'fb'; fb.textContent = 'Preencha todas (' + blank + ' vazia' + (blank > 1 ? 's' : '') + ').'; return; }
+      fb.className = 'fb ' + (wrong.length ? 'bad' : 'ok');
+      fb.textContent = wrong.length ? wrong.length + ' em vermelho. Dica: ' + wrong[0] : 'Tudo certo.';
+    });
+  });
+
+  function mcq(el, it, onDone, keepOrder){
+    var fb = document.createElement('p'); fb.className = 'fb'; var done = false;
+    var list = it.opts.map(function(o,i){ return {o:o, i:i}; }); if (!keepOrder) shuffle(list);
+    list.forEach(function(x){
+      var b = document.createElement('button'); b.className = 'opt'; b.textContent = x.o;
+      b.addEventListener('click', function(){
+        if (done) return; done = true; var ok = x.i === it.ans;
+        b.classList.add(ok ? 'ok' : 'bad'); fb.className = 'fb ' + (ok ? 'ok' : 'bad');
+        fb.textContent = (ok ? 'Certo. ' : 'Não. A resposta é: ' + it.opts[it.ans] + '. ') + it.why;
+        if (onDone) onDone(ok);
+      });
+      el.appendChild(b);
+    });
+    el.appendChild(fb);
+  }
+  function shuffle(a){ for (var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+
+  var items = [
+    { stem: '<code>Input(T)</code> quando nenhuma tupla casa com o padrão…',
+      opts: ['suspende o processo', 'devolve uma tupla vazia', 'cria a tupla no espaço'], ans: 0,
+      why: 'Input remove a tupla T e suspende se não houver casamento do padrão (s.3).' },
+    { stem: 'As tuplas <code>(1, \'A\')</code> e <code>(\'A\', 1)</code>…',
+      opts: ['têm assinaturas diferentes', 'têm a mesma assinatura', 'não são tuplas válidas'], ans: 0,
+      why: '(integer, character) e (character, integer): a ordem dos tipos importa (s.2).' },
+    { stem: 'Na multiplicação de matrizes, os workers usam <code>Read</code> para as linhas porque…',
+      opts: ['cada linha serve a vários jobs', 'Read é mais rápido que Input', 'as linhas são escritas depois'], ans: 0,
+      why: 'A linha 1 é usada pelos jobs 1, 2 e 3; se fosse removida, os outros ficariam suspensos (dedução desta lição de s.9–10).' },
+    { stem: 'Qual destas é a desvantagem de Linda citada no slide?',
+      opts: ['eficiência', 'flexibilidade', 'expressividade'], ans: 0,
+      why: 'Desvantagens: eficiência (s.12). Flexibilidade e expressividade são vantagens (s.11).' },
+    { stem: '"Independência da existência dos processos" quer dizer que…',
+      opts: ['a tupla espera quem ainda não existe', 'todo processo existe desde o início', 'processos não têm nome em Linda'], ans: 0,
+      why: 'A tupla fica no TS mesmo que o processo que vai pegá-la ainda não exista (s.7, leitura desta lição).' },
+    { stem: 'No exemplo RPC, como a resposta volta para o cliente certo?',
+      opts: ['o cliente põe o seu ID na tupla', 'o servidor sabe o nome do cliente', 'o TS guarda quem fez o pedido'], ans: 0,
+      why: 'Output("Proc", 24, …) leva o ID 24; o servidor responde Output(Caller, B), e o cliente espera Input(24, B) (s.6).' },
+    { stem: 'Revisão da Lição 7. No <code>select</code> de Ada, a cláusula <code>when</code>…',
+      opts: ['abre ou fecha uma alternativa', 'define o tempo de timeout', 'escolhe qual fila atender'], ans: 0,
+      why: 'As guardas são avaliadas, gerando o conjunto de alternativas abertas (08, s.12).' }
+  ];
+  var root = document.getElementById('quiz'), scoreEl = document.getElementById('score'), answered = 0, right = 0;
+  shuffle(items).forEach(function(it, k){
+    var d = document.createElement('div'); d.className = 'q';
+    d.innerHTML = '<p class="stem">' + (k+1) + '. ' + it.stem + '</p>';
+    mcq(d, it, function(ok){ answered++; if (ok) right++; scoreEl.textContent = 'Placar: ' + right + ' de ' + answered + (answered === items.length ? '. Me mande este placar.' : ''); });
+    root.appendChild(d);
+  });
+})();
+</script>
+</body>
+</html>
