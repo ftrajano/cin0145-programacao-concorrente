@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lição 16 — Revisão final</title>
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --rule:#d9d4c7; --accent:#8b2500; --bg:#fffdf8;
+          --ok:#1f6f3a; --bad:#9b1c1c; --soft:#f3efe4; --hi:#f6e3b4; }
+  html { background:var(--bg); }
+  body { max-width: 50rem; margin: 3rem auto 6rem; padding: 0 1.25rem; color:var(--ink);
+         font: 17px/1.6 Georgia, "Iowan Old Style", "Palatino Linotype", serif; }
+  header .kicker { color:var(--muted); font-size:.85rem; letter-spacing:.08em; text-transform:uppercase; }
+  h1 { font-weight: normal; font-size: 2.3rem; line-height:1.15; margin: .2rem 0 .4rem; letter-spacing:-.01em; }
+  .sub { color:var(--muted); font-style: italic; margin: 0 0 2.2rem; }
+  h2 { font-weight: normal; font-size: 1.4rem; margin: 2.8rem 0 .6rem; border-bottom:1px solid var(--rule); padding-bottom:.2rem; }
+  p { margin: .7rem 0; }
+  .src { color:var(--muted); font-size:.82rem; }
+  a { color: var(--accent); }
+  code { font: .88em/1.4 "SF Mono", Menlo, Consolas, monospace; background:var(--soft); padding:0 .25em; border-radius:3px; }
+  pre { background:var(--soft); padding: .8rem 1rem; border-radius:4px; overflow-x:auto; font-size:.86rem; line-height:1.45; }
+  pre code { background:none; padding:0; }
+  .box { border:1px solid var(--rule); border-radius:6px; padding: 1rem 1.2rem; margin: 1.2rem 0; background:#fff; }
+  .box.recall { border-left: 4px solid var(--accent); }
+  .box.ask { background:var(--soft); border:none; }
+  .box.exam { border-left: 4px solid #8a6d00; }
+  .box.warn { border-left: 4px solid #8a6d00; background:#fffaf0; }
+  nav { font-size:.9rem; color:var(--muted); margin-bottom: 2rem; }
+  nav a { margin-right: .75rem; }
+  details summary { cursor:pointer; color:var(--accent); font-size:.92rem; }
+  .wrap { overflow-x:auto; }
+  table { border-collapse: collapse; width:100%; font-size:.9rem; margin:.5rem 0; }
+  td, th { padding:.35rem .5rem; border-bottom:1px solid var(--rule); text-align:left; vertical-align:top; }
+  th { font-weight:normal; color:var(--muted); font-size:.8rem; }
+  td.t { color:var(--muted); font-variant-numeric: tabular-nums; width:2rem; }
+  td.s { font-family: "SF Mono", Menlo, monospace; font-size:.85rem; white-space:nowrap; }
+  tr.key td { background:var(--hi); }
+  .spin { color:#2c5282; }
+  .cs { font-weight:bold; }
+  table.trace select { font: .85rem "SF Mono", Menlo, monospace; padding:.15rem .3rem; border:1px solid var(--rule); border-radius:3px; background:#fff; color:var(--ink); max-width:100%; }
+  table.trace .ok { border-color:var(--ok); background:#e6efe8; }
+  table.trace .bad { border-color:var(--bad); background:#f8e5e5; }
+  ol.props li { margin:.5rem 0; }
+  .q { margin: 1.4rem 0; }
+  .q p.stem { margin:.2rem 0 .5rem; }
+  .q button.opt { display:block; width:100%; text-align:left; font:inherit; font-size:.97rem; padding:.45rem .8rem; margin:.3rem 0;
+       background:#fff; border:1px solid var(--rule); border-radius:4px; cursor:pointer; color:var(--ink); }
+  .q button.opt:hover { background:var(--soft); }
+  .q button.opt.ok { border-color:var(--ok); background:#e6efe8; }
+  .q button.opt.bad { border-color:var(--bad); background:#f8e5e5; }
+  .fb { font-size:.92rem; margin:.4rem 0 0; min-height:1.2rem; }
+  .fb.ok { color:var(--ok); } .fb.bad { color:var(--bad); }
+  .score { font-style: italic; color: var(--muted); }
+  button.plain { font: inherit; font-size:.9rem; padding:.35rem .8rem; border:1px solid var(--rule); background:#fff; border-radius:4px; cursor:pointer; }
+  button.plain:disabled { opacity:.4; cursor:default; }
+  textarea { width:100%; box-sizing:border-box; min-height:11rem; font: 1rem/1.5 Georgia, serif; padding:.7rem; border:1px solid var(--rule); border-radius:4px; background:#fff; color:var(--ink); }
+  .wc { font-size:.85rem; color:var(--muted); }
+  .check { display:none; } .check.on { display:block; }
+  .check label { display:block; margin:.5rem 0; padding-left:1.6rem; text-indent:-1.6rem; }
+  footer { margin-top:3rem; border-top:1px solid var(--rule); padding-top:1rem; font-size:.9rem; color:var(--muted); }
+  @media print { body { margin:0; max-width:none; font-size:11pt; } nav, button, textarea, select { display:none; } .check { display:block; } }
+  table.trace input { font: .85rem "SF Mono", Menlo, monospace; width:4.5rem; padding:.15rem .3rem; border:1px solid var(--rule); border-radius:3px; background:#fff; color:var(--ink); }
+  .sleep { color:var(--muted); font-style:italic; }
+  .rq-mcq button.opt { display:block; width:100%; text-align:left; font:inherit; font-size:.97rem; padding:.45rem .8rem; margin:.3rem 0; background:#fff; border:1px solid var(--rule); border-radius:4px; cursor:pointer; color:var(--ink); }
+  .rq-mcq button.opt:hover { background:var(--soft); }
+  .rq-mcq button.opt.ok { border-color:var(--ok); background:#e6efe8; }
+  .rq-mcq button.opt.bad { border-color:var(--bad); background:#f8e5e5; }
+  .rq { border:1px solid var(--rule); border-radius:6px; background:#fff; padding:1rem 1.2rem; margin:1.4rem 0; }
+  .rq-src { margin:0 0 .4rem; font-size:.82rem; color:var(--muted); letter-spacing:.04em; text-transform:uppercase; }
+  .rq-n { display:inline-block; min-width:1.6rem; font-weight:bold; color:var(--accent); }
+  .rq-stem { margin:.2rem 0 .8rem; }
+  .rq textarea { min-height:7rem; }
+  .rq-ans { margin-top:.8rem; }
+  .rq-ans[open] { background:var(--soft); padding:.6rem .9rem; border-radius:4px; }
+  ul.ck li { margin:.35rem 0; }
+  li.warnli { color:var(--muted); font-style:italic; }
+  .rq-grade { margin:.8rem 0 0; font-size:.9rem; color:var(--muted); }
+  .rq-grade .g.on[data-g="ok"] { background:#e6efe8; border-color:var(--ok); }
+  .rq-grade .g.on[data-g="mid"] { background:var(--hi); border-color:var(--accent); }
+  .rq-grade .g.on[data-g="bad"] { background:#f8e5e5; border-color:var(--bad); }
+  .rq.done { border-left:4px solid var(--rule); }
+  #sum ul li { margin:.2rem 0; }
+</style>
+
+</head>
+<body>
+<nav><a href="../index.html">Início</a> <a href="../reference/glossario.html">Glossário</a> <a href="../reference/guia-da-prova.html">Guia das provas</a> <a href="./0015-erlang-processos-e-caixa-postal.html">← Lição 15</a></nav>
+
+<header>
+  <div class="kicker">Lição 16 · Revisão final · modo recordação</div>
+  <h1>Revisão final: as 20 questões das 4 provas</h1>
+  <p class="sub">Todas as questões da prova de 2026-1 e das três provas antigas, misturadas entre temas. Primeiro você responde de memória; só depois abre a resposta. Tempo estimado: 1h30 a 2h, pode dividir em blocos.</p>
+</header>
+
+<div class="box recall">
+<p><strong>Como usar.</strong></p>
+<ol>
+<li><strong>Não abra a lição antes.</strong> O que fixa o conteúdo é o esforço de lembrar, não reler.</li>
+<li>Nas questões <strong>objetivas</strong> (múltipla escolha e tabelas), responda e confira: a página corrige na hora.</li>
+<li>Nas <strong>dissertativas</strong>, escreva no campo (ou pelo menos em tópicos), depois abra a <strong>resposta modelo</strong>. Ela vem como lista de pontos: conte quantos você cobriu e marque <em>Acertei</em>, <em>Parcial</em> ou <em>Errei</em>.</li>
+<li>No fim, o <strong>placar</strong> lista o que revisar, com link para a lição.</li>
+</ol>
+<p class="src">As respostas são derivadas dos slides (não são gabarito oficial), como nas lições. As das questões P1 Q2, P2 Q4 e P3 Q4 não têm slide próprio e estão marcadas em itálico cinza: confirme com o professor. Seu texto e suas marcações ficam salvos só neste navegador.</p>
+</div>
+
+<section class="rq" id="q2026-1" data-kind="auto"><p class="rq-src"><span class="rq-n">1</span> 2026-1 · Questão 1 · 1,0</p><p class="rq-stem">Identifique os estados: L (livelock), D (deadlock) ou S (starvation). Algumas podem ficar em branco.</p><div class="wrap"><table class="trace" id="t1"><tr><th>Descrição</th><th>Resposta</th></tr><tr><td>As threads continuam executando, mas não geram progresso útil observável pelo usuário.</td><td><select data-ans="L" data-hint="Executam sem progresso: livelock (03, s.21; 11, s.36)."><option value="">escolha</option><option value="L">L</option><option value="D">D</option><option value="S">S</option><option value="b">em branco</option></select></td></tr><tr><td>Uma ou mais threads monopoliza(m) o processador e impede(m) que outras executem.</td><td><select data-ans="S" data-hint="Outras querem executar e nunca conseguem: o mais próximo de starvation (03, s.5)."><option value="">escolha</option><option value="L">L</option><option value="D">D</option><option value="S">S</option><option value="b">em branco</option></select></td></tr><tr><td>O sistema encerra a execução por falta de memória RAM disponível.</td><td><select data-ans="b" data-hint="Falta de memória não é nenhum dos três."><option value="">escolha</option><option value="L">L</option><option value="D">D</option><option value="S">S</option><option value="b">em branco</option></select></td></tr><tr><td>O sistema trava completamente, com todas as threads paradas, esperando umas pelas outras.</td><td><select data-ans="D" data-hint="Todas paradas esperando umas pelas outras: deadlock (03, s.17; 11, s.36)."><option value="">escolha</option><option value="L">L</option><option value="D">D</option><option value="S">S</option><option value="b">em branco</option></select></td></tr></table></div><p><button class="plain" data-check="t1" type="button">Conferir</button> <span class="fb" id="t1fb"></span></p><details class="rq-ans"><summary>Ver comentário</summary><p>L · S (com ressalva: o material não usa "monopolizar") · em branco · D.</p><p class="src">Resposta completa: <a href="./0002-tentativas-2-a-4-e-dekker.html">Lição 2</a>.</p></details></section>
+<section class="rq" id="p2-1" data-kind="text"><p class="rq-src"><span class="rq-n">2</span> Prova 2 · Questão 1 · 3,0</p><p class="rq-stem">Soluções de problemas envolvendo concorrência devem, idealmente, satisfazer a um conjunto de características/propriedades para que sejam consideradas satisfatórias. Indique/explique quais são essas características, indicando se são essenciais ou apenas importantes/desejáveis em alguns casos.</p><textarea class="rq-txt" placeholder="Escreva sua resposta antes de abrir a resposta modelo."></textarea><details class="rq-ans"><summary>Mostrar resposta modelo</summary><ul class="ck"><li><strong>Exclusão mútua:</strong> instruções das seções críticas de dois ou mais processos não podem executar ao mesmo tempo (03, s.2).</li><li><strong>Parar fora não atrapalha:</strong> um processo pode parar fora da região crítica sem interferir nos outros.</li><li><strong>Ausência de deadlock:</strong> se processos tentam entrar, um deles deve conseguir.</li><li><strong>Ausência de starvation:</strong> se um processo quer entrar, em algum momento entrará.</li><li><strong>Sem contenção:</strong> sem disputa, entra com overhead mínimo (03, s.3–5).</li><li><strong>Essenciais × desejáveis:</strong> exclusão mútua é o que o programa "deve" satisfazer; deadlock "não pode" e starvation "não deve" acontecer; a sem contenção é sobre eficiência. Os slides não classificam explicitamente: diga isso.</li></ul><p class="src">Resposta completa: <a href="./0001-exclusao-mutua-propriedades-e-tentativa-1.html">Lição 1</a>.</p></details><p class="rq-grade">Como foi? <button class="plain g" data-g="ok" type="button">Acertei</button> <button class="plain g" data-g="mid" type="button">Parcial</button> <button class="plain g" data-g="bad" type="button">Errei</button></p></section>
+<section class="rq" id="q2026-2" data-kind="auto"><p class="rq-src"><span class="rq-n">3</span> 2026-1 · Questão 2 · 1,8</p><p class="rq-stem">Processo 1: <code>while (true) { wait(S); a(); signal(Q) }</code>. Processo 2: <code>while (true) { wait(Q); b(); signal(S) }</code>. A sequência de chamadas pode acontecer com os valores iniciais indicados? Responda S ou N.</p><div class="wrap"><table class="trace" id="t2"><tr><th>Sequência</th><th>S=1, Q=1</th><th>S=1, Q=0</th><th>S=0, Q=0</th></tr><tr><td><code>a b b a a b …</code></td><td><select data-ans="S" data-hint="S=1,Q=1: a usa o saldo de S; os dois b usam o saldo inicial de Q e o signal(Q) do a."><option value="">escolha</option><option value="S">S</option><option value="N">N</option></select></td><td><select data-ans="N" data-hint="S=1,Q=0: depois de a, Q tem saldo 1; o segundo b precisaria de mais um signal(Q), que não houve."><option value="">escolha</option><option value="S">S</option><option value="N">N</option></select></td><td><select data-ans="N" data-hint="S=0: a não pode começar (nP ≤ init + nV)."><option value="">escolha</option><option value="S">S</option><option value="N">N</option></select></td></tr><tr><td><code>a b a b a b …</code></td><td><select data-ans="S" data-hint="Alternância sempre funciona com saldo."><option value="">escolha</option><option value="S">S</option><option value="N">N</option></select></td><td><select data-ans="S" data-hint="a (S:1→0, Q:0→1), b (Q:1→0, S:0→1), e assim por diante."><option value="">escolha</option><option value="S">S</option><option value="N">N</option></select></td><td><select data-ans="N" data-hint="S=0 e Q=0: ninguém começa."><option value="">escolha</option><option value="S">S</option><option value="N">N</option></select></td></tr><tr><td><code>b a b a b a …</code></td><td><select data-ans="S" data-hint="Q=1 permite b primeiro."><option value="">escolha</option><option value="S">S</option><option value="N">N</option></select></td><td><select data-ans="N" data-hint="Q=0: b não pode começar."><option value="">escolha</option><option value="S">S</option><option value="N">N</option></select></td><td><select data-ans="N" data-hint="Ninguém começa."><option value="">escolha</option><option value="S">S</option><option value="N">N</option></select></td></tr></table></div><p><button class="plain" data-check="t2" type="button">Conferir</button> <span class="fb" id="t2fb"></span></p><details class="rq-ans"><summary>Ver comentário</summary><p>Use <code>nP ≤ init + nV</code> para cada semáforo, letra por letra (04, s.6–7). Linha 1: S N N. Linha 2: S S N. Linha 3: S N N.</p><p class="src">Resposta completa: <a href="./0003-semaforos.html">Lição 3</a>.</p></details></section>
+<section class="rq" id="p1-5" data-kind="text"><p class="rq-src"><span class="rq-n">4</span> Prova 1 · Questão 5 · 2,0</p><p class="rq-stem">Indique se a solução abaixo para o problema dos leitores e escritores (a) garante exclusão mútua, (b) garante ausência de starvation. Justifique e, caso haja problemas, indique a correção.</p><pre><code>Monitor Reader_Writer_Monitor {
+  int Readers = 0;
+  BOOL Writing = False;
+  condition OK_to_Read, OK_to_Write;
+  void Start_Read {
+    while (Writing) {wait(OK_to_Read);};
+    Readers = Readers + 1;
+  }
+  void End_Read {
+    Readers = Readers − 1;
+    if (Readers==0) {signal(OK_to_Write);};
+  }
+  void Start_Write {
+    if (Readers &gt; 0 || Writing) {wait(OK_to_Write);};
+    Writing = True;
+  }
+  void End_Write {
+    Writing := False;
+    signal(OK_to_Write);
+    signal_all(OK_to_Read);
+  }
+}</code></pre><textarea class="rq-txt" placeholder="Escreva sua resposta antes de abrir a resposta modelo."></textarea><details class="rq-ans"><summary>Mostrar resposta modelo</summary><ul class="ck"><li><strong>(a)</strong> A ideia está certa, mas <code>Start_Write</code> usa <code>if</code>: o escritor acordado não testa de novo. Se outro processo entrar no monitor entre o <code>signal</code> e a volta do escritor, ele escreve mesmo assim. <strong>Correção:</strong> <code>while</code>.</li><li><strong>Ressalva:</strong> os slides não dizem se o acordado roda imediatamente; com <code>while</code> fica garantido em qualquer caso.</li><li><strong>(b) Não garante:</strong> leitores novos entram mesmo com escritor esperando (<code>Start_Read</code> só testa <code>Writing</code>). Se <code>Readers</code> nunca chega a 0, o escritor nunca é acordado: starvation (03, s.5).</li><li><strong>Correção (ideia):</strong> leitor novo espera se há escritor esperando: <code>while (Writing || !empty(OK_to_Write))</code> (05, s.12).</li></ul><p class="src">Resposta completa: <a href="./0005-leitores-e-escritores-com-monitor.html">Lição 5</a>.</p></details><p class="rq-grade">Como foi? <button class="plain g" data-g="ok" type="button">Acertei</button> <button class="plain g" data-g="mid" type="button">Parcial</button> <button class="plain g" data-g="bad" type="button">Errei</button></p></section>
+<section class="rq" id="q2026-6" data-kind="mcq"><p class="rq-src"><span class="rq-n">5</span> 2026-1 · Questão 6 · 1,0</p><p class="rq-stem">Em Erlang, qual é o comportamento padrão quando uma mensagem chega a um processo mas não casa com nenhum padrão no bloco <code>receive</code> atual?</p><div class="rq-mcq" data-a="2" data-why="Nos desenhos de 12, s.8–10, msg_1 não casa e continua na caixa até um receive posterior."><button class="opt" type="button">O processo emissor recebe um sinal de &#x27;nack&#x27; (Negative Acknowledgement).</button><button class="opt" type="button">O processo entra em estado de erro (crash) por falta de tratamento de mensagem.</button><button class="opt" type="button">A mensagem permanece na &#x27;caixa-postal&#x27; (mailbox) para ser processada por chamadas subsequentes.</button><button class="opt" type="button">A mensagem é descartada imediatamente.</button></div><p class="fb"></p><details class="rq-ans"><summary>Ver comentário</summary><p>Nos desenhos de 12, s.8–10, msg_1 não casa e continua na caixa até um receive posterior.</p><p class="src">Resposta completa: <a href="./0015-erlang-processos-e-caixa-postal.html">Lição 15</a>.</p></details></section>
+<section class="rq" id="p1-3" data-kind="text"><p class="rq-src"><span class="rq-n">6</span> Prova 1 · Questão 3 · 2,0</p><p class="rq-stem">Descreva o funcionamento de rendezvous. Como o processo servidor pode se comportar ao receber várias solicitações ao mesmo tempo? Quais as vantagens desse mecanismo de programação, e por quê?</p><textarea class="rq-txt" placeholder="Escreva sua resposta antes de abrir a resposta modelo."></textarea><details class="rq-ans"><summary>Mostrar resposta modelo</summary><ul class="ck"><li><strong>Funcionamento:</strong> comunicação síncrona, sem buffer; o primeiro a chegar espera o outro. A calling task passa os <code>in</code> e espera; a accepting task executa o corpo do <code>accept</code>; os <code>out</code> voltam; as duas seguem (08, s.3, 7).</li><li><strong>Várias solicitações:</strong> as chamadas ficam em filas por entry; com <code>select</code>, as guardas <code>when</code> definem as alternativas abertas; atende a primeira de uma das filas; se todas vazias, suspende; <code>else</code>/<code>delay</code>/<code>terminate</code> (s.10–13).</li><li><strong>Vantagens:</strong> assimétrico, o servidor não precisa conhecer os clientes (bom para servidores, s.4); sincroniza e troca dados numa operação, nas duas direções (s.9); implementa RPC (s.14); sem variáveis compartilhadas, guardas no lugar de wait/signal; expressivo (semáforo, timeout, polling).</li></ul><p class="src">Resposta completa: <a href="./0007-ada-rendezvous-e-select.html">Lição 7</a>.</p></details><p class="rq-grade">Como foi? <button class="plain g" data-g="ok" type="button">Acertei</button> <button class="plain g" data-g="mid" type="button">Parcial</button> <button class="plain g" data-g="bad" type="button">Errei</button></p></section>
+<section class="rq" id="q2026-4" data-kind="mcq"><p class="rq-src"><span class="rq-n">7</span> 2026-1 · Questão 4 · 1,0</p><p class="rq-stem">Em Java, ao executar um método 'synchronized' de uma classe, o que acontece se uma thread tentar chamar outro método, também 'synchronized', da mesma classe?</p><div class="rq-mcq" data-a="1" data-why="Só um método synchronized executa por vez no mesmo objeto (11, s.14, 29)."><button class="opt" type="button">O objeto é clonado para permitir que ambos os threads trabalhem em cópias separadas.</button><button class="opt" type="button">O thread solicitante fica em estado de espera até que o lock do objeto seja liberado.</button><button class="opt" type="button">Os métodos são executados simultaneamente pois, apesar de serem da mesma classe, são métodos diferentes.</button><button class="opt" type="button">O sistema lança uma exceção do tipo InterruptedException imediatamente.</button></div><p class="fb"></p><details class="rq-ans"><summary>Ver comentário</summary><p>Só um método synchronized executa por vez no mesmo objeto (11, s.14, 29).</p><p class="src">Resposta completa: <a href="./0011-threads-e-synchronized-em-java.html">Lição 11</a>.</p></details></section>
+<section class="rq" id="p3-2" data-kind="text"><p class="rq-src"><span class="rq-n">8</span> Prova 3 · Questão 2 · 2,5</p><p class="rq-stem">Quais as vantagens e desvantagens do modelo de programação oferecido pela linguagem Linda? Descreva como ela funciona.</p><textarea class="rq-txt" placeholder="Escreva sua resposta antes de abrir a resposta modelo."></textarea><details class="rq-ans"><summary>Mostrar resposta modelo</summary><ul class="ck"><li><strong>Funcionamento:</strong> espaço de tuplas compartilhado; tuplas = sequências de dados com tipos; casamento de padrões pela assinatura e campos fixos (09b, s.2).</li><li><strong>Primitivas:</strong> <code>Output</code> põe; <code>Input</code> remove e suspende se nada casa (s.3); <code>Read</code> lê sem remover (dedução do exemplo); <code>Try_Input</code>, <code>Try_Read</code>.</li><li><strong>Exemplo:</strong> RPC com o ID do cliente na tupla (s.6) ou workers tirando jobs de um contador <code>("Next", k)</code> (s.9–10).</li><li><strong>Vantagens:</strong> independência de tempo e espaço, de nomes e da existência dos processos (s.2, 7); da quantidade de workers e da performance; expressividade; flexibilidade (s.11).</li><li><strong>Desvantagem:</strong> eficiência (s.12).</li></ul><p class="src">Resposta completa: <a href="./0008-linda-espaco-de-tuplas.html">Lição 8</a>.</p></details><p class="rq-grade">Como foi? <button class="plain g" data-g="ok" type="button">Acertei</button> <button class="plain g" data-g="mid" type="button">Parcial</button> <button class="plain g" data-g="bad" type="button">Errei</button></p></section>
+<section class="rq" id="q2026-3" data-kind="mcq"><p class="rq-src"><span class="rq-n">9</span> 2026-1 · Questão 3 · 1,0</p><p class="rq-stem">Qual é uma das principais vantagens do uso de Monitores em comparação com Semáforos?</p><div class="rq-mcq" data-a="2" data-why="Exclusão mútua implícita entre procedimentos do monitor (05, s.6, 11–12)."><button class="opt" type="button">O uso de variáveis de condição elimina a necessidade de sinalização entre processos.</button><button class="opt" type="button">Monitores operam em sistemas com memória distribuída.</button><button class="opt" type="button">A exclusão mútua entre os procedimentos do monitor é implícita.</button><button class="opt" type="button">Monitores permitem que múltiplos processos executem a seção crítica simultaneamente.</button></div><p class="fb"></p><details class="rq-ans"><summary>Ver comentário</summary><p>Exclusão mútua implícita entre procedimentos do monitor (05, s.6, 11–12).</p><p class="src">Resposta completa: <a href="./0004-monitores.html">Lição 4</a>.</p></details></section>
+<section class="rq" id="p1-4" data-kind="text"><p class="rq-src"><span class="rq-n">10</span> Prova 1 · Questão 4 · 2,0</p><p class="rq-stem">Para a implementação de um projeto é dada a você a oportunidade de decidir se a comunicação entre os processos deverá ser implementada usando monitores ou usando um mecanismo baseado em troca de mensagens. Que aspectos do problema podem levar você a optar por uma solução ou pela outra?</p><textarea class="rq-txt" placeholder="Escreva sua resposta antes de abrir a resposta modelo."></textarea><details class="rq-ans"><summary>Mostrar resposta modelo</summary><ul class="ck"><li><strong>Hardware:</strong> monitor pressupõe memória compartilhada; com processadores e memória fisicamente distribuídos, só rede, a escolha é mensagens (07, s.2–4; 05, s.5).</li><li><strong>Natureza da interação:</strong> proteger dados compartilhados (buffer, leitores-escritores) → monitor, que concentra dados e operações e dá exclusão mútua implícita (05, s.3–6); processos independentes trocando pedidos (clientes, servidores, filtros, peers) → mensagens (07, s.20).</li><li><strong>Sincronização:</strong> monitor usa variáveis de condição; mensagens sincronizam pelo próprio receive (07, s.8), síncrona ou assíncrona (s.10–12).</li><li><strong>Flexibilidade:</strong> mensagens sem identificação fixa permitem adicionar/remover processos dinamicamente (07, s.15, 18).</li></ul><p class="src">Resposta completa: <a href="./0006-troca-de-mensagens.html">Lição 6</a>.</p></details><p class="rq-grade">Como foi? <button class="plain g" data-g="ok" type="button">Acertei</button> <button class="plain g" data-g="mid" type="button">Parcial</button> <button class="plain g" data-g="bad" type="button">Errei</button></p></section>
+<section class="rq" id="q2026-5" data-kind="auto"><p class="rq-src"><span class="rq-n">11</span> 2026-1 · Questão 5 · 2,0</p><p class="rq-stem">Para cada linguagem, identifique suas características (S = suporta, N = não).</p><div class="wrap"><table class="trace" id="t5"><tr><th></th><th>Java</th><th>Erlang</th><th>Ada</th><th>Linda</th></tr><tr><td>Monitores</td><td><select data-ans="S" data-hint="Java: synchronized + wait/notify fazem o papel do monitor; os slides de Java não tratam de mensagens (Lição 14)."><option value="">escolha</option><option value="S">S</option><option value="N">N</option></select></td><td><select data-ans="N" data-hint="Erlang: &quot;comunicação entre processos assíncrona, unidirecional&quot; (12, s.3)."><option value="">escolha</option><option value="S">S</option><option value="N">N</option></select></td><td><select data-ans="N" data-hint="Ada: rendezvous, comunicação síncrona sem buffers (08, s.3, 9)."><option value="">escolha</option><option value="S">S</option><option value="N">N</option></select></td><td><select data-ans="N" data-hint="Linda: independência de tempo e da existência dos processos (09b, s.2, 7): assíncrona."><option value="">escolha</option><option value="S">S</option><option value="N">N</option></select></td></tr><tr><td>Mensagens assíncronas</td><td><select data-ans="N" data-hint="Java: synchronized + wait/notify fazem o papel do monitor; os slides de Java não tratam de mensagens (Lição 14)."><option value="">escolha</option><option value="S">S</option><option value="N">N</option></select></td><td><select data-ans="S" data-hint="Erlang: &quot;comunicação entre processos assíncrona, unidirecional&quot; (12, s.3)."><option value="">escolha</option><option value="S">S</option><option value="N">N</option></select></td><td><select data-ans="N" data-hint="Ada: rendezvous, comunicação síncrona sem buffers (08, s.3, 9)."><option value="">escolha</option><option value="S">S</option><option value="N">N</option></select></td><td><select data-ans="S" data-hint="Linda: independência de tempo e da existência dos processos (09b, s.2, 7): assíncrona."><option value="">escolha</option><option value="S">S</option><option value="N">N</option></select></td></tr><tr><td>Mensagens síncronas</td><td><select data-ans="N" data-hint="Java: synchronized + wait/notify fazem o papel do monitor; os slides de Java não tratam de mensagens (Lição 14)."><option value="">escolha</option><option value="S">S</option><option value="N">N</option></select></td><td><select data-ans="N" data-hint="Erlang: &quot;comunicação entre processos assíncrona, unidirecional&quot; (12, s.3)."><option value="">escolha</option><option value="S">S</option><option value="N">N</option></select></td><td><select data-ans="S" data-hint="Ada: rendezvous, comunicação síncrona sem buffers (08, s.3, 9)."><option value="">escolha</option><option value="S">S</option><option value="N">N</option></select></td><td><select data-ans="N" data-hint="Linda: independência de tempo e da existência dos processos (09b, s.2, 7): assíncrona."><option value="">escolha</option><option value="S">S</option><option value="N">N</option></select></td></tr><tr><td>Rendezvous</td><td><select data-ans="N" data-hint="Java: synchronized + wait/notify fazem o papel do monitor; os slides de Java não tratam de mensagens (Lição 14)."><option value="">escolha</option><option value="S">S</option><option value="N">N</option></select></td><td><select data-ans="N" data-hint="Erlang: &quot;comunicação entre processos assíncrona, unidirecional&quot; (12, s.3)."><option value="">escolha</option><option value="S">S</option><option value="N">N</option></select></td><td><select data-ans="S" data-hint="Ada: rendezvous, comunicação síncrona sem buffers (08, s.3, 9)."><option value="">escolha</option><option value="S">S</option><option value="N">N</option></select></td><td><select data-ans="N" data-hint="Linda: independência de tempo e da existência dos processos (09b, s.2, 7): assíncrona."><option value="">escolha</option><option value="S">S</option><option value="N">N</option></select></td></tr></table></div><p><button class="plain" data-check="t5" type="button">Conferir</button> <span class="fb" id="t5fb"></span></p><details class="rq-ans"><summary>Ver comentário</summary><p>Java: só monitores. Erlang: só assíncronas. Ada: síncronas e rendezvous. Linda: só assíncronas. Só "Erlang × assíncrona" está literal nos slides; o resto aplica as definições de 07, s.10–11.</p><p class="src">Resposta completa: <a href="./0015-erlang-processos-e-caixa-postal.html">Lição 15</a>.</p></details></section>
+<section class="rq" id="p3-1" data-kind="text"><p class="rq-src"><span class="rq-n">12</span> Prova 3 · Questão 1 · 2,5</p><p class="rq-stem">O que é o problema da exclusão mútua? Quando precisamos nos preocupar com ele? Como ele é resolvido através de Monitores?</p><textarea class="rq-txt" placeholder="Escreva sua resposta antes de abrir a resposta modelo."></textarea><details class="rq-ans"><summary>Mostrar resposta modelo</summary><ul class="ck"><li><strong>O problema:</strong> N processos em laço com seção não crítica e crítica; instruções das seções críticas não podem executar ao mesmo tempo; sem deadlock, sem starvation, parar fora não atrapalha (03, s.2–5).</li><li><strong>Quando:</strong> sempre que processos compartilham recursos; comandos não são atômicos e se intercalam de forma arbitrária, gerando interferência (11, s.5, 9, 12). Exemplo: creditar(100) || debitar(80).</li><li><strong>Com monitores:</strong> dados e operações encapsulados (ADT); processos só chamam procedimentos do monitor (05, s.3–5); exclusão mútua implícita, sem pré/pós-protocolo (s.6); variáveis de condição com wait/signal para esperar condições (s.12).</li></ul><p class="src">Resposta completa: <a href="./0004-monitores.html">Lição 4</a>.</p></details><p class="rq-grade">Como foi? <button class="plain g" data-g="ok" type="button">Acertei</button> <button class="plain g" data-g="mid" type="button">Parcial</button> <button class="plain g" data-g="bad" type="button">Errei</button></p></section>
+<section class="rq" id="p2-2" data-kind="text"><p class="rq-src"><span class="rq-n">13</span> Prova 2 · Questão 2 · 3,0</p><p class="rq-stem">Como poderia ser implementada uma solução para o problema dos filósofos em uma linguagem distribuída (por exemplo utilizando rendez-vous em Ada)? Considere que um processo separado controla os garfos e os demais processos são filósofos. Indique como se comporta sua solução em relação às características desejadas (questão anterior).</p><textarea class="rq-txt" placeholder="Escreva sua resposta antes de abrir a resposta modelo."></textarea><details class="rq-ans"><summary>Mostrar resposta modelo</summary><ul class="ck"><li><strong>Estrutura:</strong> uma task <code>Garfos</code> guarda <code>Livre(0..4)</code>; o filósofo i pede os garfos i e (i+1) mod 5 <strong>juntos</strong> (<code>Garfos.Pegar_i</code>) e depois <code>Garfos.Soltar(i)</code>.</li><li><strong>select com guardas:</strong> <code>when Livre(i) and Livre((i+1) mod 5) =&gt; accept Pegar_i</code>, marca os dois como ocupados; <code>accept Soltar(I)</code> libera (08, s.10–13).</li><li><strong>Exclusão mútua:</strong> sim, só a task Garfos mexe no estado, um rendezvous por vez.</li><li><strong>Deadlock:</strong> não há, ninguém segura um garfo esperando o outro (compare com a solução 1 dos semáforos).</li><li><strong>Starvation:</strong> não garantida, os vizinhos podem se revezar; o select atende "a primeira de uma das filas" (s.12).</li><li><strong>Sem contenção:</strong> sim, guarda aberta, atendido na hora.</li></ul><p class="src">Resposta completa: <a href="./0007-ada-rendezvous-e-select.html">Lição 7</a>.</p></details><p class="rq-grade">Como foi? <button class="plain g" data-g="ok" type="button">Acertei</button> <button class="plain g" data-g="mid" type="button">Parcial</button> <button class="plain g" data-g="bad" type="button">Errei</button></p></section>
+<section class="rq" id="q2026-7" data-kind="text"><p class="rq-src"><span class="rq-n">14</span> 2026-1 · Questão 7 · 2,2</p><p class="rq-stem">Leitores e escritores em Java. Da forma como está, o código apresenta algum problema se tivermos um grande número de processos Leitores e um único processo Escritor? Se for preciso corrigir algo, indique as modificações.</p><pre><code>class RWMonitor {
+  private String dado = "Conteúdo Inicial";
+  private int numeroLeitores = 0;
+  private boolean escritorAtivo = false;
+
+  public void iniciarLeitura(String nomeLeitor) throws InterruptedException {
+    while (escritorAtivo) {
+      wait();
+    }
+    numeroLeitores++;
+    System.out.println(nomeLeitor + " entrou. Leitores ativos: " + numeroLeitores);
+  }
+
+  public synchronized void terminarLeitura(String nomeLeitor) {
+    numeroLeitores--;
+    System.out.println(nomeLeitor + " saiu. Leitores ativos: " + numeroLeitores);
+    if (numeroLeitores == 0) {
+      notifyAll();
+    }
+  }
+
+  public void iniciarEscrita(String nomeEscritor) throws InterruptedException {
+    while (numeroLeitores &gt; 0 || escritorAtivo) {
+      wait();
+    }
+    escritorAtivo = true;
+    System.out.println(nomeEscritor + " começou a escrever.");
+  }
+
+  public synchronized void terminarEscrita(String nomeEscritor) {
+    escritorAtivo = false;
+    System.out.println(nomeEscritor + " terminou de escrever.");
+    notify();
+  }
+
+  public String getDado() { return this.dado; }
+  public void setDado(String novoDado) { this.dado = novoDado; }
+}</code></pre>
+<textarea class="rq-txt" placeholder="Escreva sua resposta antes de abrir a resposta modelo."></textarea><details class="rq-ans"><summary>Mostrar resposta modelo</summary><ul class="ck"><li><strong>Sim, há problema.</strong></li><li><code>iniciarLeitura</code> e <code>iniciarEscrita</code> chamam <code>wait()</code> sem ser <code>synchronized</code>: <code>wait</code> só pode ser chamado dentro de método synchronized. <strong>Correção:</strong> acrescentar <code>synchronized</code> (11, s.34).</li><li>Sem synchronized, testes e atualizações de <code>numeroLeitores</code>/<code>escritorAtivo</code> podem se intercalar: interferência.</li><li><code>terminarEscrita</code> usa <code>notify()</code>, que acorda só uma thread arbitrária; com muitos leitores esperando, os outros ficam parados. <strong>Correção:</strong> <code>notifyAll()</code> (s.35).</li><li>Já estava certo: os <code>while</code> e o <code>notifyAll</code> de <code>terminarLeitura</code>.</li></ul><p class="src">Resposta completa: <a href="./0012-wait-notify-e-por-que-while.html">Lição 12</a>.</p></details><p class="rq-grade">Como foi? <button class="plain g" data-g="ok" type="button">Acertei</button> <button class="plain g" data-g="mid" type="button">Parcial</button> <button class="plain g" data-g="bad" type="button">Errei</button></p></section>
+<section class="rq" id="p1-1" data-kind="text"><p class="rq-src"><span class="rq-n">15</span> Prova 1 · Questão 1 · 2,0</p><p class="rq-stem">Quais as principais dificuldades para o desenvolvimento de programas concorrentes ou distribuídos? Por que eles são mais difíceis de desenvolver que os programas sequenciais?</p><textarea class="rq-txt" placeholder="Escreva sua resposta antes de abrir a resposta modelo."></textarea><details class="rq-ans"><summary>Mostrar resposta modelo</summary><ul class="ck"><li><strong>Comandos não atômicos:</strong> até <code>saldo = saldo + 5</code> executa por partes que se intercalam (11, s.5–6).</li><li><strong>Não determinismo:</strong> a intercalação é arbitrária, o mesmo programa dá resultados diferentes (20, −80 ou 100) (s.9, 11).</li><li><strong>Interferência</strong> em recursos compartilhados (s.12).</li><li><strong>Controle extra:</strong> controlar acesso, proibir sequências, sincronizar (s.13).</li><li><strong>Custo e novos erros:</strong> sincronização reduz eficiência; deadlock e livelock (s.36).</li><li><strong>Por que mais difícil:</strong> é preciso raciocinar sobre todas as intercalações, não sobre uma sequência. Distribuídos: sem memória compartilhada, só mensagens (07, s.3, 9).</li></ul><p class="src">Resposta completa: <a href="./0013-revisao-java-e-primeira-dissertativa.html">Lição 13</a>.</p></details><p class="rq-grade">Como foi? <button class="plain g" data-g="ok" type="button">Acertei</button> <button class="plain g" data-g="mid" type="button">Parcial</button> <button class="plain g" data-g="bad" type="button">Errei</button></p></section>
+<section class="rq" id="p3-3" data-kind="text"><p class="rq-src"><span class="rq-n">16</span> Prova 3 · Questão 3 · 2,5</p><p class="rq-stem">Web browsers e servidores de web não formam um sistema distribuído, mas poderiam ser vistos (ou escritos) como tal. Classifique esse "sistema" de acordo com os critérios estudados no curso.</p><textarea class="rq-txt" placeholder="Escreva sua resposta antes de abrir a resposta modelo."></textarea><details class="rq-ans"><summary>Mostrar resposta modelo</summary><ul class="ck"><li><strong>Memória:</strong> distribuída, só a rede em comum (07, s.3–4).</li><li><strong>Tipo de processo:</strong> clientes (navegadores) e servidor (s.20).</li><li><strong>Sincronização:</strong> síncrona do ponto de vista do navegador, que pede e espera (s.10).</li><li><strong>Fluxo de dados:</strong> duas direções, pedido e resposta (s.16).</li><li><strong>Identificação:</strong> o cliente identifica o servidor; o servidor não conhece os clientes de antemão, o que dá flexibilidade (s.14–15).</li><li><strong>Criação de processos:</strong> dinâmica, clientes entram e saem, e o servidor cria processos conforme a demanda (s.17–18).</li><li class="warnli">As características da web são suposições da Lição 6, não estão nos slides.</li></ul><p class="src">Resposta completa: <a href="./0006-troca-de-mensagens.html">Lição 6</a>.</p></details><p class="rq-grade">Como foi? <button class="plain g" data-g="ok" type="button">Acertei</button> <button class="plain g" data-g="mid" type="button">Parcial</button> <button class="plain g" data-g="bad" type="button">Errei</button></p></section>
+<section class="rq" id="p2-3" data-kind="text"><p class="rq-src"><span class="rq-n">17</span> Prova 2 · Questão 3 · 3,0</p><p class="rq-stem">Descreva o problema dos leitores e escritores, e sua solução usando monitores.</p><textarea class="rq-txt" placeholder="Escreva sua resposta antes de abrir a resposta modelo."></textarea><details class="rq-ans"><summary>Mostrar resposta modelo</summary><ul class="ck"><li><strong>Problema:</strong> leitores podem ler juntos; escritores precisam excluir todos, leitores e escritores (05, s.14). Laços <code>Start_Read; Read; End_Read</code> e <code>Start_Write; Write; End_Write</code> (s.15–16).</li><li><strong>Monitor:</strong> os 4 procedimentos no monitor, exclusão mútua implícita; estado <code>Readers</code>, <code>Writing</code>; condições <code>OK_to_Read</code>, <code>OK_to_Write</code> (s.16–17).</li><li><strong>Cada procedimento:</strong> Start_Read espera enquanto Writing e incrementa; End_Read decrementa e, se 0, <code>signal(OK_to_Write)</code>; Start_Write espera se há leitores ou escrita e marca Writing; End_Write desmarca, <code>signal(OK_to_Write)</code> e <code>signal_all(OK_to_Read)</code> (s.17–19).</li><li><strong>wait/signal:</strong> wait suspende na fila FIFO e libera o monitor; signal acorda o primeiro (s.12).</li><li><strong>Extra que valoriza:</strong> o <code>if</code> de Start_Write deveria ser <code>while</code>; starvation de escritores.</li></ul><p class="src">Resposta completa: <a href="./0005-leitores-e-escritores-com-monitor.html">Lição 5</a>.</p></details><p class="rq-grade">Como foi? <button class="plain g" data-g="ok" type="button">Acertei</button> <button class="plain g" data-g="mid" type="button">Parcial</button> <button class="plain g" data-g="bad" type="button">Errei</button></p></section>
+<section class="rq" id="p3-4" data-kind="text"><p class="rq-src"><span class="rq-n">18</span> Prova 3 · Questão 4 · 2,5</p><p class="rq-stem">Como você projetaria um servidor web concorrente (com múltiplos threads)? Você detecta algum problema de exclusão mútua? Explique por quê.</p><textarea class="rq-txt" placeholder="Escreva sua resposta antes de abrir a resposta modelo."></textarea><details class="rq-ans"><summary>Mostrar resposta modelo</summary><ul class="ck"><li><strong>Projeto:</strong> uma thread principal recebe os pedidos e cria uma thread para cada pedido (ou reaproveita threads), que atende e responde; em Java, threads criadas e iniciadas com <code>start()</code> (Lição 11). Criar processos dinamicamente conforme a demanda é a "razão" de balanceamento de carga (07, s.18).</li><li><strong>Há problema de exclusão mútua quando as threads compartilham recursos</strong> que são alterados: comandos não são atômicos e se intercalam de forma arbitrária, gerando interferência (11, s.5, 9, 12). Exemplos de recurso compartilhado num servidor: um contador de acessos, um cache de páginas, um arquivo de log.</li><li><strong>Solução:</strong> acesso a esses recursos em métodos <code>synchronized</code> (11, s.14) ou num monitor (05, s.6). Se os dados são muito lidos e pouco alterados (páginas, cache), é o padrão leitores-escritores (05, s.14).</li><li><strong>Por quê:</strong> se cada thread só lê dados que ninguém altera, não há interferência; o problema aparece só onde há escrita compartilhada.</li><li class="warnli">Resposta construída para esta revisão a partir dos slides citados; os slides não falam de servidor web. Os exemplos (contador, cache, log) são suposições sobre servidores web.</li></ul></details><p class="rq-grade">Como foi? <button class="plain g" data-g="ok" type="button">Acertei</button> <button class="plain g" data-g="mid" type="button">Parcial</button> <button class="plain g" data-g="bad" type="button">Errei</button></p></section>
+<section class="rq" id="p1-2" data-kind="text"><p class="rq-src"><span class="rq-n">19</span> Prova 1 · Questão 2 · 2,0</p><p class="rq-stem">A linguagem C, ao contrário da linguagem Java, não possui suporte direto ao conceito de monitores. Entretanto eles podem ser simulados adequadamente através da estruturação do programa e de alguns tipos de dados e procedimentos disponíveis. Descreva a estrutura e o funcionamento de monitores e como este conceito é usado/implementado em C.</p><textarea class="rq-txt" placeholder="Escreva sua resposta antes de abrir a resposta modelo."></textarea><details class="rq-ans"><summary>Mostrar resposta modelo</summary><ul class="ck"><li><strong>Estrutura e funcionamento (do material):</strong> ADT que concentra dados e operações; processos só interagem chamando os procedimentos (05, s.3–5); exclusão mútua implícita; variáveis de condição com <code>wait(C)</code> (suspende na fila FIFO e libera o monitor), <code>signal(C)</code> (acorda o primeiro; com fila vazia não faz nada), <code>empty(C)</code> (s.6, 12).</li><li class="warnli"><strong>Em C: nenhum slide trata disto.</strong> Uma resposta construída com o material: (1) estruturar o monitor como um módulo, com os dados acessíveis só pelas funções do módulo (a ideia de ADT, s.3); (2) exclusão mútua: um semáforo <code>mutex = 1</code> com <code>P(mutex)</code> no início e <code>V(mutex)</code> no fim de cada função, como a região crítica de 04, s.10; (3) variáveis de condição: um semáforo iniciado em 0 por condição, em que quem espera faz <code>V(mutex)</code> e <code>P(cond)</code>, como os semáforos de sincronização do produtor-consumidor (04, s.21). O próprio slide 11 do 05 compara: com semáforos, "um para exclusão mútua, dois Not_empty/Not_Full".</li><li class="warnli">Confirme com o professor: é o ponto mais incerto da revisão.</li></ul></details><p class="rq-grade">Como foi? <button class="plain g" data-g="ok" type="button">Acertei</button> <button class="plain g" data-g="mid" type="button">Parcial</button> <button class="plain g" data-g="bad" type="button">Errei</button></p></section>
+<section class="rq" id="p2-4" data-kind="text"><p class="rq-src"><span class="rq-n">20</span> Prova 2 · Questão 4 · 1,0</p><p class="rq-stem">Como é possível controlar exclusão mútua em um sistema distribuído?</p><textarea class="rq-txt" placeholder="Escreva sua resposta antes de abrir a resposta modelo."></textarea><details class="rq-ans"><summary>Mostrar resposta modelo</summary><ul class="ck"><li class="warnli"><strong>Nenhum slide trata disto diretamente.</strong></li><li><strong>O mais próximo no material:</strong> sem memória compartilhada, não dá para usar semáforos ou monitores comuns; a exclusão mútua tem de vir das mensagens (07, s.3, 9).</li><li><strong>Processo coordenador:</strong> uma task que simula um semáforo com rendezvous (<code>loop accept Wait; accept Signal; end loop</code>, 08, s.14–15); cada processo chama <code>Wait</code> antes da região crítica e <code>Signal</code> depois.</li><li><strong>Ou um servidor dono do recurso:</strong> só ele mexe nos dados, e os pedidos são atendidos um por vez (servidores de Erlang, 12, s.15–16; Linda, contador "Next" removido com Input, 09b, s.10).</li></ul><p class="src">Resposta completa: <a href="./0007-ada-rendezvous-e-select.html">Lição 7</a>.</p></details><p class="rq-grade">Como foi? <button class="plain g" data-g="ok" type="button">Acertei</button> <button class="plain g" data-g="mid" type="button">Parcial</button> <button class="plain g" data-g="bad" type="button">Errei</button></p></section>
+<h2>Placar</h2>
+<div id="sum"><p class="score">Responda as questões para ver o placar.</p></div>
+<p><button class="plain" id="reset" type="button">Apagar minhas respostas e marcações</button></p>
+
+<div class="box">
+<p><strong>Depois desta revisão: o simulado.</strong> A prova de 2026-1 tem 7 questões e 11 pontos. Para simular: amanhã cedo, sem consultar nada, faça só as questões 1 a 7 de 2026 (nesta página, são as marcadas "2026-1") em 1 hora, cronometrando. Depois me mande o resultado.</p>
+</div>
+
+<div class="box ask">
+<p><strong>Dúvida?</strong> Mande para o agente o número da questão e o que você escreveu: ele corrige e aponta o que faltou.</p>
+</div>
+
+<footer><a href="../index.html">← Início</a> · Lição 16 de CIN0145. Fontes: Exemplo Prova Concorrencia 2026.pdf e Provas-Concorrencia-antigas.pdf; respostas das Lições 1–15.</footer>
+
+<script>
+(function(){
+  var KEY = 'rev16';
+  var st = {}; try { st = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch(e) { st = {}; }
+  function save(){ try { localStorage.setItem(KEY, JSON.stringify(st)); } catch(e) {} }
+  function rec(id){ return st[id] || (st[id] = {}); }
+
+  function norm(v){ return String(v).trim(); }
+  document.querySelectorAll('button[data-check]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var id = btn.getAttribute('data-check'), tb = document.getElementById(id), fb = document.getElementById(id + 'fb');
+      var wrong = [], blank = 0, total = 0;
+      tb.querySelectorAll('[data-ans]').forEach(function(el){
+        total++; el.classList.remove('ok','bad');
+        var v = norm(el.value); if (v === '') { blank++; return; }
+        var ok = v === el.getAttribute('data-ans');
+        el.classList.add(ok ? 'ok' : 'bad'); if (!ok) wrong.push(el.getAttribute('data-hint'));
+      });
+      if (blank) { fb.className = 'fb'; fb.textContent = 'Preencha todas (' + blank + ' vazia' + (blank > 1 ? 's' : '') + ').'; return; }
+      fb.className = 'fb ' + (wrong.length ? 'bad' : 'ok');
+      fb.textContent = wrong.length ? wrong.length + ' de ' + total + ' em vermelho. Dica: ' + wrong[0] : 'Tudo certo.';
+      var sec = btn.closest('.rq'); rec(sec.id).g = wrong.length === 0 ? 'ok' : (wrong.length <= total / 3 ? 'mid' : 'bad'); save(); summary();
+    });
+  });
+
+  document.querySelectorAll('.rq-mcq').forEach(function(box){
+    var sec = box.closest('.rq'), fb = sec.querySelector('.fb'), a = +box.getAttribute('data-a'), btns = box.querySelectorAll('button.opt');
+    function show(i){
+      btns.forEach(function(b, j){ b.classList.remove('ok','bad'); if (j === a) b.classList.add('ok'); });
+      if (i !== a) btns[i].classList.add('bad');
+      fb.className = 'fb ' + (i === a ? 'ok' : 'bad');
+      fb.textContent = (i === a ? 'Certo. ' : 'Não. ') + box.getAttribute('data-why');
+    }
+    btns.forEach(function(b, i){ b.addEventListener('click', function(){ var r = rec(sec.id); if (r.pick !== undefined) return; r.pick = i; r.g = i === a ? 'ok' : 'bad'; save(); show(i); summary(); }); });
+    var r = st[sec.id]; if (r && r.pick !== undefined) show(r.pick);
+  });
+
+  document.querySelectorAll('.rq').forEach(function(sec){
+    var ta = sec.querySelector('textarea');
+    if (ta) {
+      var r = st[sec.id]; if (r && r.txt) ta.value = r.txt;
+      ta.addEventListener('input', function(){ rec(sec.id).txt = ta.value; save(); });
+    }
+    sec.querySelectorAll('.g').forEach(function(b){
+      b.addEventListener('click', function(){ rec(sec.id).g = b.getAttribute('data-g'); save(); mark(sec); summary(); });
+    });
+    mark(sec);
+  });
+  function mark(sec){
+    var g = (st[sec.id] || {}).g;
+    sec.querySelectorAll('.g').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-g') === g); });
+    sec.classList.toggle('done', !!g);
+  }
+
+  function summary(){
+    var secs = document.querySelectorAll('.rq'), n = {ok:0, mid:0, bad:0}, todo = [], left = 0;
+    secs.forEach(function(sec){
+      var g = (st[sec.id] || {}).g;
+      if (!g) { left++; return; }
+      n[g]++;
+      if (g !== 'ok') {
+        var link = sec.querySelector('.rq-ans a');
+        todo.push('<li>' + sec.querySelector('.rq-src').textContent + (link ? ' → <a href="' + link.getAttribute('href') + '">' + link.textContent + '</a>' : ' (sem lição: pergunte ao professor)') + '</li>');
+      }
+    });
+    var el = document.getElementById('sum');
+    if (n.ok + n.mid + n.bad === 0) { el.innerHTML = '<p class="score">Responda as questões para ver o placar.</p>'; return; }
+    el.innerHTML = '<p><strong>' + n.ok + '</strong> certas · <strong>' + n.mid + '</strong> parciais · <strong>' + n.bad + '</strong> erradas · faltam ' + left + ' de ' + secs.length + '.</p>' +
+      (todo.length ? '<p>Revisar:</p><ul>' + todo.join('') + '</ul>' : '') +
+      (left === 0 ? '<p class="score">Terminou. Me mande este placar.</p>' : '');
+  }
+  document.getElementById('reset').addEventListener('click', function(){
+    st = {}; save();
+    document.querySelectorAll('textarea').forEach(function(t){ t.value = ''; });
+    document.querySelectorAll('.ok,.bad').forEach(function(e){ e.classList.remove('ok','bad'); });
+    document.querySelectorAll('select').forEach(function(s){ s.value = ''; });
+    document.querySelectorAll('.fb').forEach(function(f){ f.textContent = ''; f.className = 'fb'; });
+    document.querySelectorAll('.rq').forEach(mark);
+    summary();
+  });
+  summary();
+})();
+</script>
+</body>
+</html>
