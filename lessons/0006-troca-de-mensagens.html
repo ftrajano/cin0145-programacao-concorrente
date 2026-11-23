@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lição 6 — Troca de mensagens</title>
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --rule:#d9d4c7; --accent:#8b2500; --bg:#fffdf8;
+          --ok:#1f6f3a; --bad:#9b1c1c; --soft:#f3efe4; --hi:#f6e3b4; }
+  html { background:var(--bg); }
+  body { max-width: 50rem; margin: 3rem auto 6rem; padding: 0 1.25rem; color:var(--ink);
+         font: 17px/1.6 Georgia, "Iowan Old Style", "Palatino Linotype", serif; }
+  header .kicker { color:var(--muted); font-size:.85rem; letter-spacing:.08em; text-transform:uppercase; }
+  h1 { font-weight: normal; font-size: 2.3rem; line-height:1.15; margin: .2rem 0 .4rem; letter-spacing:-.01em; }
+  .sub { color:var(--muted); font-style: italic; margin: 0 0 2.2rem; }
+  h2 { font-weight: normal; font-size: 1.4rem; margin: 2.8rem 0 .6rem; border-bottom:1px solid var(--rule); padding-bottom:.2rem; }
+  p { margin: .7rem 0; }
+  .src { color:var(--muted); font-size:.82rem; }
+  a { color: var(--accent); }
+  code { font: .88em/1.4 "SF Mono", Menlo, Consolas, monospace; background:var(--soft); padding:0 .25em; border-radius:3px; }
+  pre { background:var(--soft); padding: .8rem 1rem; border-radius:4px; overflow-x:auto; font-size:.86rem; line-height:1.45; }
+  pre code { background:none; padding:0; }
+  .box { border:1px solid var(--rule); border-radius:6px; padding: 1rem 1.2rem; margin: 1.2rem 0; background:#fff; }
+  .box.recall { border-left: 4px solid var(--accent); }
+  .box.ask { background:var(--soft); border:none; }
+  .box.exam { border-left: 4px solid #8a6d00; }
+  .box.warn { border-left: 4px solid #8a6d00; background:#fffaf0; }
+  nav { font-size:.9rem; color:var(--muted); margin-bottom: 2rem; }
+  nav a { margin-right: .75rem; }
+  details summary { cursor:pointer; color:var(--accent); font-size:.92rem; }
+  .wrap { overflow-x:auto; }
+  table { border-collapse: collapse; width:100%; font-size:.9rem; margin:.5rem 0; }
+  td, th { padding:.35rem .5rem; border-bottom:1px solid var(--rule); text-align:left; vertical-align:top; }
+  th { font-weight:normal; color:var(--muted); font-size:.8rem; }
+  td.t { color:var(--muted); font-variant-numeric: tabular-nums; width:2rem; }
+  td.s { font-family: "SF Mono", Menlo, monospace; font-size:.85rem; white-space:nowrap; }
+  tr.key td { background:var(--hi); }
+  .spin { color:#2c5282; }
+  .cs { font-weight:bold; }
+  table.trace select { font: .85rem "SF Mono", Menlo, monospace; padding:.15rem .3rem; border:1px solid var(--rule); border-radius:3px; background:#fff; color:var(--ink); max-width:100%; }
+  table.trace .ok { border-color:var(--ok); background:#e6efe8; }
+  table.trace .bad { border-color:var(--bad); background:#f8e5e5; }
+  ol.props li { margin:.5rem 0; }
+  .q { margin: 1.4rem 0; }
+  .q p.stem { margin:.2rem 0 .5rem; }
+  .q button.opt { display:block; width:100%; text-align:left; font:inherit; font-size:.97rem; padding:.45rem .8rem; margin:.3rem 0;
+       background:#fff; border:1px solid var(--rule); border-radius:4px; cursor:pointer; color:var(--ink); }
+  .q button.opt:hover { background:var(--soft); }
+  .q button.opt.ok { border-color:var(--ok); background:#e6efe8; }
+  .q button.opt.bad { border-color:var(--bad); background:#f8e5e5; }
+  .fb { font-size:.92rem; margin:.4rem 0 0; min-height:1.2rem; }
+  .fb.ok { color:var(--ok); } .fb.bad { color:var(--bad); }
+  .score { font-style: italic; color: var(--muted); }
+  button.plain { font: inherit; font-size:.9rem; padding:.35rem .8rem; border:1px solid var(--rule); background:#fff; border-radius:4px; cursor:pointer; }
+  button.plain:disabled { opacity:.4; cursor:default; }
+  textarea { width:100%; box-sizing:border-box; min-height:11rem; font: 1rem/1.5 Georgia, serif; padding:.7rem; border:1px solid var(--rule); border-radius:4px; background:#fff; color:var(--ink); }
+  .wc { font-size:.85rem; color:var(--muted); }
+  .check { display:none; } .check.on { display:block; }
+  .check label { display:block; margin:.5rem 0; padding-left:1.6rem; text-indent:-1.6rem; }
+  footer { margin-top:3rem; border-top:1px solid var(--rule); padding-top:1rem; font-size:.9rem; color:var(--muted); }
+  @media print { body { margin:0; max-width:none; font-size:11pt; } nav, button, textarea, select { display:none; } .check { display:block; } }
+  table.trace input { font: .85rem "SF Mono", Menlo, monospace; width:4.5rem; padding:.15rem .3rem; border:1px solid var(--rule); border-radius:3px; background:#fff; color:var(--ink); }
+  .sleep { color:var(--muted); font-style:italic; }
+</style>
+</head>
+<body>
+<nav><a href="../index.html">Início</a> <a href="../reference/glossario.html">Glossário</a> <a href="../reference/guia-da-prova.html">Guia das provas</a> <a href="./0005-leitores-e-escritores-com-monitor.html">← Lição 5</a> <a href="./0010-interferencia-e-nao-determinismo.html">Lição 10 →</a></nav>
+
+<header>
+  <div class="kicker">Lição 6 · Troca de mensagens (arquivo 07)</div>
+  <h1>Troca de mensagens: send, receive e como classificar um sistema</h1>
+  <p class="sub">O que muda quando os processos não compartilham memória, a diferença entre comunicação síncrona e assíncrona, os critérios para classificar um sistema distribuído e as respostas de P1 Q4 e P3 Q3. Tempo estimado: 30 minutos. "s.N" indica a página de 07-distribprog.pdf (o PDF divide alguns slides em duas páginas).</p>
+</header>
+
+<div class="box recall">
+<p><strong>Aquecimento das Lições 3 e 4, de memória:</strong></p>
+<ol>
+<li>No monitor, quem garante que só um processo por vez executa <code>Append</code> ou <code>Take</code>?</li>
+<li>No produtor-consumidor com semáforos, o que <code>P(vagas)</code> faz quando <code>vagas = 0</code>?</li>
+</ol>
+<details><summary>Ver respostas</summary>
+<p>1. O próprio monitor: a exclusão mútua entre os procedimentos é implícita (05, s.6). 2. O produtor espera até o consumidor fazer <code>V(vagas)</code> (04, s.8 e s.21).</p>
+</details>
+</div>
+
+<h2>1. O que muda: não há memória compartilhada</h2>
+<p>Tudo até aqui (tentativas, semáforos, monitores) supõe que os processos <strong>compartilham variáveis</strong>. O slide 2 chama isso de programação concorrente baseada em acesso a variáveis compartilhadas: exige hardware em que os processos (e processadores) compartilham memória <span class="src">s.2</span>.</p>
+<div class="wrap"><table>
+<tr><th></th><th>Programação concorrente (Lições 1–5)</th><th>Programação distribuída (esta lição)</th></tr>
+<tr><td>Como os processos interagem</td><td>lendo e escrevendo variáveis compartilhadas</td><td><strong>enviando mensagens</strong> entre si</td></tr>
+<tr><td>Memória</td><td>compartilhada</td><td><strong>não há</strong> compartilhamento de memória</td></tr>
+<tr><td>Hardware</td><td>processos e processadores compartilham memória</td><td>processadores e memória fisicamente distribuídos; compartilham <strong>apenas</strong> uma rede de comunicação</td></tr>
+<tr><td>Exemplo</td><td>threads num mesmo programa</td><td>redes de computadores</td></tr>
+</table></div>
+<p class="src">s.2–4. A linha "Exemplo" da coluna da esquerda é desta lição (as threads de Java do arquivo 11); a da direita é do s.4.</p>
+
+<h2>2. A abstração: send, receive e canais</h2>
+<p>Na <strong>realidade</strong>, mensagens passam por canais de comunicação, com protocolos que definem o formato da mensagem e procedimentos para detectar e corrigir erros. Na <strong>abstração</strong> usada no curso, só existem envio e recebimento de mensagens, <strong>sem erros</strong> e <strong>sem considerações de tempo</strong>. E: <strong>não há variáveis compartilhadas!</strong> <span class="src">s.5, 9</span></p>
+<ul>
+<li>Os processos usam duas primitivas: <code>send</code> (enviar) e <code>receive</code> (receber) <span class="src">s.6</span>.</li>
+<li>Os processos compartilham <strong>canais</strong> de comunicação, que são abstrações da conexão física: escondem o tempo e os erros <span class="src">s.8</span>.</li>
+<li>Canais podem ser globais a todos os processos, podem ser direcionados, podem conectar dois ou mais processos <span class="src">s.9</span>.</li>
+</ul>
+<div class="box"><p><strong>A sincronização vem de graça.</strong> Um processo <strong>não pode receber</strong> uma mensagem sem que outro <strong>tenha enviado</strong> <span class="src">s.8</span>. Na prática, <code>send</code> e <code>receive</code> incluem alguma forma de sincronização <span class="src">s.7</span>. Compare: com semáforos, era preciso escrever <code>P</code> e <code>V</code>; aqui, o próprio <code>receive</code> faz esperar.</p></div>
+
+<h2>3. Síncrona × assíncrona</h2>
+<p>A comunicação pode ser <strong>síncrona (bloqueante)</strong> ou <strong>assíncrona (não bloqueante)</strong> <span class="src">s.9</span>.</p>
+<div class="wrap"><table>
+<tr><th></th><th>Síncrona <span class="src">s.10–11</span></th><th>Assíncrona <span class="src">s.11–12</span></th></tr>
+<tr><td>Quem envia</td><td><strong>espera</strong> o outro: o primeiro a chegar espera pelo outro</td><td><strong>não espera</strong>: mensagem enviada sem bloqueio</td></tr>
+<tr><td>Quem recebe</td><td>espera, se chegou primeiro</td><td>com ou sem bloqueio</td></tr>
+<tr><td>Onde fica a mensagem</td><td>passa direto: o envio é uma ação atômica, com a participação dos dois processos</td><td>num <strong>buffer</strong>; se o buffer estiver cheio, o processo poderá ser bloqueado</td></tr>
+<tr><td>Outro nome</td><td><strong>rendezvous</strong> (encontro)</td><td>—</td></tr>
+<tr><td>Exemplo do slide</td><td><strong>telefone</strong>: os dois precisam estar na linha</td><td><strong>correio</strong>: você posta a carta e vai embora</td></tr>
+</table></div>
+<p class="src">As explicações "os dois precisam estar na linha" e "posta a carta e vai embora" são desta lição; o slide só dá os nomes dos exemplos.</p>
+<p>Duas afirmações do slide que costumam cair:</p>
+<ul>
+<li>A síncrona é <strong>o conceito mais básico</strong>: a assíncrona pode ser simulada/implementada usando comunicação síncrona, por exemplo, usando buffers <span class="src">s.12</span>.</li>
+<li>Assíncrona, síncrona e RPC/rendezvous são <strong>equivalentes</strong>; cada uma é melhor que a outra para certos tipos de problema <span class="src">s.19</span>.</li>
+</ul>
+<p>Passo a passo, com um processo <strong>A</strong> que faz <code>send(x)</code> e um processo <strong>B</strong> que faz <code>receive(x)</code>. A chega primeiro.</p>
+<div class="wrap"><table>
+<tr><th>t</th><th>A</th><th>B</th><th>Síncrona</th><th>Assíncrona</th></tr>
+<tr class="key"><td class="t">1</td><td><code>send(x)</code></td><td>ocupado com outra coisa</td><td>A <strong>espera</strong> B</td><td>A deixa x no buffer e <strong>segue</strong></td></tr>
+<tr><td class="t">2</td><td>…</td><td>ocupado</td><td class="sleep">A esperando</td><td>A já faz outras coisas</td></tr>
+<tr class="key"><td class="t">3</td><td>…</td><td><code>receive(x)</code></td><td>encontro: x passa de A para B; <strong>os dois seguem</strong></td><td>B pega x do buffer e segue</td></tr>
+</table></div>
+<p class="src">Tabela construída por esta lição a partir de s.10–11.</p>
+
+<h2>Prática 1 · Quem espera?</h2>
+<p>Para cada linha, diga se o processo indicado <strong>espera</strong> ou <strong>segue</strong>.</p>
+<div class="wrap"><table class="trace" id="tb1">
+<tr><th>#</th><th>Situação</th><th>O processo…</th></tr>
+<tr><td class="t">1</td><td>Síncrona. B chega ao <code>receive</code> antes de A chegar ao <code>send</code>. E B?</td>
+<td><select data-ans="esp" data-hint="Síncrona: o primeiro a chegar espera pelo outro (s.10). B chegou primeiro."><option value="">escolha</option><option value="esp">espera</option><option value="seg">segue</option></select></td></tr>
+<tr><td class="t">2</td><td>Assíncrona. A faz <code>send</code>, o buffer tem espaço, B ainda não chegou. E A?</td>
+<td><select data-ans="seg" data-hint="Assíncrona: mensagem enviada sem bloqueio (s.11)."><option value="">escolha</option><option value="esp">espera</option><option value="seg">segue</option></select></td></tr>
+<tr><td class="t">3</td><td>Assíncrona. A faz <code>send</code>, mas o buffer está <strong>cheio</strong>. E A?</td>
+<td><select data-ans="esp" data-hint="Se o buffer estiver cheio, o processo poderá ser bloqueado (s.11). É o mesmo caso do produtor com vagas = 0 na Lição 3."><option value="">escolha</option><option value="esp">espera</option><option value="seg">segue</option></select></td></tr>
+<tr><td class="t">4</td><td>Síncrona. A chega ao <code>send</code>; B já está esperando no <code>receive</code>. E A?</td>
+<td><select data-ans="seg" data-hint="B chegou primeiro e já está esperando: o encontro acontece na hora e os dois seguem (s.10)."><option value="">escolha</option><option value="esp">espera</option><option value="seg">segue</option></select></td></tr>
+<tr><td class="t">5</td><td>Assíncrona com recebimento <strong>com bloqueio</strong>. B faz <code>receive</code> e o buffer está vazio. E B?</td>
+<td><select data-ans="esp" data-hint="Com bloqueio, B espera a mensagem. Lembre de s.8: não se recebe sem que outro tenha enviado."><option value="">escolha</option><option value="esp">espera</option><option value="seg">segue</option></select></td></tr>
+</table></div>
+<p><button class="plain" data-check="tb1" type="button">Conferir</button></p>
+<p class="fb" id="tb1fb"></p>
+
+<h2>4. Critérios para classificar um sistema distribuído</h2>
+<p>Os slides 13–18 dão os critérios que a questão P3 Q3 pede ("classifique de acordo com os critérios estudados"). Há várias formas de dar nomes aos canais, de usá-los e de sincronizar a comunicação <span class="src">s.9</span>.</p>
+<div class="wrap"><table>
+<tr><th>Critério</th><th>Opções</th><th>O que o slide diz</th></tr>
+<tr><td><strong>Sincronização</strong></td><td>síncrona ou assíncrona</td><td>seção 3 acima <span class="src">s.9–12</span></td></tr>
+<tr><td><strong>Identificação de processos</strong></td><td>canal dedicado (telefone, linha dedicada) · linha chaveada · quadro de avisos (qualquer um escreve/lê) · sem identificação</td><td>Canais dedicados são <strong>mais eficientes</strong> (mensagem enviada sem custo de decifrar endereços), mas modificar o sistema exige mudar o código-fonte. <strong>Sem</strong> identificação, a flexibilidade é ainda maior: adicionar, remover, modificar processos dinamicamente <span class="src">s.13–15</span></td></tr>
+<tr><td><strong>Fluxo de dados</strong></td><td>uma direção ou duas direções</td><td>Sistemas assíncronos usam fluxo unidirecional; em sistemas síncronos é criado um canal de comunicação <span class="src">s.15–16</span></td></tr>
+<tr><td><strong>Criação de processos</strong></td><td>estática (no início) ou dinâmica</td><td>Estática é <strong>mais eficiente</strong>; em embedded systems, configuração fixa e melhor previsão de performance. Razões para criar dinamicamente: flexibilidade (ex.: terminais), uso dinâmico de recursos (alguns só são usados em algumas fases do programa), balanceamento de carga (aumento na demanda por certos processos) <span class="src">s.16–18</span></td></tr>
+<tr><td><strong>Tipo de processo</strong></td><td>filtros · clientes · servidores · peers (coleções de processos idênticos)</td><td><span class="src">s.20</span></td></tr>
+</table></div>
+<p class="src">O slide 16 lista também "Eficiência" como tópico, sem texto. O slide 13 cita "linha chaveada" sem explicar o termo.</p>
+
+<h2>Prática 2 · Classifique</h2>
+<div id="quiz2"></div>
+
+<h2>Questão da prova: P1, questão 4 (com resposta)</h2>
+<div class="box"><p><em>"Para a implementação de um projeto é dada a você a oportunidade de decidir se a comunicação entre os processos deverá ser implementada usando monitores ou usando um mecanismo baseado em troca de mensagens. Que aspectos do problema podem levar você a optar por uma solução ou pela outra?"</em></p></div>
+<p><strong>Resposta modelo:</strong></p>
+<ol>
+<li><strong>O hardware.</strong> Monitores pressupõem <strong>memória compartilhada</strong>: os dados ficam dentro do monitor e os processos interagem chamando seus procedimentos (05, s.5; 07, s.2). Se os processos rodam em processadores com memória fisicamente distribuída, que compartilham apenas uma rede, não há onde pôr o monitor: a escolha é troca de mensagens (07, s.3–4).</li>
+<li><strong>A natureza da interação.</strong> Se o problema é proteger <strong>dados compartilhados</strong> (um buffer, leitores e escritores), o monitor concentra dados e operações num lugar só e dá exclusão mútua <strong>implícita</strong> (05, s.3–6). Se o problema é de processos independentes que trocam dados ou pedidos (filtros, clientes, servidores, peers), as mensagens modelam isso diretamente (07, s.20).</li>
+<li><strong>A sincronização necessária.</strong> No monitor, a sincronização de condição é feita com variáveis de condição, <code>wait</code>/<code>signal</code> (05, s.6). Com mensagens, a sincronização vem do próprio <code>receive</code>: não se recebe sem que alguém tenha enviado (07, s.8). E dá para escolher síncrona (os dois se encontram) ou assíncrona (quem envia não espera, com buffer) (07, s.10–12).</li>
+<li><strong>Flexibilidade e evolução do sistema.</strong> Com mensagens sem identificação fixa de processos, é possível adicionar, remover e modificar processos dinamicamente (07, s.15), e criar processos sob demanda para balancear carga (07, s.18).</li>
+</ol>
+<p class="src">A organização em 4 aspectos é desta lição; cada aspecto vem dos slides citados. Os slides não têm uma lista "quando escolher monitor ou mensagens".</p>
+
+<h2>Questão da prova: P3, questão 3 (com resposta)</h2>
+<div class="box"><p><em>"Web browsers e servidores de web não formam um sistema distribuído, mas poderiam ser vistos (ou escritos) como tal. Classifique esse 'sistema' de acordo com os critérios estudados no curso."</em></p></div>
+<div class="box warn"><p><strong>Atenção.</strong> Os slides dão os <strong>critérios</strong>, mas não falam de web. As características da web usadas abaixo (o navegador pede uma página a um endereço e espera a resposta; o servidor atende quem pedir; navegadores abrem e fecham a qualquer momento) são suposições desta lição sobre como a web funciona. Confira com o professor ou colegas.</p></div>
+<p><strong>Resposta modelo</strong>, critério por critério (seção 4):</p>
+<div class="wrap"><table>
+<tr><th>Critério</th><th>Classificação</th><th>Justificativa</th></tr>
+<tr><td>Memória</td><td>distribuída, sem memória compartilhada</td><td>navegador e servidor estão em máquinas diferentes e só compartilham a rede (s.3–4)</td></tr>
+<tr><td>Tipo de processo</td><td><strong>clientes</strong> (navegadores) e <strong>servidor</strong></td><td>s.20</td></tr>
+<tr><td>Sincronização</td><td><strong>síncrona</strong>, do ponto de vista do navegador</td><td>o navegador envia o pedido e espera a resposta para mostrar a página (s.10)</td></tr>
+<tr><td>Fluxo de dados</td><td><strong>duas direções</strong></td><td>pedido vai do navegador ao servidor; a página volta do servidor ao navegador (s.16)</td></tr>
+<tr><td>Identificação</td><td>o cliente identifica o servidor (pelo endereço); o servidor <strong>não</strong> identifica previamente os clientes</td><td>o servidor atende qualquer um que pedir: isso dá a flexibilidade de clientes entrarem e saírem sem mudar o servidor (s.14–15)</td></tr>
+<tr><td>Criação de processos</td><td><strong>dinâmica</strong></td><td>navegadores surgem e somem o tempo todo (flexibilidade, como os terminais do slide); o servidor pode criar processos conforme o aumento da demanda (balanceamento de carga) (s.17–18)</td></tr>
+</table></div>
+<p class="src">Classificação construída por esta lição aplicando os critérios de s.9–20 às suposições da caixa acima.</p>
+
+<h2>Prática 3 · Quiz de memória</h2>
+<div id="quiz"></div>
+<p class="score" id="score"></p>
+
+<h2>Leitura opcional</h2>
+<p>Ben-Ari, <em>Principles of Concurrent and Distributed Programming</em>, 2ª ed., cap. 8 "Channels". Andrews, cap. 7 "Message Passing" (7.1 Asynchronous, 7.5 Synchronous). Mapeamento em <a href="../reference/mapa-do-curso.html">Mapa do curso</a>.</p>
+
+<div class="box ask">
+<p><strong>Dúvida?</strong> Pergunte ao agente, seu professor neste workspace. Próxima lição: Ada (arquivo 08), onde a comunicação síncrona vira código: o rendezvous com <code>entry</code> e <code>accept</code>.</p>
+</div>
+
+<footer><a href="../index.html">← Início</a> · Lição 6 de CIN0145. Fonte: 07-distribprog.pdf, páginas 2–20.</footer>
+
+<script>
+(function(){
+  function norm(v){ return String(v).trim().replace(/\s/g,'').replace('−','-'); }
+  document.querySelectorAll('button[data-check]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var id = btn.getAttribute('data-check'), tb = document.getElementById(id), fb = document.getElementById(id + 'fb');
+      var wrong = [], blank = 0;
+      tb.querySelectorAll('[data-ans]').forEach(function(el){
+        el.classList.remove('ok','bad');
+        var v = norm(el.value); if (v === '') { blank++; return; }
+        var a = el.getAttribute('data-ans'), ok = el.tagName === 'INPUT' ? Number(v) === Number(a) : v === a;
+        el.classList.add(ok ? 'ok' : 'bad'); if (!ok) wrong.push(el.getAttribute('data-hint'));
+      });
+      if (blank) { fb.className = 'fb'; fb.textContent = 'Preencha todas (' + blank + ' vazia' + (blank > 1 ? 's' : '') + ').'; return; }
+      fb.className = 'fb ' + (wrong.length ? 'bad' : 'ok');
+      fb.textContent = wrong.length ? wrong.length + ' em vermelho. Dica: ' + wrong[0] : 'Tudo certo.';
+    });
+  });
+
+  function mcq(el, it, onDone, keepOrder){
+    var fb = document.createElement('p'); fb.className = 'fb'; var done = false;
+    var list = it.opts.map(function(o,i){ return {o:o, i:i}; }); if (!keepOrder) shuffle(list);
+    list.forEach(function(x){
+      var b = document.createElement('button'); b.className = 'opt'; b.textContent = x.o;
+      b.addEventListener('click', function(){
+        if (done) return; done = true; var ok = x.i === it.ans;
+        b.classList.add(ok ? 'ok' : 'bad'); fb.className = 'fb ' + (ok ? 'ok' : 'bad');
+        fb.textContent = (ok ? 'Certo. ' : 'Não. A resposta é: ' + it.opts[it.ans] + '. ') + it.why;
+        if (onDone) onDone(ok);
+      });
+      el.appendChild(b);
+    });
+    el.appendChild(fb);
+  }
+  function shuffle(a){ for (var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+
+  var cls = [
+    { stem: 'Telefone é o exemplo do slide para comunicação…',
+      opts: ['síncrona', 'assíncrona'], ans: 0,
+      why: 'Telefone: síncrona (s.10–11). Correio: assíncrona (s.12).' },
+    { stem: 'Correio é o exemplo do slide para comunicação…',
+      opts: ['síncrona', 'assíncrona'], ans: 1,
+      why: 'Quem posta a carta não espera o destinatário: envio sem bloqueio (s.11–12).' },
+    { stem: '"Quadro de avisos: qualquer um escreve/lê". Quanto à identificação de processos, é…',
+      opts: ['sem identificação', 'canal dedicado'], ans: 0,
+      why: 'Ninguém precisa saber quem vai ler ou quem escreveu (s.13, 15).' },
+    { stem: 'Um sistema embarcado (embedded) com número fixo de processos. Criação de processos…',
+      opts: ['estática', 'dinâmica'], ans: 0,
+      why: 'Em embedded systems: configuração fixa, melhor previsão de performance (s.17).' },
+    { stem: 'Um sistema que cria mais processos quando aumenta a demanda. Criação de processos…',
+      opts: ['estática', 'dinâmica'], ans: 1,
+      why: 'Balanceamento de carga é uma das razões para criar processos dinamicamente (s.18).' }
+  ];
+  var q2 = document.getElementById('quiz2');
+  cls.forEach(function(it, k){
+    var d = document.createElement('div'); d.className = 'q';
+    d.innerHTML = '<p class="stem">' + (k+1) + '. ' + it.stem + '</p>';
+    mcq(d, it, null, true);
+    q2.appendChild(d);
+  });
+
+  var items = [
+    { stem: 'Na programação distribuída, os processos…',
+      opts: ['não compartilham memória', 'compartilham um monitor', 'compartilham semáforos'], ans: 0,
+      why: 'Processos se comunicam enviando mensagens; não há compartilhamento de memória (s.3).' },
+    { stem: 'Na comunicação síncrona, quem chega primeiro ao ponto de troca…',
+      opts: ['espera pelo outro processo', 'deixa a mensagem no buffer', 'descarta a mensagem enviada'], ans: 0,
+      why: 'Síncrona: o primeiro a chegar espera pelo outro; é o rendezvous (s.10).' },
+    { stem: 'Na comunicação assíncrona, quem envia pode ser bloqueado quando…',
+      opts: ['o buffer está cheio', 'o receptor está ocupado', 'a rede tem algum erro'], ans: 0,
+      why: 'Mensagem enviada sem bloqueio, mas, se o buffer estiver cheio, o processo poderá ser bloqueado (s.11). A abstração ignora erros (s.5).' },
+    { stem: 'Segundo o slide, qual é o conceito mais básico?',
+      opts: ['comunicação síncrona', 'comunicação assíncrona', 'variável compartilhada'], ans: 0,
+      why: 'A assíncrona pode ser simulada usando comunicação síncrona, por exemplo com buffers (s.12).' },
+    { stem: 'Canais dedicados, comparados a sistemas sem identificação de processos…',
+      opts: ['são mais eficientes, mas menos flexíveis', 'são mais flexíveis, mas menos eficientes', 'são iguais em eficiência e flexibilidade'], ans: 0,
+      why: 'Dedicados: sem custo de decifrar endereços, mas mudar o sistema exige mudar o código (s.14). Sem identificação: flexibilidade ainda maior (s.15).' },
+    { stem: 'Por que a troca de mensagens já traz sincronização?',
+      opts: ['não se recebe sem que alguém tenha enviado', 'o envio sempre bloqueia quem envia a mensagem', 'os canais guardam um semáforo escondido'], ans: 0,
+      why: 'A sincronização ocorre, visto que um processo não pode receber uma mensagem sem que outro tenha enviado (s.8).' },
+    { stem: 'Revisão da Lição 4. No monitor, <code>signal(C)</code> com a fila de C vazia…',
+      opts: ['não faz nada', 'soma 1 em C', 'bloqueia quem chamou'], ans: 0,
+      why: 'Diferente de V, o signal não fica guardado (05, s.11–12).' }
+  ];
+  var root = document.getElementById('quiz'), scoreEl = document.getElementById('score'), answered = 0, right = 0;
+  shuffle(items).forEach(function(it, k){
+    var d = document.createElement('div'); d.className = 'q';
+    d.innerHTML = '<p class="stem">' + (k+1) + '. ' + it.stem + '</p>';
+    mcq(d, it, function(ok){ answered++; if (ok) right++; scoreEl.textContent = 'Placar: ' + right + ' de ' + answered + (answered === items.length ? '. Me mande este placar.' : ''); });
+    root.appendChild(d);
+  });
+})();
+</script>
+</body>
+</html>

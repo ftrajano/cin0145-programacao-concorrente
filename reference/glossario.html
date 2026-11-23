@@ -184,11 +184,11 @@
 
 <dt>Comunicação síncrona</dt>
 <dd>Envio da mensagem é ação atômica; participação dos dois processos; sincronização das execuções; rendezvous; o primeiro a chegar espera pelo outro. Exemplo: telefone.
-<span class="src">07-distribprog.pdf, slide 7</span></dd>
+<span class="src">07-distribprog.pdf, p.10–11</span></dd>
 
 <dt>Comunicação assíncrona</dt>
 <dd>Mensagem enviada sem bloqueio; recebimento com ou sem bloqueio; buffering (se o buffer estiver cheio o processo poderá ser bloqueado). Exemplo: correio. Pode ser implementada usando comunicação síncrona.
-<span class="src">07-distribprog.pdf, slide 8</span></dd>
+<span class="src">07-distribprog.pdf, p.11–12</span></dd>
 
 <dt>Rendezvous (Ada)</dt>
 <dd>Comunicação síncrona, sem buffers; duas tasks se encontram para se comunicar; a <em>accepting task</em> é a dona do rendezvous; a <em>calling task</em> precisa saber a identidade da accepting task e o nome do local do rendezvous. Modelo assimétrico, bom para servidores. Fluxo de dados nas duas direções.
