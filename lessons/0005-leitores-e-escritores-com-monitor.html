@@ -69,8 +69,8 @@
 
 <header>
   <div class="kicker">Lição 5 · Modo prova · Monitores</div>
-  <h1>Leitores e escritores com monitor</h1>
-  <p class="sub">O problema que caiu em três das quatro provas, com o monitor dos slides linha por linha e as duas questões antigas respondidas. Tempo estimado: 30 minutos. "s.N" = 05-monitores.pdf, salvo indicação.</p>
+  <h1>Leitores e escritores com monitor (e o fim do arquivo 05)</h1>
+  <p class="sub">O problema que caiu em três das quatro provas, com o monitor dos slides linha por linha e as duas questões antigas respondidas. No fim, o resto do arquivo 05: a emulação de semáforos por monitores e o barbeiro que dorme. Tempo estimado: 45 minutos. "s.N" = 05-monitores.pdf, salvo indicação.</p>
 </header>
 
 <div class="box recall">
@@ -212,11 +212,90 @@ f3  signal_all(OK_to_Read);
 <h2>O mesmo problema em Java: 2026-1, questão 7</h2>
 <p>A questão 7 da prova de 2026-1 é este mesmo problema escrito em Java. Ela é respondida na <a href="./0012-wait-notify-e-por-que-while.html">Lição 12</a>, depois das lições de Java (arquivo 11), porque a resposta depende de <code>synchronized</code>, <code>wait()</code> e <code>notify()</code>.</p>
 
+<h2>4. Emulação de semáforos por monitores</h2>
+<p>Os slides mostram que um monitor consegue fazer o papel de um semáforo: uma variável <code>S</code> e duas operações, <code>P</code> e <code>V</code>, como na Lição 3. Há duas versões <span class="src">s.20–22</span>.</p>
+<div class="wrap"><table>
+<tr><th>Versão 1 <span class="src">s.20</span></th><th>Versão 2 <span class="src">s.21–22</span></th></tr>
+<tr><td><pre style="margin:0"><code>monitor Semaphore_Emulation {
+  int S = 0;
+  Condition Not_Zero;
+
+  procedure P {
+    while (S == 0) {wait(Not_Zero);};
+    S = S - 1;
+  }
+  procedure V {
+    S = S + 1;
+    signal(Not_Zero);
+  }
+}</code></pre></td>
+<td><pre style="margin:0"><code>monitor Semaphore_Emulation {
+  int S = 0;
+  Condition Not_Zero;
+
+  procedure P {
+    if (S &gt; 0) {S = S - 1;}
+    else {wait(Not_Zero);};
+  }
+  procedure V {
+    if (empty(Not_Zero)) {S = S + 1}
+    else {signal(Not_Zero)};
+  }
+}</code></pre></td></tr>
+</table></div>
+<p class="src">Código de s.20–22, com a indentação desta lição.</p>
+<p><strong>A diferença está no V</strong> (leitura desta lição do código):</p>
+<ul>
+<li><strong>Versão 1:</strong> <code>V</code> sempre soma 1 em <code>S</code> e depois acorda alguém. O processo acordado volta ao <code>while</code>, vê <code>S</code> maior que 0 e ele mesmo subtrai 1. É o <code>P</code> da Lição 3 escrito com <code>wait</code>/<code>signal</code>: <code>&lt;await (s &gt; 0) -&gt; s := s – 1&gt;</code> (04, s.8).</li>
+<li><strong>Versão 2:</strong> se <strong>há</strong> alguém esperando, <code>V</code> <strong>não</strong> soma 1: só acorda esse processo, e o <code>P</code> dele termina sem subtrair. A "unidade" de <code>S</code> passa direto de quem fez <code>V</code> para quem estava esperando. Se <strong>não há</strong> ninguém esperando (<code>empty(Not_Zero)</code>), aí sim <code>S</code> aumenta, para o sinal não se perder.</li>
+</ul>
+<p>Esse último ponto é a ligação com a Lição 4: <code>signal</code> com a fila vazia não faz nada, enquanto <code>V</code> sempre "guarda" o sinal em <code>S</code>. As duas versões guardam o sinal em <code>S</code> quando ninguém espera, e por isso se comportam como semáforo.</p>
+
+<h2>Prática 3 · Complete: as duas versões lado a lado</h2>
+<p><code>S</code> começa em 0. Os passos acontecem em ordem.</p>
+<div class="wrap"><table class="trace" id="tb2">
+<tr><th>#</th><th>O que acontece</th><th>S na versão 1</th><th>S na versão 2</th></tr>
+<tr><td class="t">1</td><td>A chama <code>P</code>. <code>S</code> é 0, então A faz <code>wait(Not_Zero)</code>.</td><td class="s">0</td><td class="s">0</td></tr>
+<tr><td class="t">2</td><td>B chama <code>V</code>. Valor de <code>S</code> <strong>logo depois do V</strong>, antes de A voltar a rodar:</td>
+<td><input data-ans="1" data-hint="Versão 1: V sempre faz S = S + 1, e só depois signal."></td>
+<td><input data-ans="0" data-hint="Versão 2: a fila Not_Zero tem A, então V só faz signal, sem somar."></td></tr>
+<tr><td class="t">3</td><td>A volta a rodar e termina o <code>P</code>.</td>
+<td><input data-ans="0" data-hint="A refaz o while: S = 1, não é 0, sai do while e faz S = S − 1."></td>
+<td><input data-ans="0" data-hint="Na versão 2, o P de A termina depois do wait, sem subtrair."></td></tr>
+<tr><td class="t">4</td><td>C chama <code>V</code>. Ninguém espera.</td>
+<td><input data-ans="1" data-hint="S = S + 1; o signal com a fila vazia não faz nada."></td>
+<td><input data-ans="1" data-hint="empty(Not_Zero) é verdadeiro: S = S + 1."></td></tr>
+<tr><td class="t">5</td><td>D chama <code>P</code>.</td>
+<td><input data-ans="0" data-hint="S = 1: o while não espera, S = S − 1."></td>
+<td><input data-ans="0" data-hint="S > 0: S = S − 1."></td></tr>
+</table></div>
+<p><button class="plain" data-check="tb2">Conferir</button> <span class="fb" id="tb2fb"></span></p>
+<p class="src">Tabela construída por esta lição. Nos dois casos, o resultado final é o mesmo de um semáforo (Lição 3); só muda o caminho no passo 2.</p>
+
+<h2>5. O problema do barbeiro que dorme</h2>
+<p>O último exemplo do arquivo 05 é só descrito, sem código <span class="src">s.23–25</span>:</p>
+<ul>
+<li>Uma barbearia com duas portas (entrada e saída) e algumas cadeiras de espera.</li>
+<li>O barbeiro atende um cliente de cada vez. Se faltam clientes, o barbeiro <strong>dorme</strong>.</li>
+<li>Se um cliente chega, ele <strong>acorda</strong> o barbeiro para que corte seu cabelo.</li>
+<li>O cliente <strong>dorme</strong> nas cadeiras de espera se o barbeiro está ocupado.</li>
+</ul>
+<p>Como modelar: clientes e barbeiros são <strong>processos</strong>; a barbearia é o <strong>monitor</strong>; a relação é cliente/servidor, com o barbeiro como servidor. Procedimentos do monitor: <code>get_haircut</code>, <code>get_next_custumer</code>, <code>finished_cut</code> <span class="src">s.24–25</span>. O slide diz ainda que o problema é semelhante a problemas de escalonamento de disco e que é um relacionamento <strong>cliente-servidor</strong> do tipo <strong>rendezvous</strong> <span class="src">s.23</span>.</p>
+<div class="wrap"><table>
+<tr><th>Procedimento</th><th>Quem chama</th><th>Para quê</th></tr>
+<tr><td><code>get_haircut</code></td><td>cliente</td><td>pedir o corte: acorda o barbeiro ou espera numa cadeira</td></tr>
+<tr><td><code>get_next_custumer</code></td><td>barbeiro</td><td>pegar o próximo cliente; se não há, dorme</td></tr>
+<tr><td><code>finished_cut</code></td><td>barbeiro</td><td>avisar que terminou o corte, liberando o cliente</td></tr>
+</table></div>
+<p class="src">Os nomes dos procedimentos são do slide (inclusive a grafia "custumer"). As colunas "Quem chama" e "Para quê" são deduções desta lição a partir dos nomes e da descrição de s.24; os slides não mostram o código.</p>
+<p><strong>Por que "rendezvous"?</strong> Cliente e barbeiro precisam se <strong>encontrar</strong> para o corte acontecer: quem chega primeiro espera o outro (o barbeiro dorme sem clientes; o cliente dorme se o barbeiro está ocupado). É a mesma ideia do rendezvous da comunicação síncrona (07, s.10; Lição 7). Isso ajuda na questão P1 Q3 (rendezvous e servidor com várias solicitações): as cadeiras de espera são a fila de pedidos do servidor.</p>
+<p class="src">A ligação com o rendezvous das Lições 6–7 e com P1 Q3 é desta lição.</p>
+
 <div class="box ask">
 <p><strong>Dúvida?</strong> Pergunte ao agente. Próxima lição: <a href="./0006-troca-de-mensagens.html">troca de mensagens (arquivo 07)</a>.</p>
 </div>
 
-<footer><a href="../index.html">← Início</a> · Lição 5 de CIN0145. Fonte: 05-monitores.pdf, slides 12–19.</footer>
+<footer><a href="../index.html">← Início</a> · Lição 5 de CIN0145. Fonte: 05-monitores.pdf, slides 12–25.</footer>
 
 <script>
 (function(){
@@ -255,7 +334,13 @@ f3  signal_all(OK_to_Read);
       why: 'empty(C): verdadeiro se a fila de C está vazia (s.12). É a base da correção da starvation.' },
     { stem: '<code>wait(C)</code> faz o processo…',
       opts: ['entrar na fila de C e liberar o monitor', 'entrar na fila de C e manter o monitor', 'sair do monitor sem entrar em fila'], ans: 0,
-      why: 'Revisão da lição 4 (s.12).' }
+      why: 'Revisão da lição 4 (s.12).' },
+    { stem: 'Na emulação de semáforo, versão 2, <code>V</code> com alguém esperando em <code>Not_Zero</code>…',
+      opts: ['só acorda, sem somar em S', 'soma 1 em S e acorda', 'soma 1 em S e não acorda'], ans: 0,
+      why: 'if (empty(Not_Zero)) {S = S + 1} else {signal(Not_Zero)} (s.22). O acordado termina o P sem subtrair.' },
+    { stem: 'No barbeiro que dorme, a barbearia é modelada como…',
+      opts: ['um monitor', 'um processo', 'um semáforo'], ans: 0,
+      why: 'Clientes e barbeiros são processos; a barbearia é o monitor (s.24–25).' }
   ];
   var root = document.getElementById('quiz'), scoreEl = document.getElementById('score'), answered = 0, right = 0;
   shuffle(items).forEach(function(it, k){
