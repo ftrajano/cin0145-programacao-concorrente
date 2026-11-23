@@ -287,6 +287,15 @@ p5  signal(Not_Empty);                      c5  signal(Not_Full);
 <li>"Operam com memória distribuída": monitores são para processos que compartilham memória; sem memória compartilhada usa-se troca de mensagens (07, s.2–3).</li>
 <li>"Vários processos na seção crítica ao mesmo tempo": isso violaria a exclusão mútua.</li>
 </ul>
+<p><strong>Por trás da resposta: o que o monitor resolve.</strong> Os slides comparam os dois assim:</p>
+<table>
+<tr><th>Semáforos (05, s.2)</th><th>Monitores (05, s.3–7)</th></tr>
+<tr><td>Variáveis compartilhadas são <strong>globais</strong>; o acesso pode estar <strong>espalhado pelo programa</strong></td><td>ADT: <strong>concentra dados e operações em um único lugar</strong>; processos interagem só pelas chamadas aos procedimentos</td></tr>
+<tr><td>Exige consultar <strong>o programa todo</strong> para entender como as variáveis são usadas; a cada novo processo, verificar se ele as usa corretamente</td><td>O monitor está correto <strong>independentemente do número de processos</strong> que o usam; permite ignorar como e onde os procedimentos são chamados</td></tr>
+<tr><td><strong>Mesma estrutura</strong> (o semáforo) para exclusão mútua e para sincronização de condição</td><td>Exclusão mútua <strong>implícita</strong>; sincronização por <strong>variáveis de condição</strong></td></tr>
+<tr><td></td><td>Desenvolvimento por equipes independentes; facilita entender os programas concorrentes</td></tr>
+</table>
+<p>Numa questão de múltipla escolha, marque a alternativa que existe. Numa dissertativa ("compare monitores e semáforos"), use esta tabela inteira.</p>
 <p class="src">Exemplo Prova Concorrencia 2026.pdf. Alternativas na ordem da prova.</p>
 </div>
 
