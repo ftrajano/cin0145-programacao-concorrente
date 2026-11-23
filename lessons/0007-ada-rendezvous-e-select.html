@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lição 7 — Ada: rendezvous e select</title>
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --rule:#d9d4c7; --accent:#8b2500; --bg:#fffdf8;
+          --ok:#1f6f3a; --bad:#9b1c1c; --soft:#f3efe4; --hi:#f6e3b4; }
+  html { background:var(--bg); }
+  body { max-width: 50rem; margin: 3rem auto 6rem; padding: 0 1.25rem; color:var(--ink);
+         font: 17px/1.6 Georgia, "Iowan Old Style", "Palatino Linotype", serif; }
+  header .kicker { color:var(--muted); font-size:.85rem; letter-spacing:.08em; text-transform:uppercase; }
+  h1 { font-weight: normal; font-size: 2.3rem; line-height:1.15; margin: .2rem 0 .4rem; letter-spacing:-.01em; }
+  .sub { color:var(--muted); font-style: italic; margin: 0 0 2.2rem; }
+  h2 { font-weight: normal; font-size: 1.4rem; margin: 2.8rem 0 .6rem; border-bottom:1px solid var(--rule); padding-bottom:.2rem; }
+  p { margin: .7rem 0; }
+  .src { color:var(--muted); font-size:.82rem; }
+  a { color: var(--accent); }
+  code { font: .88em/1.4 "SF Mono", Menlo, Consolas, monospace; background:var(--soft); padding:0 .25em; border-radius:3px; }
+  pre { background:var(--soft); padding: .8rem 1rem; border-radius:4px; overflow-x:auto; font-size:.86rem; line-height:1.45; }
+  pre code { background:none; padding:0; }
+  .box { border:1px solid var(--rule); border-radius:6px; padding: 1rem 1.2rem; margin: 1.2rem 0; background:#fff; }
+  .box.recall { border-left: 4px solid var(--accent); }
+  .box.ask { background:var(--soft); border:none; }
+  .box.exam { border-left: 4px solid #8a6d00; }
+  .box.warn { border-left: 4px solid #8a6d00; background:#fffaf0; }
+  nav { font-size:.9rem; color:var(--muted); margin-bottom: 2rem; }
+  nav a { margin-right: .75rem; }
+  details summary { cursor:pointer; color:var(--accent); font-size:.92rem; }
+  .wrap { overflow-x:auto; }
+  table { border-collapse: collapse; width:100%; font-size:.9rem; margin:.5rem 0; }
+  td, th { padding:.35rem .5rem; border-bottom:1px solid var(--rule); text-align:left; vertical-align:top; }
+  th { font-weight:normal; color:var(--muted); font-size:.8rem; }
+  td.t { color:var(--muted); font-variant-numeric: tabular-nums; width:2rem; }
+  td.s { font-family: "SF Mono", Menlo, monospace; font-size:.85rem; white-space:nowrap; }
+  tr.key td { background:var(--hi); }
+  .spin { color:#2c5282; }
+  .cs { font-weight:bold; }
+  table.trace select { font: .85rem "SF Mono", Menlo, monospace; padding:.15rem .3rem; border:1px solid var(--rule); border-radius:3px; background:#fff; color:var(--ink); max-width:100%; }
+  table.trace .ok { border-color:var(--ok); background:#e6efe8; }
+  table.trace .bad { border-color:var(--bad); background:#f8e5e5; }
+  ol.props li { margin:.5rem 0; }
+  .q { margin: 1.4rem 0; }
+  .q p.stem { margin:.2rem 0 .5rem; }
+  .q button.opt { display:block; width:100%; text-align:left; font:inherit; font-size:.97rem; padding:.45rem .8rem; margin:.3rem 0;
+       background:#fff; border:1px solid var(--rule); border-radius:4px; cursor:pointer; color:var(--ink); }
+  .q button.opt:hover { background:var(--soft); }
+  .q button.opt.ok { border-color:var(--ok); background:#e6efe8; }
+  .q button.opt.bad { border-color:var(--bad); background:#f8e5e5; }
+  .fb { font-size:.92rem; margin:.4rem 0 0; min-height:1.2rem; }
+  .fb.ok { color:var(--ok); } .fb.bad { color:var(--bad); }
+  .score { font-style: italic; color: var(--muted); }
+  button.plain { font: inherit; font-size:.9rem; padding:.35rem .8rem; border:1px solid var(--rule); background:#fff; border-radius:4px; cursor:pointer; }
+  button.plain:disabled { opacity:.4; cursor:default; }
+  textarea { width:100%; box-sizing:border-box; min-height:11rem; font: 1rem/1.5 Georgia, serif; padding:.7rem; border:1px solid var(--rule); border-radius:4px; background:#fff; color:var(--ink); }
+  .wc { font-size:.85rem; color:var(--muted); }
+  .check { display:none; } .check.on { display:block; }
+  .check label { display:block; margin:.5rem 0; padding-left:1.6rem; text-indent:-1.6rem; }
+  footer { margin-top:3rem; border-top:1px solid var(--rule); padding-top:1rem; font-size:.9rem; color:var(--muted); }
+  @media print { body { margin:0; max-width:none; font-size:11pt; } nav, button, textarea, select { display:none; } .check { display:block; } }
+  table.trace input { font: .85rem "SF Mono", Menlo, monospace; width:4.5rem; padding:.15rem .3rem; border:1px solid var(--rule); border-radius:3px; background:#fff; color:var(--ink); }
+  .sleep { color:var(--muted); font-style:italic; }
+</style>
+</head>
+<body>
+<nav><a href="../index.html">Início</a> <a href="../reference/glossario.html">Glossário</a> <a href="../reference/guia-da-prova.html">Guia das provas</a> <a href="./0006-troca-de-mensagens.html">← Lição 6</a> <a href="./0010-interferencia-e-nao-determinismo.html">Lição 10 →</a></nav>
+
+<header>
+  <div class="kicker">Lição 7 · Ada (arquivo 08)</div>
+  <h1>Ada: rendezvous, <code>accept</code> e <code>select</code></h1>
+  <p class="sub">A comunicação síncrona da Lição 6 virando código: tasks, entries, o buffer com <code>select</code> e guardas, e as respostas de P1 Q3, P2 Q2 e da coluna Ada de 2026 Q5. Tempo estimado: 45 minutos. "s.N" indica a página de 08-Ada.pdf (o PDF divide alguns slides em duas páginas).</p>
+</header>
+
+<div class="box recall">
+<p><strong>Aquecimento da Lição 6, de memória:</strong></p>
+<ol>
+<li>Na comunicação síncrona, o que acontece com quem chega primeiro?</li>
+<li>Qual o exemplo do slide para comunicação síncrona: telefone ou correio?</li>
+</ol>
+<details><summary>Ver respostas</summary>
+<p>1. Espera pelo outro; é o rendezvous (07, s.10). 2. Telefone. Correio é o da assíncrona (07, s.11–12).</p>
+</details>
+</div>
+
+<h2>1. Ada e o rendezvous</h2>
+<p>Ada foi criada pelo US DOD para ser a linguagem padrão no desenvolvimento de softwares críticos: tipos fortes, packages e <strong>suporte direto a concorrência com tasks</strong> <span class="src">s.2</span>. Uma <strong>task</strong> é um processo.</p>
+<p>O <strong>rendezvous</strong> ("encontro") é a comunicação síncrona da Lição 6, <strong>sem buffers</strong> <span class="src">s.3</span>:</p>
+<ul>
+<li>duas tasks se encontram num rendezvous para se comunicar, e <strong>a primeira a chegar espera pela outra</strong>;</li>
+<li>a <strong>accepting task</strong> (a que aceita) é a dona do rendezvous;</li>
+<li>a <strong>calling task</strong> (a que chama) tem que saber a identidade da accepting task e o nome do local do rendezvous.</li>
+</ul>
+<p>É um modelo <strong>assimétrico</strong>: quem chama sabe com quem fala; quem aceita, não precisa saber quem chama. Por isso é bom para programar <strong>processos servidores</strong> <span class="src">s.4</span>. O slide 3 também lista o tema "expressividade vs. eficiência".</p>
+
+<h2>2. Como se escreve: specification, body, entry, accept</h2>
+<p>Uma task em Ada tem duas partes <span class="src">s.4–6</span>: a <strong>specification</strong>, que lista as <strong>entries</strong> (os "locais de encontro" que a task oferece), e o <strong>body</strong>, com o código.</p>
+<pre><code>task Buffer is                         -- specification
+  entry Append (I: in Integer);
+  entry Take (I: out Integer);
+end Buffer;
+
+task body Buffer is                    -- body
+begin
+  …
+  accept Append(I: in Integer) do
+    … corpo do accept
+  end Append;
+  …
+end Buffer;
+
+Buffer.Append(I);                      -- chamada, em outra task</code></pre>
+<p class="src">s.5–6, com a indentação e os comentários desta lição.</p>
+<div class="box"><p><strong>Notação Ada que aparece nos slides.</strong> <code>:=</code> é atribuição; <code>--</code> começa um comentário; <code>mod</code> é o resto da divisão (o <code>%</code> de C); <code>in</code> é parâmetro que <strong>entra</strong> na accepting task, <code>out</code> é parâmetro que <strong>volta</strong> para quem chamou. E aqui, diferente do monitor dos slides, a chamada <strong>usa ponto</strong>: <code>Buffer.Append(I)</code> = entry <code>Append</code> da task <code>Buffer</code>.</p></div>
+<p class="src">A leitura de <code>:=</code>, <code>--</code> e <code>mod</code> é desta lição, a partir do uso nos slides. <code>in</code>/<code>out</code>: s.7.</p>
+<p><strong>O que acontece no rendezvous</strong> <span class="src">s.7</span>:</p>
+<ol>
+<li>a calling task passa seus parâmetros <code>in</code> para a accepting task e <strong>espera</strong> o rendezvous se completar;</li>
+<li>a accepting task executa os comandos do corpo do <code>accept</code> (até o <code>end</code>);</li>
+<li>os parâmetros <code>out</code> são passados de volta à calling task;</li>
+<li>o rendezvous terminou, e as duas tasks não estão mais suspensas.</li>
+</ol>
+<p>Resumo do slide 9: o rendezvous de Ada é <strong>comunicação síncrona e não bufferizada</strong>, com <strong>identificação assimétrica</strong> e <strong>fluxo de dados nas duas direções</strong> durante o rendezvous (<code>in</code> vai, <code>out</code> volta).</p>
+
+<h2>3. O buffer, versão 1: sem <code>select</code></h2>
+<pre><code>task body Buffer is
+  B: Array (0..N-1) of Integer;
+  In_Ptr, Out_Ptr: Integer := 0;
+  Count: Integer := 0;
+begin
+  loop
+    accept Append(I: in Integer) do
+      B(In_Ptr) := I;
+    end Append;
+    Count := Count + 1;
+    In_Ptr := (In_Ptr + 1) mod N;
+    accept Take(I: out Integer) do
+      I := B(Out_Ptr);
+    end Take;
+    Count := Count - 1;
+    Out_Ptr := (Out_Ptr + 1) mod N;
+  end loop;
+end Buffer;</code></pre>
+<p class="src">s.8. O slide chama de buffer <strong>degenerado (de tamanho 1)</strong>.</p>
+<p>Compare com o monitor da Lição 4: mesmos <code>B</code>, <code>In_Ptr</code>, <code>Out_Ptr</code>, <code>Count</code>. Mas não há <code>wait</code> nem <code>signal</code>: quem espera é quem chega ao encontro primeiro. Por que "degenerado"? Os dois <code>accept</code> estão <strong>em sequência</strong>: depois de um <code>Append</code>, a task só aceita <code>Take</code>. Então o buffer nunca guarda mais de 1 item, mesmo tendo N posições.</p>
+<p class="src">A explicação de "degenerado" é desta lição, lendo o código de s.8.</p>
+
+<h2>4. O buffer, versão 2: <code>select</code> com guardas</h2>
+<pre><code>task body Buffer is …
+begin
+  loop
+    select
+      when Count &lt; N =&gt;
+        accept Append(I: in Integer) do
+          B(In_Ptr) := I;
+        end Append;
+        Count := Count + 1;
+        In_Ptr := (In_Ptr + 1) mod N;
+    or
+      when Count &gt; 0 =&gt;
+        accept Take(I: out Integer) do
+          I := B(Out_Ptr);
+        end Take;
+        Count := Count - 1;
+        Out_Ptr := (Out_Ptr + 1) mod N;
+    end select;
+  end loop;
+end Buffer;</code></pre>
+<p class="src">s.10–11, com a indentação desta lição.</p>
+<p><strong>Semântica do <code>select</code></strong> <span class="src">s.12–13</span>:</p>
+<ol>
+<li>as <strong>guardas</strong> (cláusulas <code>when</code>) são avaliadas, gerando o conjunto de <strong>alternativas abertas</strong>; tem que haver pelo menos uma, ou um <code>else</code>;</li>
+<li>se há tasks em fila esperando por entries em alternativas abertas, o rendezvous é iniciado com <strong>a primeira de uma das filas</strong>;</li>
+<li>se todas as filas das alternativas abertas estão vazias, a accepting task é <strong>suspensa</strong> até que uma task chame uma dessas entradas; o conjunto de alternativas abertas <strong>não muda</strong> enquanto isso;</li>
+<li>a última alternativa pode ser <code>else …</code>, <code>delay T …</code> ou <code>terminate</code>.</li>
+</ol>
+<p>Lendo as guardas: <code>when Count &lt; N</code> = "só aceito <code>Append</code> se há vaga"; <code>when Count &gt; 0</code> = "só aceito <code>Take</code> se há item". É o papel que <code>vagas</code>/<code>itens</code> tinham na Lição 3 e <code>Not_Full</code>/<code>Not_Empty</code> na Lição 4. Quem chama uma entry fechada fica na fila dela.</p>
+<p class="src">A comparação com as Lições 3 e 4 é desta lição.</p>
+
+<h2>Prática 1 · Complete: o buffer com <code>select</code>, N = 2</h2>
+<p>Começa vazio. Para cada momento: quais alternativas estão abertas, o valor de <code>Count</code> depois e se quem chamou espera ou segue.</p>
+<div class="wrap"><table class="trace" id="tb1">
+<tr><th>t</th><th>O que acontece</th><th>Abertas</th><th>Count depois</th><th>Quem chamou…</th></tr>
+<tr><td class="t">1</td><td>Count = 0. O consumidor chama <code>Buffer.Take(X)</code>.</td>
+<td><select data-ans="app" data-hint="Count > 0 é falso; Count < 2 é verdadeiro. Só Append está aberta."><option value="">escolha</option><option value="app">só Append</option><option value="take">só Take</option><option value="amb">as duas</option></select></td>
+<td><input data-ans="0" data-hint="Ninguém foi atendido: Count não muda."></td>
+<td><select data-ans="esp" data-hint="Take está fechada: o consumidor fica na fila de Take (s.12–13)."><option value="">escolha</option><option value="esp">espera na fila</option><option value="seg">é atendido</option></select></td></tr>
+<tr><td class="t">2</td><td>O produtor chama <code>Buffer.Append(5)</code>.</td>
+<td><select data-ans="app" data-hint="Ainda Count = 0 antes deste atendimento: só Append."><option value="">escolha</option><option value="app">só Append</option><option value="take">só Take</option><option value="amb">as duas</option></select></td>
+<td><input data-ans="1" data-hint="Append atendido: Count := Count + 1."></td>
+<td><select data-ans="seg" data-hint="Append está aberta: rendezvous imediato."><option value="">escolha</option><option value="esp">espera na fila</option><option value="seg">é atendido</option></select></td></tr>
+<tr><td class="t">3</td><td>Nova volta do <code>loop</code>. O consumidor ainda está na fila de <code>Take</code>.</td>
+<td><select data-ans="amb" data-hint="Count = 1: 1 < 2 e 1 > 0. As duas estão abertas."><option value="">escolha</option><option value="app">só Append</option><option value="take">só Take</option><option value="amb">as duas</option></select></td>
+<td><input data-ans="0" data-hint="Há uma task na fila de uma alternativa aberta (Take): rendezvous com ela, e Count := Count − 1."></td>
+<td><select data-ans="seg" data-hint="O consumidor sai da fila e recebe X = 5."><option value="">escolha</option><option value="esp">espera na fila</option><option value="seg">é atendido</option></select></td></tr>
+<tr><td class="t">4</td><td>O produtor chama <code>Append(6)</code>, depois <code>Append(7)</code>; os dois são atendidos.</td>
+<td class="s">—</td>
+<td><input data-ans="2" data-hint="0 + 1 + 1."></td>
+<td class="s">—</td></tr>
+<tr><td class="t">5</td><td>O produtor chama <code>Append(8)</code>.</td>
+<td><select data-ans="take" data-hint="Count = 2: Count < 2 é falso. Só Take está aberta."><option value="">escolha</option><option value="app">só Append</option><option value="take">só Take</option><option value="amb">as duas</option></select></td>
+<td><input data-ans="2" data-hint="Ninguém foi atendido."></td>
+<td><select data-ans="esp" data-hint="Append está fechada: o produtor espera na fila até um Take abrir vaga."><option value="">escolha</option><option value="esp">espera na fila</option><option value="seg">é atendido</option></select></td></tr>
+</table></div>
+<p><button class="plain" data-check="tb1" type="button">Conferir</button></p>
+<p class="fb" id="tb1fb"></p>
+
+<h2>5. Programando com rendezvous</h2>
+<p>O slide 14 resume: <strong>rendezvous implementa remote procedure call (RPC)</strong>; <strong><code>delay</code> implementa timeout</strong>; <strong><code>else</code> implementa polling</strong>; sincronização pode ser feita com corpos de <code>accept</code> vazios <span class="src">s.14</span>. Os exemplos:</p>
+<div class="wrap"><table>
+<tr><th>Exemplo</th><th>Código (resumido)</th><th>O que faz</th></tr>
+<tr><td>Semáforo binário <span class="src">s.14–15</span></td><td><code>loop accept Wait; accept Signal; end loop;</code></td><td>Depois de um <code>Wait</code>, a task só aceita <code>Signal</code>. Então um segundo <code>Wait</code> espera até alguém fazer <code>Signal</code>: é o semáforo binário que começa em 1 da Lição 3.</td></tr>
+<tr><td>Accepts aninhados <span class="src">s.15–16</span></td><td><code>accept Synch_2 do accept Synch_3; end Synch_2;</code></td><td>Sincroniza múltiplas tarefas: T1, a task que chama <code>Synch_2</code> e a que chama <code>Synch_3</code> só seguem quando as três se encontraram.</td></tr>
+<tr><td>Múltiplos accepts <span class="src">s.17</span></td><td><code>accept E(…) do</code> <em>process odd calls</em> <code>end E; accept E(…) do</code> <em>process even calls</em> <code>end E;</code></td><td>A mesma entry com dois tratamentos: as chamadas ímpares (1ª, 3ª, …) pelo primeiro, as pares pelo segundo.</td></tr>
+<tr><td><code>select</code> na calling task <span class="src">s.18</span></td><td><code>select Sensor.Sample(…); or delay 1.0; Notify_Operator; end select;</code></td><td>A calling task só pode suspender em <strong>uma</strong> entry. Se <code>Sensor</code> não aceitar em 1 segundo, desiste e avisa o operador: timeout.</td></tr>
+<tr><td>Polling de vários servidores <span class="src">s.19–20</span></td><td><code>select Server_1.E(…); else null; end select; select Server_2.E(…); else null; end select;</code></td><td>Alterna a busca: tenta Server_1; se ele não está pronto agora, não espera (<code>else null</code>) e tenta Server_2.</td></tr>
+<tr><td>Polling de um servidor <span class="src">s.20</span></td><td><code>select Server_1.E(…); else select Server_2.E(…); else …; end select; end select;</code></td><td>Só usa o segundo quando o primeiro falha (não está pronto).</td></tr>
+</table></div>
+<p class="src">Na coluna "O que faz", estas frases são dos slides: "sincroniza múltiplas tarefas", "a calling task só pode suspender em uma entry", "alterna a busca", "só usa o segundo quando o primeiro falha". O resto é leitura desta lição do código.</p>
+
+<h2>6. Arrays de tasks</h2>
+<p>Ada permite definir um <strong>tipo</strong> task, como um registro. As operações válidas são entry calls e passagem como parâmetro; cada nova variável declarada cria um novo objeto task; dá para fazer arrays e listas de tarefas <span class="src">s.21</span>:</p>
+<pre><code>task type Buffer_Type is …
+  entry Append(I: in Integer);
+  entry Take(I: out Integer);
+end Buffer_Type;
+
+Buffers : array(1..20) of Buffer_Type;      -- 20 buffers, 20 tasks
+
+procedure P(Buff: in Buffer_Type) is
+  I : Integer := …;
+begin
+  Buff.Append(I);           -- call entry in parameter
+end P;
+
+Buffers(I+1).Append(E1);    -- direct call
+P(Buffers(J));              -- task parameter</code></pre>
+<p class="src">s.22–23.</p>
+
+<h2>Prática 2 · Exercício do slide 23: leitores e escritores</h2>
+<p>O slide pergunta: <em>"o que é necessário para corrigir essa implementação do problema dos Leitores e Escritores?"</em> <span class="src">s.23–24</span></p>
+<pre><code>task body Readers_and_Writers is … begin
+  accept Start_Write;
+  accept End_Write;
+  loop
+    select
+      accept Start_Read …;
+    or accept End_Read …;
+    or accept Start_Write …;
+    or accept End_Write …;
+    end select;
+  end loop;
+end Readers_and_Writers;</code></pre>
+<p>Pense antes de abrir: o que impede um leitor de começar enquanto alguém escreve?</p>
+<details><summary>Ver uma resposta</summary>
+<p><strong>Nada impede.</strong> Sem guardas, as 4 alternativas estão sempre abertas: um <code>Start_Read</code> pode ser aceito no meio de uma escrita, e dois <code>Start_Write</code> seguidos também. Falta guardar estado (quantos leem, se alguém escreve) e usar guardas <code>when</code>, como no buffer:</p>
+<pre><code>task body Readers_and_Writers is
+  Readers: Integer := 0;
+  Writing: Boolean := False;
+begin
+  accept Start_Write;
+  accept End_Write;
+  loop
+    select
+      when not Writing =&gt;
+        accept Start_Read;  Readers := Readers + 1;
+    or accept End_Read;     Readers := Readers - 1;
+    or when Readers = 0 and not Writing =&gt;
+        accept Start_Write; Writing := True;
+    or accept End_Write;    Writing := False;
+    end select;
+  end loop;
+end Readers_and_Writers;</code></pre>
+<p>Mesmo assim, como no monitor da Lição 5, se sempre houver um leitor lendo, <code>Readers</code> nunca chega a 0 e o escritor pode sofrer <strong>starvation</strong>.</p>
+<p class="src">Esta correção é desta lição (o slide só faz a pergunta), usando apenas construções dos slides: variáveis da task e guardas <code>when</code> (s.10–12).</p>
+</details>
+
+<h2>7. Ponte para Go</h2>
+<p>Os últimos slides comparam Ada com Go: a task de Ada é como uma goroutine; o par entry/accept é como enviar e receber num canal <strong>não bufferizado</strong>; nos dois, a comunicação <strong>bloqueia até que as duas partes estejam prontas</strong> <span class="src">s.24–26</span>. Go é o assunto da Lição 9; aqui basta guardar que o rendezvous aparece de novo lá.</p>
+
+<h2>Questão da prova: 2026-1, questão 5, coluna Ada (com resposta)</h2>
+<div class="wrap"><table>
+<tr><th>Característica</th><th>Ada</th><th>Por quê</th></tr>
+<tr><td>Monitores</td><td>não</td><td>os slides de Ada não falam de monitores</td></tr>
+<tr><td>Mensagens assíncronas</td><td>não</td><td>o rendezvous é síncrono e <strong>sem buffers</strong> (s.3, 9)</td></tr>
+<tr><td>Mensagens síncronas</td><td><strong>sim</strong></td><td>"comunicação síncrona" (s.3, 9)</td></tr>
+<tr><td>Rendezvous</td><td><strong>sim</strong></td><td>é o mecanismo central (s.3–13)</td></tr>
+</table></div>
+<p class="src">"Não" em monitores e assíncronas segue o que os slides dizem e não dizem. Uma assíncrona pode ser <em>simulada</em> com uma task buffer (07, s.12; 08, s.10–11), mas isso não é suporte direto da linguagem. As outras colunas entram nas Lições 8 (Linda), 11 (Java) e 15 (Erlang).</p>
+
+<h2>Questão da prova: P1, questão 3 (com resposta)</h2>
+<div class="box"><p><em>"Descreva o funcionamento de rendezvous. Como o processo servidor pode se comportar ao receber várias solicitações ao mesmo tempo? Quais as vantagens desse mecanismo de programação, e por que?"</em></p></div>
+<p><strong>Resposta modelo:</strong></p>
+<ol>
+<li><strong>Funcionamento.</strong> Rendezvous é comunicação síncrona, sem buffers: duas tasks se encontram para se comunicar e a primeira a chegar espera pela outra. A accepting task (servidor) declara entries e as aceita com <code>accept</code>; a calling task (cliente) chama <code>Servidor.Entry(params)</code>. A calling task passa os parâmetros <code>in</code> e espera; a accepting task executa o corpo do <code>accept</code>; os parâmetros <code>out</code> voltam; as duas seguem (s.3, 7).</li>
+<li><strong>Várias solicitações ao mesmo tempo.</strong> As chamadas ficam em <strong>filas</strong>, uma por entry. Com <code>select</code>, o servidor avalia as guardas <code>when</code> e obtém as alternativas abertas; se há tasks esperando em alguma delas, atende a primeira de uma das filas; se não há, fica suspenso até chegar uma chamada. Ele atende uma por vez, e as guardas permitem recusar temporariamente pedidos que não podem ser atendidos (ex.: <code>Append</code> com buffer cheio). A última alternativa pode ser <code>else</code> (não esperar), <code>delay T</code> (timeout) ou <code>terminate</code> (s.10–13).</li>
+<li><strong>Vantagens, e por quê.</strong>
+<ul>
+<li>Modelo <strong>assimétrico</strong>: o cliente precisa saber o nome do servidor, o servidor não precisa conhecer os clientes; por isso é bom para programar servidores (s.3–4).</li>
+<li>Sincronização e troca de dados <strong>numa operação só</strong>, com dados nas <strong>duas direções</strong> (<code>in</code> e <code>out</code>) (s.9). Implementa RPC (s.14).</li>
+<li>Não há variáveis compartilhadas entre as tasks: os dados ficam dentro da task servidora, e só ela mexe neles. As guardas fazem o papel das variáveis de condição, sem <code>wait</code>/<code>signal</code> (s.8–11).</li>
+<li>É expressivo: simula semáforo, sincroniza várias tarefas, faz timeout e polling (s.14–20).</li>
+</ul></li>
+</ol>
+<p class="src">A frase "não há variáveis compartilhadas… só ela mexe neles" é leitura desta lição dos códigos de s.8–11 e de 07, s.3.</p>
+
+<h2>Questão da prova: P2, questão 2 (com resposta)</h2>
+<div class="box"><p><em>"Como poderia ser implementada uma solução para o problema dos filósofos em uma linguagem distribuída (por exemplo utilizando rendez-vous em Ada)? Considere que um processo separado controla os garfos e os demais processos são filósofos. Indique como se comporta sua solução em relação às características desejadas de uma solução envolvendo programas concorrentes/distribuídos (questão anterior)."</em></p></div>
+<p><strong>Resposta modelo.</strong> Uma task <code>Garfos</code> guarda o estado dos 5 garfos. O filósofo <code>i</code> usa os garfos <code>i</code> e <code>(i+1) mod 5</code>, como na Lição 3. Cada filósofo pede <strong>os dois garfos de uma vez</strong>; a guarda só abre o pedido quando os dois estão livres.</p>
+<pre><code>task Garfos is
+  entry Pegar_0;  entry Pegar_1;  entry Pegar_2;
+  entry Pegar_3;  entry Pegar_4;
+  entry Soltar(I: in Integer);
+end Garfos;
+
+task body Garfos is
+  Livre: Array (0..4) of Boolean := (True, True, True, True, True);
+begin
+  loop
+    select
+      when Livre(0) and Livre(1) =&gt; accept Pegar_0;
+           Livre(0) := False;  Livre(1) := False;
+    or when Livre(1) and Livre(2) =&gt; accept Pegar_1;
+           Livre(1) := False;  Livre(2) := False;
+    or when Livre(2) and Livre(3) =&gt; accept Pegar_2;
+           Livre(2) := False;  Livre(3) := False;
+    or when Livre(3) and Livre(4) =&gt; accept Pegar_3;
+           Livre(3) := False;  Livre(4) := False;
+    or when Livre(4) and Livre(0) =&gt; accept Pegar_4;
+           Livre(4) := False;  Livre(0) := False;
+    or accept Soltar(I: in Integer) do
+           Livre(I) := True;  Livre((I + 1) mod 5) := True;
+       end Soltar;
+    end select;
+  end loop;
+end Garfos;
+
+-- filósofo 2 (os outros são iguais, com o próprio número):
+loop
+  Pensar;
+  Garfos.Pegar_2;       -- espera até os garfos 2 e 3 estarem livres
+  Comer;
+  Garfos.Soltar(2);
+end loop;</code></pre>
+<p class="src">Código construído por esta lição (os slides não resolvem os filósofos em Ada), com as construções de s.5–13. Há uma entry por filósofo porque cada guarda precisa saber quais garfos testar, e nos slides as guardas usam variáveis da task, como <code>Count</code> (s.10).</p>
+<p><strong>Comportamento em relação às propriedades</strong> (03, s.2–5; Lição 1):</p>
+<div class="wrap"><table>
+<tr><th>Propriedade</th><th>Garante?</th><th>Por quê</th></tr>
+<tr><td>Exclusão mútua (cada garfo com no máximo um filósofo)</td><td><strong>sim</strong></td><td>só a task <code>Garfos</code> mexe em <code>Livre</code>, um rendezvous por vez; um <code>Pegar</code> só é aceito com os dois garfos livres</td></tr>
+<tr><td>Ausência de deadlock</td><td><strong>sim</strong></td><td>ninguém segura um garfo esperando o outro: os dois são pegos juntos. Se há filósofos esperando e ninguém comendo, todos os garfos estão livres e a guarda de algum deles está aberta. Compare com a solução 1 da Lição 3, que dava deadlock</td></tr>
+<tr><td>Ausência de starvation</td><td><strong>não garante</strong></td><td>os dois vizinhos de um filósofo podem se revezar comendo de modo que sempre um dos garfos dele está ocupado. E, entre filas abertas, o <code>select</code> atende "a primeira de <strong>uma</strong> das filas" (s.12), sem dizer qual</td></tr>
+<tr><td>Ausência de contenção</td><td><strong>sim</strong></td><td>sem disputa, a guarda está aberta e o filósofo é atendido assim que chama</td></tr>
+</table></div>
+<p class="src">Análise desta lição.</p>
+
+<div class="box warn"><p><strong>Ligação com P2 Q4</strong> ("como controlar exclusão mútua num sistema distribuído?"), que não tem slide próprio. O mais próximo nos slides é o semáforo simulado com rendezvous (s.14–15): uma task <code>Semaphore</code> faz o papel de coordenador, e cada processo chama <code>Semaphore.Wait</code> antes da região crítica e <code>Semaphore.Signal</code> depois. Isso é uma aplicação desta lição; confirme com o professor se é essa a resposta esperada.</p></div>
+
+<h2>Prática 3 · Quiz de memória</h2>
+<div id="quiz"></div>
+<p class="score" id="score"></p>
+
+<h2>Leitura opcional</h2>
+<p>Ben-Ari, <em>Principles of Concurrent and Distributed Programming</em>, 2ª ed., seção 2.11 "Concurrency in Ada" e cap. 8. Andrews, cap. 8 "RPC and Rendezvous" (8.2 Rendezvous; 8.6 Case Study: Ada). Mapeamento em <a href="../reference/mapa-do-curso.html">Mapa do curso</a>.</p>
+
+<div class="box ask">
+<p><strong>Dúvida?</strong> Pergunte ao agente, seu professor neste workspace. Se travar na Prática 1, diga qual <code>t</code>. Próxima lição: Linda (arquivo 09b).</p>
+</div>
+
+<footer><a href="../index.html">← Início</a> · Lição 7 de CIN0145. Fonte: 08-Ada.pdf, páginas 2–26.</footer>
+
+<script>
+(function(){
+  function norm(v){ return String(v).trim().replace(/\s/g,'').replace('−','-'); }
+  document.querySelectorAll('button[data-check]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var id = btn.getAttribute('data-check'), tb = document.getElementById(id), fb = document.getElementById(id + 'fb');
+      var wrong = [], blank = 0;
+      tb.querySelectorAll('[data-ans]').forEach(function(el){
+        el.classList.remove('ok','bad');
+        var v = norm(el.value); if (v === '') { blank++; return; }
+        var a = el.getAttribute('data-ans'), ok = el.tagName === 'INPUT' ? Number(v) === Number(a) : v === a;
+        el.classList.add(ok ? 'ok' : 'bad'); if (!ok) wrong.push(el.getAttribute('data-hint'));
+      });
+      if (blank) { fb.className = 'fb'; fb.textContent = 'Preencha todas (' + blank + ' vazia' + (blank > 1 ? 's' : '') + ').'; return; }
+      fb.className = 'fb ' + (wrong.length ? 'bad' : 'ok');
+      fb.textContent = wrong.length ? wrong.length + ' em vermelho. Dica: ' + wrong[0] : 'Tudo certo.';
+    });
+  });
+
+  function mcq(el, it, onDone, keepOrder){
+    var fb = document.createElement('p'); fb.className = 'fb'; var done = false;
+    var list = it.opts.map(function(o,i){ return {o:o, i:i}; }); if (!keepOrder) shuffle(list);
+    list.forEach(function(x){
+      var b = document.createElement('button'); b.className = 'opt'; b.textContent = x.o;
+      b.addEventListener('click', function(){
+        if (done) return; done = true; var ok = x.i === it.ans;
+        b.classList.add(ok ? 'ok' : 'bad'); fb.className = 'fb ' + (ok ? 'ok' : 'bad');
+        fb.textContent = (ok ? 'Certo. ' : 'Não. A resposta é: ' + it.opts[it.ans] + '. ') + it.why;
+        if (onDone) onDone(ok);
+      });
+      el.appendChild(b);
+    });
+    el.appendChild(fb);
+  }
+  function shuffle(a){ for (var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+
+  var items = [
+    { stem: 'No rendezvous de Ada, quem chega primeiro ao encontro…',
+      opts: ['espera pela outra task', 'deixa os dados num buffer', 'desiste e tenta mais tarde'], ans: 0,
+      why: 'Comunicação síncrona, sem buffers: o primeiro a chegar espera pelo outro (s.3).' },
+    { stem: 'Quem precisa saber o nome de quem no rendezvous?',
+      opts: ['a calling task, o da accepting', 'a accepting task, o da calling', 'as duas, o nome uma da outra'], ans: 0,
+      why: 'A calling task tem que saber a identidade da accepting task e o nome do local (s.3): identificação assimétrica (s.9).' },
+    { stem: 'No <code>select</code>, as cláusulas <code>when</code> servem para…',
+      opts: ['definir as alternativas abertas', 'escolher a fila com mais tasks', 'repetir o accept várias vezes'], ans: 0,
+      why: 'As guardas são avaliadas, gerando o conjunto de alternativas abertas (s.12).' },
+    { stem: 'Se todas as filas das alternativas abertas estão vazias, a accepting task…',
+      opts: ['fica suspensa até uma chamada', 'executa a primeira alternativa', 'reavalia as guardas sem parar'], ans: 0,
+      why: 'É suspensa até que uma task chame uma dessas entradas; o conjunto de alternativas abertas não muda (s.12–13).' },
+    { stem: 'Em <code>select</code>, a alternativa <code>delay T</code> implementa…',
+      opts: ['timeout', 'polling', 'RPC'], ans: 0,
+      why: 'delay implementa timeout; else implementa polling; rendezvous implementa RPC (s.14).' },
+    { stem: 'Parâmetros <code>out</code> de uma entry…',
+      opts: ['voltam para a calling task', 'vão para a accepting task', 'ficam guardados num buffer'], ans: 0,
+      why: 'A calling task passa os in; os out são passados de volta à calling task (s.7). Fluxo nas duas direções (s.9).' },
+    { stem: 'Por que o buffer de s.8 é "degenerado"?',
+      opts: ['os accepts estão em sequência fixa', 'o array B tem só uma posição', 'o loop executa uma vez só'], ans: 0,
+      why: 'Depois de Append, só aceita Take, e vice-versa: nunca guarda mais de 1 item, embora B tenha N posições (leitura desta lição de s.8).' },
+    { stem: 'Revisão da Lição 6. Na comunicação assíncrona, quem envia…',
+      opts: ['não espera, salvo buffer cheio', 'sempre espera o receptor', 'precisa de um monitor'], ans: 0,
+      why: 'Mensagem enviada sem bloqueio; se o buffer estiver cheio, poderá ser bloqueado (07, s.11).' }
+  ];
+  var root = document.getElementById('quiz'), scoreEl = document.getElementById('score'), answered = 0, right = 0;
+  shuffle(items).forEach(function(it, k){
+    var d = document.createElement('div'); d.className = 'q';
+    d.innerHTML = '<p class="stem">' + (k+1) + '. ' + it.stem + '</p>';
+    mcq(d, it, function(ok){ answered++; if (ok) right++; scoreEl.textContent = 'Placar: ' + right + ' de ' + answered + (answered === items.length ? '. Me mande este placar.' : ''); });
+    root.appendChild(d);
+  });
+})();
+</script>
+</body>
+</html>
