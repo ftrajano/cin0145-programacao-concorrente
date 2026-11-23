@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lição 15 — Erlang</title>
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --rule:#d9d4c7; --accent:#8b2500; --bg:#fffdf8;
+          --ok:#1f6f3a; --bad:#9b1c1c; --soft:#f3efe4; --hi:#f6e3b4; }
+  html { background:var(--bg); }
+  body { max-width: 50rem; margin: 3rem auto 6rem; padding: 0 1.25rem; color:var(--ink);
+         font: 17px/1.6 Georgia, "Iowan Old Style", "Palatino Linotype", serif; }
+  header .kicker { color:var(--muted); font-size:.85rem; letter-spacing:.08em; text-transform:uppercase; }
+  h1 { font-weight: normal; font-size: 2.3rem; line-height:1.15; margin: .2rem 0 .4rem; letter-spacing:-.01em; }
+  .sub { color:var(--muted); font-style: italic; margin: 0 0 2.2rem; }
+  h2 { font-weight: normal; font-size: 1.4rem; margin: 2.8rem 0 .6rem; border-bottom:1px solid var(--rule); padding-bottom:.2rem; }
+  p { margin: .7rem 0; }
+  .src { color:var(--muted); font-size:.82rem; }
+  a { color: var(--accent); }
+  code { font: .88em/1.4 "SF Mono", Menlo, Consolas, monospace; background:var(--soft); padding:0 .25em; border-radius:3px; }
+  pre { background:var(--soft); padding: .8rem 1rem; border-radius:4px; overflow-x:auto; font-size:.86rem; line-height:1.45; }
+  pre code { background:none; padding:0; }
+  .box { border:1px solid var(--rule); border-radius:6px; padding: 1rem 1.2rem; margin: 1.2rem 0; background:#fff; }
+  .box.recall { border-left: 4px solid var(--accent); }
+  .box.ask { background:var(--soft); border:none; }
+  .box.exam { border-left: 4px solid #8a6d00; }
+  .box.warn { border-left: 4px solid #8a6d00; background:#fffaf0; }
+  nav { font-size:.9rem; color:var(--muted); margin-bottom: 2rem; }
+  nav a { margin-right: .75rem; }
+  details summary { cursor:pointer; color:var(--accent); font-size:.92rem; }
+  .wrap { overflow-x:auto; }
+  table { border-collapse: collapse; width:100%; font-size:.9rem; margin:.5rem 0; }
+  td, th { padding:.35rem .5rem; border-bottom:1px solid var(--rule); text-align:left; vertical-align:top; }
+  th { font-weight:normal; color:var(--muted); font-size:.8rem; }
+  td.t { color:var(--muted); font-variant-numeric: tabular-nums; width:2rem; }
+  td.s { font-family: "SF Mono", Menlo, monospace; font-size:.85rem; white-space:nowrap; }
+  tr.key td { background:var(--hi); }
+  .spin { color:#2c5282; }
+  .cs { font-weight:bold; }
+  table.trace select { font: .85rem "SF Mono", Menlo, monospace; padding:.15rem .3rem; border:1px solid var(--rule); border-radius:3px; background:#fff; color:var(--ink); max-width:100%; }
+  table.trace .ok { border-color:var(--ok); background:#e6efe8; }
+  table.trace .bad { border-color:var(--bad); background:#f8e5e5; }
+  ol.props li { margin:.5rem 0; }
+  .q { margin: 1.4rem 0; }
+  .q p.stem { margin:.2rem 0 .5rem; }
+  .q button.opt { display:block; width:100%; text-align:left; font:inherit; font-size:.97rem; padding:.45rem .8rem; margin:.3rem 0;
+       background:#fff; border:1px solid var(--rule); border-radius:4px; cursor:pointer; color:var(--ink); }
+  .q button.opt:hover { background:var(--soft); }
+  .q button.opt.ok { border-color:var(--ok); background:#e6efe8; }
+  .q button.opt.bad { border-color:var(--bad); background:#f8e5e5; }
+  .fb { font-size:.92rem; margin:.4rem 0 0; min-height:1.2rem; }
+  .fb.ok { color:var(--ok); } .fb.bad { color:var(--bad); }
+  .score { font-style: italic; color: var(--muted); }
+  button.plain { font: inherit; font-size:.9rem; padding:.35rem .8rem; border:1px solid var(--rule); background:#fff; border-radius:4px; cursor:pointer; }
+  button.plain:disabled { opacity:.4; cursor:default; }
+  textarea { width:100%; box-sizing:border-box; min-height:11rem; font: 1rem/1.5 Georgia, serif; padding:.7rem; border:1px solid var(--rule); border-radius:4px; background:#fff; color:var(--ink); }
+  .wc { font-size:.85rem; color:var(--muted); }
+  .check { display:none; } .check.on { display:block; }
+  .check label { display:block; margin:.5rem 0; padding-left:1.6rem; text-indent:-1.6rem; }
+  footer { margin-top:3rem; border-top:1px solid var(--rule); padding-top:1rem; font-size:.9rem; color:var(--muted); }
+  @media print { body { margin:0; max-width:none; font-size:11pt; } nav, button, textarea, select { display:none; } .check { display:block; } }
+  table.trace input { font: .85rem "SF Mono", Menlo, monospace; width:4.5rem; padding:.15rem .3rem; border:1px solid var(--rule); border-radius:3px; background:#fff; color:var(--ink); }
+  .sleep { color:var(--muted); font-style:italic; }
+</style>
+</head>
+<body>
+<nav><a href="../index.html">Início</a> <a href="../reference/glossario.html">Glossário</a> <a href="../reference/guia-da-prova.html">Guia das provas</a> <a href="./0014-wait-e-notify-passo-a-passo.html">← Lição 14</a></nav>
+
+<header>
+  <div class="kicker">Lição 15 · Erlang (arquivo 12)</div>
+  <h1>Erlang: processos, mensagens e a caixa-postal</h1>
+  <p class="sub">Troca de mensagens assíncrona na prática: <code>spawn</code>, <code>!</code>, <code>receive</code>, a ordem em que a caixa-postal entrega as mensagens, servidores que guardam estado, links e o banco distribuído. Com as respostas de 2026 Q6 e da tabela completa de 2026 Q5. Tempo estimado: 40 minutos. "s.N" indica o slide de 12-erlang-v2.pdf.</p>
+</header>
+
+<div class="box recall">
+<p><strong>Aquecimento das Lições 6 e 8, de memória:</strong></p>
+<ol>
+<li>Segundo o arquivo 07, que tipo de fluxo de dados os sistemas assíncronos usam?</li>
+<li>Em Linda, o que <code>Input</code> faz quando nenhuma tupla casa com o padrão?</li>
+</ol>
+<details><summary>Ver respostas</summary>
+<p>1. Unidirecional (07, s.16). 2. Suspende (09b, s.3).</p>
+</details>
+</div>
+
+<h2>1. Por que Erlang e o que ela oferece</h2>
+<p>Erlang nasceu da necessidade de uma linguagem simbólica de alto nível para sistemas de <strong>telecomunicações</strong>, com <strong>concorrência implícita na linguagem</strong> e <strong>tratamento de erros</strong> <span class="src">s.2</span>. Características listadas no slide 3: tempo real; suporte a projetos de larga escala; sistemas non-stop; incremental code loading; portabilidade; concorrência; distribuição; garbage collection; robustez; timing; e <strong>comunicação entre processos assíncrona e unidirecional</strong> <span class="src">s.3</span>.</p>
+<div class="box"><p>Guarde a última: <strong>assíncrona e unidirecional</strong>. É exatamente o par que o arquivo 07 descreve ("sistemas assíncronos usam fluxo unidirecional", 07, s.16), e é o que a questão 5 de 2026 pede.</p></div>
+
+<h2>2. Como ler o código de Erlang</h2>
+<pre><code>-module(math1).
+-export([area/1]).
+
+area({square, Side}) -&gt;
+    Side * Side;
+area({rectangle, X, Y}) -&gt;
+    X * Y;
+area({triangle, A, B, C}) -&gt;
+    S = (A + B + C)/2,
+    math:sqrt(S*(S-A)*(S-B)*(S-C)).</code></pre>
+<p class="src">s.4. Chamada (s.5): <code>Thing = {triangle, 6, 7, 8}.</code> e depois <code>math1:area(Thing).</code> devolve <code>20.3332</code>.</p>
+<p>Os slides não explicam a sintaxe. Lendo os exemplos:</p>
+<ul>
+<li><code>{square, Side}</code> é uma <strong>tupla</strong> (chaves). <code>[1,2,3,5]</code> é uma <strong>lista</strong> (colchetes).</li>
+<li>Palavras com <strong>minúscula</strong> (<code>square</code>, <code>analyse</code>, <code>ok</code>) são valores fixos; com <strong>maiúscula</strong> (<code>Side</code>, <code>Table</code>, <code>From</code>) são variáveis que recebem valores.</li>
+<li>A função <code>area</code> tem três versões; vale a primeira cujo padrão casa com o argumento. Com <code>{triangle, 6, 7, 8}</code>, só a terceira casa, e <code>A=6, B=7, C=8</code>.</li>
+<li><code>,</code> separa comandos em sequência; <code>;</code> separa versões (ou alternativas); <code>.</code> termina a função.</li>
+<li>A chamada usa <code>módulo:função</code>, como <code>math1:area(Thing)</code>.</li>
+</ul>
+<p class="src">Lista construída por esta lição a partir dos exemplos de s.4–5 e s.15–17; os slides não descrevem a sintaxe.</p>
+
+<h2>3. As três primitivas de concorrência</h2>
+<div class="wrap"><table>
+<tr><th>Primitiva</th><th>Forma</th><th>O que faz <span class="src">s.6–7</span></th></tr>
+<tr><td><code>spawn</code></td><td><code>Pid = spawn(Módulo, Função, ListArg)</code></td><td>cria um novo processo concorrente para avaliar a Função e retorna o seu identificador (<strong>Pid</strong>)</td></tr>
+<tr><td><code>!</code> (send)</td><td><code>Pid ! Message</code></td><td>envia uma mensagem para um processo</td></tr>
+<tr><td><code>receive</code></td><td><pre style="margin:0"><code>receive
+  Message1 [when Guard1] -&gt; Actions1;
+  Message2 [when Guard2] -&gt; Actions2;
+  ...
+end</code></pre></td><td>recebe uma mensagem; cada alternativa é um padrão, opcionalmente com uma guarda <code>when</code></td></tr>
+</table></div>
+<p>Compare com Ada (Lição 7): lá, <code>select</code> com <code>when</code> escolhia qual <strong>entry</strong> aceitar; aqui, <code>receive</code> com <code>when</code> escolhe qual <strong>mensagem</strong> tratar. E o <code>!</code> não espera ninguém: comunicação assíncrona.</p>
+<p class="src">A comparação com Ada é desta lição.</p>
+
+<h2>4. A caixa-postal: em que ordem as mensagens são recebidas</h2>
+<p>As mensagens enviadas a um processo são armazenadas numa <strong>"caixa-postal"</strong> (mailbox) <span class="src">s.8</span>. Os slides 8–11 mostram uma sequência de quatro estados. Acompanhe:</p>
+<div class="wrap"><table>
+<tr><th>Estado</th><th>Caixa-postal (do início para o fim)</th><th><code>receive</code> executado</th><th>O que sai</th></tr>
+<tr><td>(a) s.8</td><td><code>msg_1, msg_2, msg_3, msg_4</code></td><td><code>msg_3 -&gt; …</code></td><td><code>msg_3</code></td></tr>
+<tr class="key"><td>(b) s.9</td><td><code>msg_1, msg_2, msg_4</code></td><td><code>msg_4 -&gt; …; msg_2 -&gt; …</code></td><td><strong><code>msg_2</code></strong></td></tr>
+<tr><td>(c) s.10</td><td><code>msg_1, msg_4</code></td><td><code>AnyMessage -&gt; …</code></td><td><code>msg_1</code></td></tr>
+<tr><td>(d) s.11</td><td><code>msg_4</code></td><td>—</td><td>—</td></tr>
+</table></div>
+<p>O que os desenhos mostram:</p>
+<ol>
+<li><strong>Mensagem que não casa fica na caixa.</strong> Em (a), <code>msg_1</code> e <code>msg_2</code> não casam com <code>msg_3</code>, e continuam lá em (b). <code>msg_1</code> só é tratada em (c), por outro <code>receive</code>.</li>
+<li><strong>A ordem é a da caixa, não a dos padrões.</strong> Em (b), o primeiro padrão é <code>msg_4</code>, mas sai <code>msg_2</code>: percorrendo a caixa do início, <code>msg_1</code> não casa com nenhum padrão, e <code>msg_2</code> é a primeira que casa com algum.</li>
+<li><strong>Um padrão variável casa com qualquer coisa.</strong> Em (c), <code>AnyMessage</code> (maiúscula: variável) pega a primeira da caixa, <code>msg_1</code>.</li>
+</ol>
+<p class="src">Os slides mostram só os desenhos (a)–(d). As três conclusões são desta lição, tiradas da diferença entre um estado e o seguinte.</p>
+
+<h2>Prática 1 · O que sai da caixa?</h2>
+<p>A caixa começa com <code>{b, 2}, {a, 1}, {c, 3}</code>, nesta ordem. Cada <code>receive</code> roda sobre a caixa deixada pelo anterior.</p>
+<div class="wrap"><table class="trace" id="tb1">
+<tr><th>#</th><th><code>receive</code></th><th>Sai</th></tr>
+<tr><td class="t">1</td><td><code>{a, X} -&gt; …</code></td>
+<td><select data-ans="a1" data-hint="Só {a, 1} casa com {a, X}. As outras ficam na caixa."><option value="">escolha</option><option value="b2">{b, 2}</option><option value="a1">{a, 1}</option><option value="c3">{c, 3}</option><option value="nada">nenhuma: espera</option></select></td></tr>
+<tr><td class="t">2</td><td><code>{c, X} -&gt; …; {b, X} -&gt; …</code></td>
+<td><select data-ans="b2" data-hint="Caixa: {b,2}, {c,3}. Percorrendo do início, {b,2} já casa com um dos padrões. A ordem dos padrões não importa (estado b do slide)."><option value="">escolha</option><option value="b2">{b, 2}</option><option value="a1">{a, 1}</option><option value="c3">{c, 3}</option><option value="nada">nenhuma: espera</option></select></td></tr>
+<tr><td class="t">3</td><td><code>{a, X} -&gt; …</code></td>
+<td><select data-ans="nada" data-hint="Caixa: {c,3}. Nenhuma casa com {a, X}: o processo espera, e {c,3} continua lá."><option value="">escolha</option><option value="b2">{b, 2}</option><option value="a1">{a, 1}</option><option value="c3">{c, 3}</option><option value="nada">nenhuma: espera</option></select></td></tr>
+<tr><td class="t">4</td><td>(em outro momento) <code>Any -&gt; …</code></td>
+<td><select data-ans="c3" data-hint="Variável casa com qualquer mensagem: sai a primeira da caixa, {c,3}."><option value="">escolha</option><option value="b2">{b, 2}</option><option value="a1">{a, 1}</option><option value="c3">{c, 3}</option><option value="nada">nenhuma: espera</option></select></td></tr>
+</table></div>
+<p><button class="plain" data-check="tb1" type="button">Conferir</button></p>
+<p class="fb" id="tb1fb"></p>
+<p class="src">Na linha 3, "espera" vem da definição de receive como recebimento (s.7) e do comportamento das mensagens que não casam (s.8–11). Os slides não mostram explicitamente um receive sem nenhuma mensagem que case.</p>
+
+<h2>5. Timeouts</h2>
+<p><code>after</code> é um argumento opcional do <code>receive</code>: se nenhuma mensagem for processada em t milissegundos, realiza uma ação <span class="src">s.12</span>.</p>
+<pre><code>get_event() -&gt;
+    receive
+        {mouse, click} -&gt;
+            receive
+                {mouse, click} -&gt;
+                    double_click
+            after double_click_interval() -&gt;
+                single_click
+            end
+        ...
+    end.</code></pre>
+<p>Leitura: chegou um clique; se chegar outro antes do intervalo, é <code>double_click</code>; se o tempo passar sem outro clique, é <code>single_click</code>. É o mesmo papel do <code>delay</code> no <code>select</code> de Ada (08, s.14).</p>
+<p class="src">s.12. A leitura e a comparação com Ada são desta lição.</p>
+
+<h2>6. Servidor com processo registrado</h2>
+<p><code>register(Nome, Pid)</code> associa um nome a um processo; <code>unregister(Nome)</code> remove; <code>whereis(Nome)</code> devolve o Pid (ou <code>undefined</code>); <code>registered()</code> lista os nomes <span class="src">s.13</span>. Com isso, um cliente manda mensagens para <strong>um nome</strong>, sem precisar do Pid. O exemplo é um servidor de central telefônica que analisa números discados <span class="src">s.14–17</span>:</p>
+<pre><code>start() -&gt;
+    register(number_analyser,
+             spawn(number_analyser, server, [nil])).
+
+%% Funções de interface (rodam no processo do cliente)
+add_number(Seq, Dest) -&gt; request({add_number, Seq, Dest}).
+analyse(Seq)          -&gt; request({analyse, Seq}).
+
+request(Req) -&gt;
+    number_analyser ! {self(), Req},          % envia: {quem sou eu, pedido}
+    receive
+        {number_analyser, Reply} -&gt; Reply     % espera a resposta
+    end.
+
+%% Servidor
+server(Table) -&gt;
+    receive
+        {From, {analyse, Seq}} -&gt;
+            Result = lookup(Seq, Table),
+            From ! {number_analyser, Result},
+            server(Table);
+        {From, {add_number, Seq, Dest}} -&gt;
+            From ! {number_analyser, ack},
+            server(insert(Seq, Dest, Table))
+    end.</code></pre>
+<p class="src">s.15–16; os comentários com <code>%</code> são desta lição.</p>
+<p>Três coisas para entender (leitura desta lição):</p>
+<ol>
+<li><strong>A resposta volta porque o cliente manda o próprio Pid.</strong> <code>self()</code> é o Pid de quem chama; o servidor o recebe em <code>From</code> e responde <code>From ! …</code>. É a mesma ideia do RPC de Linda (o cliente põe seu ID na tupla, Lição 8).</li>
+<li><strong>O servidor "guarda estado" chamando a si mesmo.</strong> Não há variável global: depois de cada mensagem, <code>server</code> chama <code>server(…)</code> com a tabela atual (ou com a tabela nova, depois de <code>insert</code>). É assim que ele fica em loop e lembra os números.</li>
+<li><strong>Um pedido por vez.</strong> O servidor trata uma mensagem, responde e volta ao <code>receive</code>. Os pedidos dos vários clientes esperam na caixa-postal dele. Não há variáveis compartilhadas, então não há interferência.</li>
+</ol>
+<p>Teste <span class="src">s.17</span>: <code>add_number([1,2,3,5], "jose")</code> → <code>ack</code>; <code>analyse([1,2,3,5])</code> → <code>"jose"</code>; <code>analyse([1,2,3,4])</code> → <code>undefined</code>.</p>
+
+<h2>7. Terminação e processos ligados</h2>
+<p><strong>Terminação normal:</strong> a função termina, ou chamada a <code>exit(normal)</code>. <strong>Anormal:</strong> <code>exit(Reason)</code> com qualquer <code>Reason</code> diferente de <code>normal</code>, ou falha em tempo de execução (ex.: divisão por zero) <span class="src">s.18</span>.</p>
+<p><strong>Processos ligados</strong> (<code>link(Pid)</code>, <code>unlink(Pid)</code>) <span class="src">s.19</span>: a ligação é <strong>bidirecional</strong>. Quando um processo termina, um sinal <code>{'EXIT', Exiting_Pid, Reason}</code> é enviado a todos os processos ligados a ele. Se <code>Reason</code> é <code>normal</code>, o sinal é ignorado; caso contrário, quem recebe também termina anormalmente e envia <code>'EXIT'</code> a todos os seus ligados.</p>
+<p>O desenho do slide 20 mostra a consequência: numa cadeia de processos ligados, o da ponta morre, o sinal Exit derruba o do meio, que derruba o seguinte. A falha se <strong>propaga</strong> pela cadeia <span class="src">s.20</span>.</p>
+<p class="src">A frase "a falha se propaga" é a leitura desta lição do desenho de s.20.</p>
+
+<h2>8. Distribuição: o banco</h2>
+<p>Por que distribuir <span class="src">s.21</span>: velocidade; confiabilidade e tolerância a falhas (falhas isoladas não afetam o sistema todo); acesso a recursos de outros nós; extensibilidade. Um <strong>nó</strong> é um sistema Erlang completo e independente; um computador pode rodar um ou mais nós.</p>
+<div class="wrap"><table>
+<tr><th>Primitiva</th><th>O que faz <span class="src">s.22–23</span></th></tr>
+<tr><td><code>spawn(Node, Mod, Func, Args)</code></td><td>cria um processo num nó remoto</td></tr>
+<tr><td><code>spawn_link(Node, Mod, Func, Args)</code></td><td>cria e já gera um link para ele</td></tr>
+<tr><td><code>{Name, Node} ! Msg</code></td><td>envia Msg ao processo registrado como Name no nó Node</td></tr>
+<tr><td><code>monitor_node(Node, Flag)</code></td><td>com <code>true</code>, passa a monitorar se Node está "vivo"; com <code>false</code>, para</td></tr>
+<tr><td><code>node()</code> · <code>nodes()</code> · <code>node(Item)</code> · <code>disconnect_node(N)</code></td><td>nome do próprio nó · lista de nós conhecidos · nó de origem de Item · desconecta</td></tr>
+</table></div>
+<p><strong>O servidor do banco</strong> <span class="src">s.25–27</span> segue o padrão da seção 6: <code>server(Data)</code>, com <code>Data</code> sendo uma lista de pares <code>{Quem, Saldo}</code>.</p>
+<pre><code>{From, {deposit, Who, Amount}} -&gt;
+    From ! {bank_server, ok},
+    server(deposit(Who, Amount, Data));
+{From, {ask, Who}} -&gt;
+    From ! {bank_server, lookup(Who, Data)},
+    server(Data);
+{From, {withdraw, Who, Amount}} -&gt;
+    case lookup(Who, Data) of
+        undefined -&gt;
+            From ! {bank_server, no},  server(Data);
+        Balance when Balance &gt; Amount -&gt;
+            From ! {bank_server, ok},  server(deposit(Who, -Amount, Data));
+        _ -&gt;
+            From ! {bank_server, no},  server(Data)
+    end</code></pre>
+<p class="src">s.25–26, com o espaçamento desta lição. <code>lookup</code> devolve o saldo ou <code>undefined</code>; <code>deposit</code> soma X ao saldo (ou cria a conta) (s.27).</p>
+<p><strong>O cliente com monitoramento</strong> <span class="src">s.30</span>: liga <code>monitor_node(Headoffice, true)</code>, envia <code>{bank_server, Headoffice} ! {self(), Msg}</code> e espera <strong>uma de duas</strong>: a resposta <code>{bank_server, Reply}</code>, ou <code>{nodedown, Headoffice}</code>, caso o nó do servidor caia; nesse caso devolve <code>no</code> em vez de esperar para sempre.</p>
+
+<h2>Prática 2 · Rastreie o banco</h2>
+<p>O servidor começa com <code>Data = []</code>. Os pedidos chegam nesta ordem.</p>
+<div class="wrap"><table class="trace" id="tb2">
+<tr><th>#</th><th>Pedido</th><th>Resposta</th><th>Saldo de 'Andre' depois</th></tr>
+<tr><td class="t">1</td><td><code>deposit('Andre', 10)</code></td><td class="s">ok</td><td class="s">10</td></tr>
+<tr><td class="t">2</td><td><code>withdraw('Andre', 4)</code></td>
+<td><select data-ans="ok" data-hint="Balance = 10 > 4: ok, e deposita −4."><option value="">escolha</option><option value="ok">ok</option><option value="no">no</option><option value="undef">undefined</option></select></td>
+<td><input data-ans="6" data-hint="10 − 4."></td></tr>
+<tr><td class="t">3</td><td><code>withdraw('Andre', 6)</code></td>
+<td><select data-ans="no" data-hint="A guarda é Balance > Amount, e 6 > 6 é falso. Cai em _ -> no. Com esse código, não dá para sacar o saldo inteiro."><option value="">escolha</option><option value="ok">ok</option><option value="no">no</option><option value="undef">undefined</option></select></td>
+<td><input data-ans="6" data-hint="Resposta no: server(Data), saldo não muda."></td></tr>
+<tr><td class="t">4</td><td><code>withdraw('Maria', 1)</code></td>
+<td><select data-ans="no" data-hint="lookup devolve undefined (Maria não existe), e o servidor responde no (s.26)."><option value="">escolha</option><option value="ok">ok</option><option value="no">no</option><option value="undef">undefined</option></select></td>
+<td><input data-ans="6" data-hint="Nada muda para Andre."></td></tr>
+<tr><td class="t">5</td><td><code>ask('Maria')</code></td>
+<td><select data-ans="undef" data-hint="ask devolve o próprio lookup: undefined (como ask('Andres') em s.31)."><option value="">escolha</option><option value="ok">ok</option><option value="no">no</option><option value="undef">undefined</option></select></td>
+<td><input data-ans="6" data-hint="Nada muda."></td></tr>
+</table></div>
+<p><button class="plain" data-check="tb2" type="button">Conferir</button></p>
+<p class="fb" id="tb2fb"></p>
+
+<h2>Questão da prova: 2026-1, questão 6 (com resposta)</h2>
+<div class="box"><p><em>"Em Erlang, qual é o comportamento padrão quando uma mensagem chega a um processo mas não casa com nenhum padrão no bloco <code>receive</code> atual?"</em></p>
+<p>( ) O processo emissor recebe um sinal de 'nack'. ( ) O processo entra em estado de erro (crash). <strong>(X) A mensagem permanece na 'caixa-postal' (mailbox) para ser processada por chamadas subsequentes.</strong> ( ) A mensagem é descartada imediatamente.</p></div>
+<p><strong>Por quê:</strong> nos slides 8–10, <code>msg_1</code> não casa com <code>msg_3</code> em (a), nem com <code>msg_4</code>/<code>msg_2</code> em (b), e continua na caixa até ser tratada pelo <code>receive AnyMessage</code> em (c).</p>
+
+<h2>Questão da prova: 2026-1, questão 5, tabela completa (com resposta)</h2>
+<div class="wrap"><table>
+<tr><th>Característica</th><th>Java</th><th>Erlang</th><th>Ada</th><th>Linda</th></tr>
+<tr><td>Monitores</td><td><strong>sim</strong></td><td>não</td><td>não</td><td>não</td></tr>
+<tr><td>Mensagens assíncronas</td><td>não</td><td><strong>sim</strong></td><td>não</td><td><strong>sim</strong></td></tr>
+<tr><td>Mensagens síncronas</td><td>não</td><td>não</td><td><strong>sim</strong></td><td>não</td></tr>
+<tr><td>Rendezvous</td><td>não</td><td>não</td><td><strong>sim</strong></td><td>não</td></tr>
+</table></div>
+<ul>
+<li><strong>Java:</strong> <code>synchronized</code> + <code>wait</code>/<code>notify</code> fazem o papel do monitor (Lição 14); os slides de Java (11) não tratam de mensagens.</li>
+<li><strong>Erlang:</strong> "comunicação entre processos assíncrona, unidirecional" (12, s.3). Uma chamada como <code>request</code> (seção 6) espera a resposta, mas isso é construído com dois envios assíncronos e um <code>receive</code>.</li>
+<li><strong>Ada:</strong> rendezvous, comunicação síncrona sem buffers (08, s.3, 9). Lição 7.</li>
+<li><strong>Linda:</strong> independência de tempo e da existência dos processos (09b, s.2, 7). Lição 8.</li>
+</ul>
+<p class="src">Só a linha Erlang × assíncrona está escrita literalmente nos slides (12, s.3). As outras células aplicam as definições de 07, s.10–11, ao que cada arquivo diz, e os "não" seguem o que os slides não mencionam. Java × monitores: ver a nota da Lição 14 ("nenhum slide diz literalmente que Java tem monitores").</p>
+
+<h2>Prática 3 · Quiz de memória</h2>
+<div id="quiz"></div>
+<p class="score" id="score"></p>
+
+<h2>Leitura opcional</h2>
+<p>Os slides indicam a página oficial (https://www.erlang.org/) e um compilador online (https://onecompiler.com/erlang) para testar os exemplos <span class="src">s.32</span>. O mapeamento de capítulos dos livros (<a href="../reference/mapa-do-curso.html">Mapa do curso</a>) ainda não tem uma linha para Erlang.</p>
+
+<div class="box ask">
+<p><strong>Dúvida?</strong> Pergunte ao agente, seu professor neste workspace. Esta é a última lição dos arquivos de slides que caíram nas provas. Próximo passo: a revisão final em modo recordação.</p>
+</div>
+
+<footer><a href="../index.html">← Início</a> · Lição 15 de CIN0145. Fonte: 12-erlang-v2.pdf, slides 2–32.</footer>
+
+<script>
+(function(){
+  function norm(v){ return String(v).trim().replace(/\s/g,'').replace('−','-'); }
+  document.querySelectorAll('button[data-check]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var id = btn.getAttribute('data-check'), tb = document.getElementById(id), fb = document.getElementById(id + 'fb');
+      var wrong = [], blank = 0;
+      tb.querySelectorAll('[data-ans]').forEach(function(el){
+        el.classList.remove('ok','bad');
+        var v = norm(el.value); if (v === '') { blank++; return; }
+        var a = el.getAttribute('data-ans'), ok = el.tagName === 'INPUT' ? Number(v) === Number(a) : v === a;
+        el.classList.add(ok ? 'ok' : 'bad'); if (!ok) wrong.push(el.getAttribute('data-hint'));
+      });
+      if (blank) { fb.className = 'fb'; fb.textContent = 'Preencha todas (' + blank + ' vazia' + (blank > 1 ? 's' : '') + ').'; return; }
+      fb.className = 'fb ' + (wrong.length ? 'bad' : 'ok');
+      fb.textContent = wrong.length ? wrong.length + ' em vermelho. Dica: ' + wrong[0] : 'Tudo certo.';
+    });
+  });
+
+  function mcq(el, it, onDone, keepOrder){
+    var fb = document.createElement('p'); fb.className = 'fb'; var done = false;
+    var list = it.opts.map(function(o,i){ return {o:o, i:i}; }); if (!keepOrder) shuffle(list);
+    list.forEach(function(x){
+      var b = document.createElement('button'); b.className = 'opt'; b.textContent = x.o;
+      b.addEventListener('click', function(){
+        if (done) return; done = true; var ok = x.i === it.ans;
+        b.classList.add(ok ? 'ok' : 'bad'); fb.className = 'fb ' + (ok ? 'ok' : 'bad');
+        fb.textContent = (ok ? 'Certo. ' : 'Não. A resposta é: ' + it.opts[it.ans] + '. ') + it.why;
+        if (onDone) onDone(ok);
+      });
+      el.appendChild(b);
+    });
+    el.appendChild(fb);
+  }
+  function shuffle(a){ for (var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+
+  var items = [
+    { stem: 'Segundo o slide 3, a comunicação entre processos em Erlang é…',
+      opts: ['assíncrona e unidirecional', 'síncrona e bidirecional', 'síncrona e unidirecional'], ans: 0,
+      why: 'Comunicação entre processos: assíncrona, unidirecional (s.3).' },
+    { stem: '<code>Pid ! Message</code>…',
+      opts: ['envia a mensagem ao processo Pid', 'cria um novo processo chamado Pid', 'espera uma mensagem vinda de Pid'], ans: 0,
+      why: '! (send) envia uma mensagem para um processo (s.6). spawn cria; receive recebe.' },
+    { stem: 'Caixa: <code>msg_1, msg_2, msg_4</code>. <code>receive msg_4 -&gt; …; msg_2 -&gt; … end</code> tira…',
+      opts: ['msg_2', 'msg_4', 'msg_1'], ans: 0,
+      why: 'Do estado (b) para o (c) do slide, sai msg_2: a caixa é percorrida do início, e msg_2 é a primeira que casa com algum padrão (s.9–10).' },
+    { stem: 'O <code>after</code> num <code>receive</code> serve para…',
+      opts: ['agir se nada chegar a tempo', 'repetir o receive mais tarde', 'enviar uma resposta atrasada'], ans: 0,
+      why: 'Caso nenhuma mensagem tenha sido processada em t milissegundos, realiza uma ação (s.12).' },
+    { stem: 'Como o servidor <code>server(Table)</code> mantém a tabela entre um pedido e outro?',
+      opts: ['chama server com a tabela nova', 'guarda a tabela numa global', 'pede a tabela ao cliente'], ans: 0,
+      why: 'Depois de cada mensagem, server(Table) ou server(insert(…)) (s.16; leitura desta lição).' },
+    { stem: 'Processo ligado termina com <code>Reason = normal</code>. Os ligados a ele…',
+      opts: ['ignoram o sinal EXIT', 'terminam de forma anormal', 'não recebem nenhum sinal'], ans: 0,
+      why: 'O sinal é enviado a todos os ligados; normal → ignore; caso contrário, terminam anormalmente (s.19).' },
+    { stem: 'No cliente do banco com <code>monitor_node</code>, se o nó do servidor cai…',
+      opts: ['recebe nodedown e devolve no', 'espera a resposta para sempre', 'recria o servidor em outro nó'], ans: 0,
+      why: 'O receive espera {bank_server, Reply} ou {nodedown, Headoffice} -> no (s.30).' },
+    { stem: 'Revisão da Lição 8. Em Linda, a desvantagem citada é…',
+      opts: ['eficiência', 'flexibilidade', 'expressividade'], ans: 0,
+      why: 'Desvantagens: eficiência (09b, s.12).' }
+  ];
+  var root = document.getElementById('quiz'), scoreEl = document.getElementById('score'), answered = 0, right = 0;
+  shuffle(items).forEach(function(it, k){
+    var d = document.createElement('div'); d.className = 'q';
+    d.innerHTML = '<p class="stem">' + (k+1) + '. ' + it.stem + '</p>';
+    mcq(d, it, function(ok){ answered++; if (ok) right++; scoreEl.textContent = 'Placar: ' + right + ' de ' + answered + (answered === items.length ? '. Me mande este placar.' : ''); });
+    root.appendChild(d);
+  });
+})();
+</script>
+</body>
+</html>
