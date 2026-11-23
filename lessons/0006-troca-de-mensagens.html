@@ -101,7 +101,9 @@
 <li>Os processos compartilham <strong>canais</strong> de comunicação, que são abstrações da conexão física: escondem o tempo e os erros <span class="src">s.8</span>.</li>
 <li>Canais podem ser globais a todos os processos, podem ser direcionados, podem conectar dois ou mais processos <span class="src">s.9</span>.</li>
 </ul>
-<div class="box"><p><strong>A sincronização vem de graça.</strong> Um processo <strong>não pode receber</strong> uma mensagem sem que outro <strong>tenha enviado</strong> <span class="src">s.8</span>. Na prática, <code>send</code> e <code>receive</code> incluem alguma forma de sincronização <span class="src">s.7</span>. Compare: com semáforos, era preciso escrever <code>P</code> e <code>V</code>; aqui, o próprio <code>receive</code> faz esperar.</p></div>
+<div class="box"><p><strong>A sincronização vem junto.</strong> Um processo <strong>não pode receber</strong> uma mensagem sem que outro <strong>tenha enviado</strong> <span class="src">s.8</span>. Na prática, <code>send</code> e <code>receive</code> incluem alguma forma de sincronização <span class="src">s.7</span>. Compare: com semáforos, era preciso escrever <code>P</code> e <code>V</code>; aqui, o próprio <code>receive</code> faz esperar.</p>
+<p><strong>Atenção: a regra é numa direção só.</strong> O slide garante que <em>quem recebe</em> espera quem envia. Se <em>quem envia</em> também espera quem recebe depende do tipo de comunicação (seção 3): na síncrona, sim; na assíncrona, não (deixa no buffer e segue).</p>
+<p class="src">"Vem junto" e a observação sobre a direção são desta lição, a partir de s.8–12.</p></div>
 
 <h2>3. Síncrona × assíncrona</h2>
 <p>A comunicação pode ser <strong>síncrona (bloqueante)</strong> ou <strong>assíncrona (não bloqueante)</strong> <span class="src">s.9</span>.</p>
