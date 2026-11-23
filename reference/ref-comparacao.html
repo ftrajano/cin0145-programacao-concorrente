@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comparação das linguagens — Programação Concorrente</title>
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --rule:#d9d4c7; --accent:#8b2500; --bg:#fffdf8; --soft:#f3efe4; --hi:#f6e3b4; }
+  html { background:var(--bg); }
+  body { max-width: 50rem; margin: 3rem auto 6rem; padding: 0 1.25rem; color:var(--ink);
+         font: 17px/1.55 Georgia, "Iowan Old Style", "Palatino Linotype", serif; }
+  h1 { font-weight: normal; font-size: 2.2rem; margin: 0 0 .25rem; letter-spacing:-.01em; }
+  .sub { color:var(--muted); font-style: italic; margin: 0 0 2rem; }
+  h2 { font-weight: normal; font-size: 1.35rem; margin: 2.5rem 0 .5rem; border-bottom: 1px solid var(--rule); padding-bottom:.2rem; }
+  h3 { font-weight: normal; font-style: italic; font-size: 1.1rem; margin: 1.6rem 0 .3rem; }
+  .src { color:var(--muted); font-size: .82rem; }
+  p.src { margin-top:.2rem; }
+  code { font: .88em/1.4 "SF Mono", Menlo, Consolas, monospace; background:var(--soft); padding:0 .25em; border-radius:3px; }
+  pre { background:var(--soft); padding:.7rem 1rem; border-radius:4px; overflow-x:auto; font-size:.85rem; line-height:1.45; margin:.5rem 0; }
+  pre code { background:none; padding:0; }
+  a { color: var(--accent); }
+  nav { font-size:.9rem; color:var(--muted); margin-bottom: 2rem; }
+  nav a { margin-right: .75rem; }
+  .wrap { overflow-x:auto; }
+  table { border-collapse: collapse; width:100%; font-size:.93rem; margin:.6rem 0; }
+  td, th { padding:.35rem .5rem; border-bottom:1px solid var(--rule); text-align:left; vertical-align:top; }
+  th { font-weight:normal; color:var(--muted); font-size:.8rem; }
+  td:first-child { white-space:nowrap; }
+  .box { border:1px solid var(--rule); border-radius:6px; padding:.8rem 1.1rem; margin:1rem 0; background:#fff; }
+  .box.key { border-left:4px solid var(--accent); }
+  .box.warn { border-left:4px solid #9b1c1c; }
+  .ded { color:var(--muted); font-style:italic; }
+  @media print { body { margin:0; max-width:none; font-size:10.5pt; } nav { display:none; } pre { white-space:pre-wrap; } td:first-child { white-space:normal; } }
+</style>
+</head>
+<body>
+<nav><a href="../index.html">Início</a> <a href="./glossario.html">Glossário</a> <a href="./ref-ada.html">Ada</a> <a href="./ref-linda.html">Linda</a> <a href="./ref-erlang.html">Erlang</a> <a href="./ref-go.html">Go</a> <a href="./ref-comparacao.html">Comparação</a></nav>
+<h1>Ada, Linda, Erlang e Go lado a lado</h1>
+<p class="sub">A mesma ideia em cada linguagem. Útil para a questão 5 de 2026 e para não misturar a sintaxe. Detalhes nas referências de <a href="./ref-ada.html">Ada</a>, <a href="./ref-linda.html">Linda</a>, <a href="./ref-erlang.html">Erlang</a> e <a href="./ref-go.html">Go</a>.</p>
+
+<div class="wrap"><table>
+<tr><th></th><th>Ada (08)</th><th>Linda (09b)</th><th>Erlang (12)</th><th>Go (09c)</th></tr>
+<tr><td>Processo</td><td>task</td><td>processo / worker</td><td>processo (<code>spawn</code>)</td><td>goroutine (<code>go</code>)</td></tr>
+<tr><td>Comunica por</td><td>rendezvous (entry/accept)</td><td>espaço de tuplas</td><td>mensagens para um Pid</td><td>channels</td></tr>
+<tr><td>Enviar</td><td><code>Server.Entry(x)</code></td><td><code>Output(t)</code></td><td><code>Pid ! Msg</code></td><td><code>ch &lt;- x</code></td></tr>
+<tr><td>Receber</td><td><code>accept Entry(…) do … end</code></td><td><code>Input(padrão)</code> / <code>Read</code></td><td><code>receive padrão -&gt; … end</code></td><td><code>x := &lt;-ch</code></td></tr>
+<tr><td>Quem envia espera?</td><td>sim, até o rendezvous terminar</td><td class="ded">não</td><td>não</td><td>sem buffer: sim; com buffer: só se cheio</td></tr>
+<tr><td>Quem recebe espera?</td><td>sim, se chegar primeiro</td><td>sim (<code>Input</code> suspende)</td><td class="ded">sim, até algo casar</td><td>sim, até alguém enviar</td></tr>
+<tr><td>Escolher entre várias</td><td><code>select … or …</code> com <code>when</code></td><td class="ded">o padrão do Input</td><td><code>receive</code> com vários padrões e <code>when</code></td><td><code>select { case … }</code></td></tr>
+<tr><td>Timeout</td><td><code>or delay T</code></td><td>—</td><td><code>after T</code></td><td><code>case &lt;-time.After(T)</code></td></tr>
+<tr><td>Não esperar</td><td><code>else</code> (polling)</td><td class="ded"><code>Try_Input</code>? (não explicado)</td><td>—</td><td><code>default</code></td></tr>
+<tr><td>Identificação</td><td>assimétrica: quem chama sabe o nome do servidor</td><td>nenhuma: independência de nomes</td><td>Pid ou nome registrado</td><td>pelo canal</td></tr>
+<tr><td>Dados nas duas direções</td><td>sim, <code>in</code> e <code>out</code></td><td class="ded">com duas tuplas (RPC)</td><td>unidirecional; resposta é outra mensagem</td><td class="ded">um canal por direção, ou bidirecional</td></tr>
+<tr><td>Comentário</td><td><code>--</code></td><td><code>--</code></td><td><code>%%</code></td><td><code>//</code></td></tr>
+<tr><td>Atribuição</td><td><code>:=</code></td><td><code>:=</code></td><td class="ded"><code>=</code> (casamento)</td><td><code>:=</code> (cria) / <code>=</code></td></tr>
+</table></div>
+<p class="src">"—" = os slides daquela linguagem não mostram esse caso.</p>
+
+<h2>Questão 5 de 2026</h2>
+<div class="wrap"><table>
+<tr><th></th><th>Java</th><th>Erlang</th><th>Ada</th><th>Linda</th></tr>
+<tr><td>Monitores</td><td><strong>S</strong></td><td>N</td><td>N</td><td>N</td></tr>
+<tr><td>Mensagens assíncronas</td><td>N</td><td><strong>S</strong></td><td>N</td><td><strong>S</strong></td></tr>
+<tr><td>Mensagens síncronas</td><td>N</td><td>N</td><td><strong>S</strong></td><td>N</td></tr>
+<tr><td>Rendezvous</td><td>N</td><td>N</td><td><strong>S</strong></td><td>N</td></tr>
+</table></div>
+<p class="src">Só "Erlang × assíncrona" está literal nos slides (12, s.3). As demais aplicam as definições de 07, s.10–11; detalhes na <a href="../lessons/0015-erlang-processos-e-caixa-postal.html">Lição 15</a>.</p>
+
+<p class="src" style="margin-top:3rem">Convenção: texto em <span class="ded">cinza itálico</span> é dedução desta página a partir do código dos slides; o resto está nos slides citados. Esta página não traz nada de fora do material da disciplina.</p>
+</body>
+</html>

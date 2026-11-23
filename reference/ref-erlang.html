@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Erlang: referência — Programação Concorrente</title>
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --rule:#d9d4c7; --accent:#8b2500; --bg:#fffdf8; --soft:#f3efe4; --hi:#f6e3b4; }
+  html { background:var(--bg); }
+  body { max-width: 50rem; margin: 3rem auto 6rem; padding: 0 1.25rem; color:var(--ink);
+         font: 17px/1.55 Georgia, "Iowan Old Style", "Palatino Linotype", serif; }
+  h1 { font-weight: normal; font-size: 2.2rem; margin: 0 0 .25rem; letter-spacing:-.01em; }
+  .sub { color:var(--muted); font-style: italic; margin: 0 0 2rem; }
+  h2 { font-weight: normal; font-size: 1.35rem; margin: 2.5rem 0 .5rem; border-bottom: 1px solid var(--rule); padding-bottom:.2rem; }
+  h3 { font-weight: normal; font-style: italic; font-size: 1.1rem; margin: 1.6rem 0 .3rem; }
+  .src { color:var(--muted); font-size: .82rem; }
+  p.src { margin-top:.2rem; }
+  code { font: .88em/1.4 "SF Mono", Menlo, Consolas, monospace; background:var(--soft); padding:0 .25em; border-radius:3px; }
+  pre { background:var(--soft); padding:.7rem 1rem; border-radius:4px; overflow-x:auto; font-size:.85rem; line-height:1.45; margin:.5rem 0; }
+  pre code { background:none; padding:0; }
+  a { color: var(--accent); }
+  nav { font-size:.9rem; color:var(--muted); margin-bottom: 2rem; }
+  nav a { margin-right: .75rem; }
+  .wrap { overflow-x:auto; }
+  table { border-collapse: collapse; width:100%; font-size:.93rem; margin:.6rem 0; }
+  td, th { padding:.35rem .5rem; border-bottom:1px solid var(--rule); text-align:left; vertical-align:top; }
+  th { font-weight:normal; color:var(--muted); font-size:.8rem; }
+  td:first-child { white-space:nowrap; }
+  .box { border:1px solid var(--rule); border-radius:6px; padding:.8rem 1.1rem; margin:1rem 0; background:#fff; }
+  .box.key { border-left:4px solid var(--accent); }
+  .box.warn { border-left:4px solid #9b1c1c; }
+  .ded { color:var(--muted); font-style:italic; }
+  @media print { body { margin:0; max-width:none; font-size:10.5pt; } nav { display:none; } pre { white-space:pre-wrap; } td:first-child { white-space:normal; } }
+</style>
+</head>
+<body>
+<nav><a href="../index.html">Início</a> <a href="./glossario.html">Glossário</a> <a href="./ref-ada.html">Ada</a> <a href="./ref-linda.html">Linda</a> <a href="./ref-erlang.html">Erlang</a> <a href="./ref-go.html">Go</a> <a href="./ref-comparacao.html">Comparação</a></nav>
+<h1>Erlang: referência rápida</h1>
+<p class="sub">Processos, mensagens e a caixa-postal: como ler o código dos slides (12-erlang-v2.pdf, "s.N" = slide). Lição completa: <a href="../lessons/0015-erlang-processos-e-caixa-postal.html">Lição 15</a>.</p>
+
+<div class="box key"><p><strong>Em uma frase.</strong> Processos que só se comunicam por mensagens, numa comunicação <strong>assíncrona e unidirecional</strong> (s.3); cada processo tem uma <strong>caixa-postal</strong> (s.8). Na questão 5 de 2026: <strong>assíncronas: sim</strong> · síncronas, rendezvous, monitores: não. Questão 6: mensagem que não casa <strong>fica na caixa-postal</strong>.</p></div>
+
+<h2>Como ler o código</h2>
+<div class="wrap"><table>
+<tr><th>Você vê</th><th>Significa</th><th>Onde</th></tr>
+<tr><td><code>-module(math1).</code></td><td class="ded">nome do módulo (arquivo)</td><td>s.4</td></tr>
+<tr><td><code>-export([area/1]).</code></td><td class="ded">funções visíveis fora do módulo; <code>/1</code> = número de argumentos</td><td>s.4</td></tr>
+<tr><td><code>{square, Side}</code></td><td class="ded">tupla (chaves)</td><td>s.4</td></tr>
+<tr><td><code>[1,2,3,5]</code>, <code>[]</code></td><td class="ded">lista (colchetes); <code>[]</code> é a lista vazia</td><td>s.17, 25</td></tr>
+<tr><td><code>[H|T]</code></td><td class="ded">lista separada em primeiro elemento (<code>H</code>) e resto (<code>T</code>)</td><td>s.27</td></tr>
+<tr><td><code>square</code>, <code>ok</code>, <code>analyse</code></td><td class="ded">minúscula: valor fixo (um nome)</td><td>s.4, 16</td></tr>
+<tr><td><code>Side</code>, <code>From</code>, <code>Table</code></td><td class="ded">maiúscula: variável, recebe valor no casamento</td><td>s.4, 16</td></tr>
+<tr><td><code>_</code></td><td class="ded">casa com qualquer coisa e descarta</td><td>s.26–27</td></tr>
+<tr><td><code>'EXIT'</code>, <code>'Andre'</code></td><td class="ded">nome entre aspas simples (pode ter maiúscula)</td><td>s.19, 31</td></tr>
+<tr><td><code>"jose"</code></td><td class="ded">texto (string)</td><td>s.17</td></tr>
+<tr><td><code>f(X) -&gt; corpo</code></td><td class="ded">uma versão (cláusula) da função</td><td>s.4</td></tr>
+<tr><td><code>,</code> &nbsp; <code>;</code> &nbsp; <code>.</code></td><td class="ded"><code>,</code> separa comandos em sequência; <code>;</code> separa cláusulas/alternativas; <code>.</code> termina a função</td><td>s.4</td></tr>
+<tr><td><code>%% texto</code></td><td class="ded">comentário</td><td>s.15–16</td></tr>
+<tr><td><code>math1:area(Thing)</code></td><td class="ded">chama a função <code>area</code> do módulo <code>math1</code></td><td>s.5</td></tr>
+<tr><td><code>&gt; c(math1).</code></td><td class="ded">no terminal do Erlang: compila o módulo; responde <code>{ok,math1}</code></td><td>s.5</td></tr>
+<tr><td><code>case Expr of P1 -&gt; …; P2 -&gt; … end</code></td><td class="ded">escolhe o primeiro padrão que casa com o valor</td><td>s.26</td></tr>
+<tr><td><code>Balance when Balance &gt; Amount -&gt;</code></td><td class="ded">padrão com guarda: só casa se a condição vale</td><td>s.26</td></tr>
+</table></div>
+<p><strong>Casamento de padrões nas funções</strong> (s.4–5): <code>area</code> tem três cláusulas. Com <code>area({triangle, 6, 7, 8})</code>, só a terceira casa, e <code>A=6, B=7, C=8</code>; resultado <code>20.3332</code>.</p>
+
+<h2>Primitivas de concorrência</h2>
+<div class="wrap"><table>
+<tr><th>Primitiva</th><th>Faz</th><th>Onde</th></tr>
+<tr><td><code>Pid = spawn(Mod, Func, Args)</code></td><td>cria um processo que avalia a função; devolve o <strong>Pid</strong></td><td>s.6</td></tr>
+<tr><td><code>Pid ! Msg</code></td><td>envia <code>Msg</code> ao processo (assíncrono)</td><td>s.6</td></tr>
+<tr><td><code>receive P1 [when G1] -&gt; A1; … end</code></td><td>recebe uma mensagem da caixa-postal que case com um padrão</td><td>s.7</td></tr>
+<tr><td><code>receive … after T -&gt; Ação end</code></td><td>se nenhuma mensagem for processada em T milissegundos, faz a ação</td><td>s.12</td></tr>
+<tr><td><code>self()</code></td><td class="ded">o Pid do próprio processo</td><td>s.15</td></tr>
+<tr><td><code>register(Nome, Pid)</code> · <code>unregister(Nome)</code> · <code>whereis(Nome)</code> · <code>registered()</code></td><td>associa nome a Pid · remove · devolve o Pid ou <code>undefined</code> · lista os nomes</td><td>s.13</td></tr>
+<tr><td><code>link(Pid)</code> · <code>unlink(Pid)</code></td><td>liga (bidirecional) / desliga processos</td><td>s.19</td></tr>
+<tr><td><code>exit(normal)</code> · <code>exit(Reason)</code></td><td>termina normalmente / anormalmente</td><td>s.18</td></tr>
+</table></div>
+
+<h2>A caixa-postal: 3 regras (s.8–11)</h2>
+<div class="wrap"><table>
+<tr><th>Caixa</th><th><code>receive</code></th><th>Sai</th></tr>
+<tr><td><code>msg_1 msg_2 msg_3 msg_4</code></td><td><code>msg_3 -&gt;</code></td><td><code>msg_3</code></td></tr>
+<tr><td><code>msg_1 msg_2 msg_4</code></td><td><code>msg_4 -&gt; …; msg_2 -&gt;</code></td><td><code>msg_2</code></td></tr>
+<tr><td><code>msg_1 msg_4</code></td><td><code>AnyMessage -&gt;</code></td><td><code>msg_1</code></td></tr>
+</table></div>
+<ol class="ded">
+<li>Mensagem que não casa <strong>fica na caixa</strong> para um receive posterior.</li>
+<li>A caixa é percorrida <strong>do início</strong>: sai a primeira mensagem que casa com <strong>algum</strong> padrão, não importa a ordem dos padrões.</li>
+<li>Padrão variável (<code>AnyMessage</code>) casa com qualquer coisa: pega a primeira da caixa.</li>
+</ol>
+
+<h2>O padrão "servidor" (s.15–16, 25–29)</h2>
+<pre><code>start() -&gt; register(number_analyser, spawn(number_analyser, server, [nil])).
+
+request(Req) -&gt;                              %% roda no processo do CLIENTE
+    number_analyser ! {self(), Req},         %% envia {meu Pid, pedido}
+    receive {number_analyser, Reply} -&gt; Reply end.
+
+server(Table) -&gt;                             %% roda no processo do SERVIDOR
+    receive
+        {From, {analyse, Seq}} -&gt;
+            From ! {number_analyser, lookup(Seq, Table)},
+            server(Table);                   %% volta a esperar, mesma tabela
+        {From, {add_number, Seq, Dest}} -&gt;
+            From ! {number_analyser, ack},
+            server(insert(Seq, Dest, Table)) %% volta a esperar, tabela nova
+    end.</code></pre>
+<ul class="ded">
+<li><strong>Resposta volta para quem pediu</strong> porque o cliente manda <code>self()</code>, que o servidor recebe em <code>From</code>.</li>
+<li><strong>Estado sem variável global:</strong> o servidor chama a si mesmo com a tabela atual ou nova.</li>
+<li><strong>Um pedido por vez:</strong> os outros esperam na caixa-postal; não há dado compartilhado.</li>
+<li>O cliente espera a resposta, mas isso é feito com <strong>dois envios assíncronos</strong> e um <code>receive</code>.</li>
+</ul>
+<p><strong>Banco</strong> (s.25–31): mesmo padrão, com <code>deposit</code>, <code>ask</code>, <code>withdraw</code>. Pegadinha: <code>withdraw</code> só dá <code>ok</code> se <code>Balance &gt; Amount</code>, <span class="ded">então sacar o saldo inteiro dá <code>no</code></span>. Teste do slide: <code>deposit('Andre',10)</code> → <code>ok</code>; <code>ask('Andre')</code> → <code>10</code>; <code>ask('Andres')</code> → <code>undefined</code>.</p>
+
+<h2>Falhas e distribuição</h2>
+<ul>
+<li><strong>Links</strong> (s.19–20): quando um processo termina, envia <code>{'EXIT', Pid, Reason}</code> aos ligados. <code>normal</code> → ignorado; outro motivo → o ligado também termina anormalmente e repassa. <span class="ded">A falha se propaga pela cadeia.</span></li>
+<li><strong>Nó</strong> (s.21): sistema Erlang completo e independente; um computador pode ter vários.</li>
+<li><code>spawn(Node, Mod, Func, Args)</code>, <code>spawn_link(…)</code>, <code>{Name, Node} ! Msg</code>, <code>monitor_node(Node, true/false)</code>, <code>node()</code>, <code>nodes()</code>, <code>node(Item)</code>, <code>disconnect_node(N)</code> (s.22–23).</li>
+<li><strong>Cliente com monitoramento</strong> (s.30): espera <code>{bank_server, Reply}</code> <strong>ou</strong> <code>{nodedown, Headoffice}</code>; se o nó cair, devolve <code>no</code> em vez de esperar para sempre.</li>
+</ul>
+
+<p class="src" style="margin-top:3rem">Convenção: texto em <span class="ded">cinza itálico</span> é dedução desta página a partir do código dos slides; o resto está nos slides citados. Esta página não traz nada de fora do material da disciplina.</p>
+</body>
+</html>

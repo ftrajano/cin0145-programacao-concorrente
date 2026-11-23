@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Linda: referência — Programação Concorrente</title>
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --rule:#d9d4c7; --accent:#8b2500; --bg:#fffdf8; --soft:#f3efe4; --hi:#f6e3b4; }
+  html { background:var(--bg); }
+  body { max-width: 50rem; margin: 3rem auto 6rem; padding: 0 1.25rem; color:var(--ink);
+         font: 17px/1.55 Georgia, "Iowan Old Style", "Palatino Linotype", serif; }
+  h1 { font-weight: normal; font-size: 2.2rem; margin: 0 0 .25rem; letter-spacing:-.01em; }
+  .sub { color:var(--muted); font-style: italic; margin: 0 0 2rem; }
+  h2 { font-weight: normal; font-size: 1.35rem; margin: 2.5rem 0 .5rem; border-bottom: 1px solid var(--rule); padding-bottom:.2rem; }
+  h3 { font-weight: normal; font-style: italic; font-size: 1.1rem; margin: 1.6rem 0 .3rem; }
+  .src { color:var(--muted); font-size: .82rem; }
+  p.src { margin-top:.2rem; }
+  code { font: .88em/1.4 "SF Mono", Menlo, Consolas, monospace; background:var(--soft); padding:0 .25em; border-radius:3px; }
+  pre { background:var(--soft); padding:.7rem 1rem; border-radius:4px; overflow-x:auto; font-size:.85rem; line-height:1.45; margin:.5rem 0; }
+  pre code { background:none; padding:0; }
+  a { color: var(--accent); }
+  nav { font-size:.9rem; color:var(--muted); margin-bottom: 2rem; }
+  nav a { margin-right: .75rem; }
+  .wrap { overflow-x:auto; }
+  table { border-collapse: collapse; width:100%; font-size:.93rem; margin:.6rem 0; }
+  td, th { padding:.35rem .5rem; border-bottom:1px solid var(--rule); text-align:left; vertical-align:top; }
+  th { font-weight:normal; color:var(--muted); font-size:.8rem; }
+  td:first-child { white-space:nowrap; }
+  .box { border:1px solid var(--rule); border-radius:6px; padding:.8rem 1.1rem; margin:1rem 0; background:#fff; }
+  .box.key { border-left:4px solid var(--accent); }
+  .box.warn { border-left:4px solid #9b1c1c; }
+  .ded { color:var(--muted); font-style:italic; }
+  @media print { body { margin:0; max-width:none; font-size:10.5pt; } nav { display:none; } pre { white-space:pre-wrap; } td:first-child { white-space:normal; } }
+</style>
+</head>
+<body>
+<nav><a href="../index.html">Início</a> <a href="./glossario.html">Glossário</a> <a href="./ref-ada.html">Ada</a> <a href="./ref-linda.html">Linda</a> <a href="./ref-erlang.html">Erlang</a> <a href="./ref-go.html">Go</a> <a href="./ref-comparacao.html">Comparação</a></nav>
+<h1>Linda: referência rápida</h1>
+<p class="sub">Espaço de tuplas e casamento de padrões (09b-Linda.pdf, "s.N" = slide). Lição completa: <a href="../lessons/0008-linda-espaco-de-tuplas.html">Lição 8</a>.</p>
+
+<div class="box key"><p><strong>Em uma frase.</strong> Ninguém manda mensagem <em>para</em> ninguém: os processos <strong>põem</strong> tuplas num <strong>espaço de tuplas</strong> (TS) compartilhado e <strong>tiram</strong> as que casam com um padrão (s.2–3). Na questão 5 de 2026: <span class="ded"><strong>assíncronas: sim</strong> (independência de tempo e da existência dos processos, s.2, 7)</span> · síncronas, rendezvous, monitores: não.</p></div>
+
+<h2>Tuplas e assinaturas</h2>
+<div class="wrap"><table>
+<tr><th>Tupla</th><th>Assinatura</th></tr>
+<tr><td><code>(1, 'A')</code></td><td><code>(integer, character)</code></td></tr>
+<tr><td><code>(1, 2)</code></td><td><code>(integer, integer)</code></td></tr>
+<tr><td><code>('A', 1)</code></td><td><code>(character, integer)</code>: diferente de <code>(1,'A')</code>, a ordem importa</td></tr>
+</table></div>
+<p class="src">s.2.</p>
+
+<h2>As primitivas</h2>
+<div class="wrap"><table>
+<tr><th>Primitiva</th><th>Faz</th></tr>
+<tr><td><code>Output(T)</code></td><td><span class="ded">põe a tupla T no TS; não espera ninguém</span></td></tr>
+<tr><td><code>Input(T)</code></td><td><strong>remove</strong> uma tupla que case com T; <strong>suspende</strong> se não houver casamento (s.3)</td></tr>
+<tr><td><code>Read(T)</code></td><td><span class="ded">lê uma tupla que case, <strong>sem remover</strong> (deduzido do exemplo das matrizes)</span></td></tr>
+<tr><td><code>Try_Input(T)</code>, <code>Try_Read(T)</code></td><td>só o nome está no slide; <span class="ded">o nome sugere uma tentativa que não suspende; confirme</span></td></tr>
+</table></div>
+
+<h2>Padrões: campo fixo × campo variável</h2>
+<div class="wrap"><table>
+<tr><th>No padrão</th><th>Quer dizer</th><th>Exemplo</th></tr>
+<tr><td><code>"job"</code>, <code>24</code>, <code>'A'</code></td><td>valor <strong>fixo</strong>: a tupla precisa ter exatamente isso</td><td><code>Input("job", J: Job_ID; 24)</code>: só pedidos para o processo 24 (s.5)</td></tr>
+<tr><td><code>J: Job_ID</code>, <code>C: Character</code></td><td>campo <strong>variável</strong> com tipo: casa com qualquer valor do tipo e o guarda na variável</td><td><code>Input(I: Integer; C: Character)</code> pega <code>(1,'A')</code> e faz <code>I = 1</code>, <code>C = 'A'</code> (s.4)</td></tr>
+<tr><td>variável num <code>Output</code></td><td>"envia pedido a qualquer processo"</td><td><code>Output("job", 17, P: Process_ID)</code> (s.5)</td></tr>
+</table></div>
+<p class="src">A leitura "fixo/variável" é desta página, a partir dos comentários de s.4–5.</p>
+
+<h2>Os exemplos dos slides</h2>
+<h3>Exemplo 1 (s.4)</h3>
+<pre><code>Output(1, 'A');
+Input(I: Integer; C: Character);     -- pega (1,'A'): I = 1, C = 'A'</code></pre>
+<h3>Exemplo 2: pedidos de trabalho (s.5)</h3>
+<pre><code>Input("job", J: Job_ID; 24)       -- proc 24 espera para servir
+Output("job", 17, 24)             -- envia pedido ao proc 24
+Output("job", 17, P: Process_ID)  -- envia pedido a qualquer processo</code></pre>
+<p>A string identifica o pedido, o inteiro identifica a tarefa, o nome identifica o ID do processo.</p>
+<h3>RPC só com tuplas (s.6)</h3>
+<pre><code>Cliente:   Output("Proc", 24, 65, 'X');           -- procedimento, quem chama, 2 parâmetros
+           Input(24, B: Boolean);                 -- espera a resposta com o seu ID
+Servidor:  Input("Proc", Caller: Process_ID; I: Integer; C: Character);
+           Proc(I, C, B);
+           Output(Caller, B);                     -- devolve para quem chamou</code></pre>
+<p class="ded">O truque: o cliente põe o próprio ID na tupla, e a resposta volta marcada com ele.</p>
+<h3>Multiplicação de matrizes (s.8–10)</h3>
+<pre><code>-- cliente: põe linhas de A, colunas de B e o contador; depois recolhe os 9 resultados
+Output('A', 1, (1,2,3));  …  Output('B', 3, (1,1,1));
+Output("Next", 1);
+for I in 1..3 loop for J in 1..3 loop
+  Input('C', I, J: Integer; C: Integer);
+end loop; end loop;
+
+-- cada worker (quantos quiser)
+loop
+  Input("Next", Element);           -- tira o contador: ninguém mais pega o mesmo job
+  Output("Next", Element + 1);      -- devolve o próximo
+  exit when Element &gt; 3*3;
+  I := (Element - 1) / 3 + 1;       -- job → linha
+  J := (Element - 1) mod 3 + 1;     -- job → coluna
+  Row_Tuple := Read('A', I, V1);    -- Read: a linha continua lá para outros jobs
+  Col_Tuple := Read('B', J, V2);
+  X := Inner_Product(V1, V2);
+  Output('C', I, J, X);
+end loop;</code></pre>
+<p class="ded">O contador "Next" é exclusão mútua feita com uma tupla: enquanto um worker está com ela, os outros suspendem no Input. Os números da matriz no slide 8 têm erros (linha 1, coluna 3 deveria ser 6) e as colunas postas em s.9 não batem com a matriz; o algoritmo não muda.</p>
+<p class="ded">O código está escrito com a notação de Ada: <code>:=</code>, <code>--</code>, <code>mod</code>, <code>for … in 1..3 loop</code>, <code>exit when</code> (sai do laço quando a condição vale). Veja a <a href="./ref-ada.html">referência de Ada</a>.</p>
+
+<h2>Características, vantagens, desvantagem</h2>
+<div class="wrap"><table>
+<tr><th>Item</th><th>Slide</th></tr>
+<tr><td>Independência de tempo e espaço</td><td>s.2</td></tr>
+<tr><td>Independência de nomes de processos e da existência dos processos</td><td>s.7</td></tr>
+<tr><td>Vantagens: independência da quantidade de workers; independência da performance; expressividade; flexibilidade</td><td>s.11</td></tr>
+<tr><td>Desvantagem: <strong>eficiência</strong></td><td>s.12</td></tr>
+</table></div>
+
+<p class="src" style="margin-top:3rem">Convenção: texto em <span class="ded">cinza itálico</span> é dedução desta página a partir do código dos slides; o resto está nos slides citados. Esta página não traz nada de fora do material da disciplina.</p>
+</body>
+</html>

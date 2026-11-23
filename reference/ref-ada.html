@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ada: referência — Programação Concorrente</title>
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --rule:#d9d4c7; --accent:#8b2500; --bg:#fffdf8; --soft:#f3efe4; --hi:#f6e3b4; }
+  html { background:var(--bg); }
+  body { max-width: 50rem; margin: 3rem auto 6rem; padding: 0 1.25rem; color:var(--ink);
+         font: 17px/1.55 Georgia, "Iowan Old Style", "Palatino Linotype", serif; }
+  h1 { font-weight: normal; font-size: 2.2rem; margin: 0 0 .25rem; letter-spacing:-.01em; }
+  .sub { color:var(--muted); font-style: italic; margin: 0 0 2rem; }
+  h2 { font-weight: normal; font-size: 1.35rem; margin: 2.5rem 0 .5rem; border-bottom: 1px solid var(--rule); padding-bottom:.2rem; }
+  h3 { font-weight: normal; font-style: italic; font-size: 1.1rem; margin: 1.6rem 0 .3rem; }
+  .src { color:var(--muted); font-size: .82rem; }
+  p.src { margin-top:.2rem; }
+  code { font: .88em/1.4 "SF Mono", Menlo, Consolas, monospace; background:var(--soft); padding:0 .25em; border-radius:3px; }
+  pre { background:var(--soft); padding:.7rem 1rem; border-radius:4px; overflow-x:auto; font-size:.85rem; line-height:1.45; margin:.5rem 0; }
+  pre code { background:none; padding:0; }
+  a { color: var(--accent); }
+  nav { font-size:.9rem; color:var(--muted); margin-bottom: 2rem; }
+  nav a { margin-right: .75rem; }
+  .wrap { overflow-x:auto; }
+  table { border-collapse: collapse; width:100%; font-size:.93rem; margin:.6rem 0; }
+  td, th { padding:.35rem .5rem; border-bottom:1px solid var(--rule); text-align:left; vertical-align:top; }
+  th { font-weight:normal; color:var(--muted); font-size:.8rem; }
+  td:first-child { white-space:nowrap; }
+  .box { border:1px solid var(--rule); border-radius:6px; padding:.8rem 1.1rem; margin:1rem 0; background:#fff; }
+  .box.key { border-left:4px solid var(--accent); }
+  .box.warn { border-left:4px solid #9b1c1c; }
+  .ded { color:var(--muted); font-style:italic; }
+  @media print { body { margin:0; max-width:none; font-size:10.5pt; } nav { display:none; } pre { white-space:pre-wrap; } td:first-child { white-space:normal; } }
+</style>
+</head>
+<body>
+<nav><a href="../index.html">Início</a> <a href="./glossario.html">Glossário</a> <a href="./ref-ada.html">Ada</a> <a href="./ref-linda.html">Linda</a> <a href="./ref-erlang.html">Erlang</a> <a href="./ref-go.html">Go</a> <a href="./ref-comparacao.html">Comparação</a></nav>
+<h1>Ada: referência rápida</h1>
+<p class="sub">Tasks e rendezvous: como ler o código dos slides (08-Ada.pdf, "s.N" = página do PDF). Lição completa: <a href="../lessons/0007-ada-rendezvous-e-select.html">Lição 7</a>.</p>
+
+<div class="box key"><p><strong>Em uma frase.</strong> Processos são <strong>tasks</strong>; elas se comunicam por <strong>rendezvous</strong>: comunicação <strong>síncrona, sem buffer</strong>, em que a primeira a chegar espera a outra (s.3, 9). Na questão 5 de 2026: <strong>síncronas: sim · rendezvous: sim</strong> · assíncronas: não · monitores: não.</p></div>
+
+<h2>Como ler o código</h2>
+<div class="wrap"><table>
+<tr><th>Você vê</th><th>Significa</th><th>Onde</th></tr>
+<tr><td><code>X := 0;</code></td><td class="ded">atribuição</td><td>s.8</td></tr>
+<tr><td><code>-- texto</code></td><td class="ded">comentário até o fim da linha</td><td>s.18, 23</td></tr>
+<tr><td><code>(In_Ptr + 1) mod N</code></td><td class="ded">resto da divisão (o <code>%</code> de C)</td><td>s.8</td></tr>
+<tr><td><code>B: Array (0..N-1) of Integer;</code></td><td class="ded">array de N inteiros, índices 0 a N−1</td><td>s.8</td></tr>
+<tr><td><code>In_Ptr, Out_Ptr: Integer := 0;</code></td><td class="ded">declara duas variáveis inteiras valendo 0</td><td>s.8</td></tr>
+<tr><td><code>loop … end loop;</code></td><td class="ded">laço infinito</td><td>s.8</td></tr>
+<tr><td><code>is … begin … end Nome;</code></td><td class="ded">declarações antes de <code>begin</code>; código entre <code>begin</code> e <code>end</code></td><td>s.6, 8</td></tr>
+<tr><td><code>(I: in Integer)</code></td><td>parâmetro <strong>in</strong>: vai da calling task para a accepting task</td><td>s.7</td></tr>
+<tr><td><code>(I: out Integer)</code></td><td>parâmetro <strong>out</strong>: volta para a calling task no fim do rendezvous</td><td>s.7</td></tr>
+<tr><td><code>Buffer.Append(I);</code></td><td>chamada da entry <code>Append</code> da task <code>Buffer</code> (com ponto)</td><td>s.6</td></tr>
+<tr><td><code>null</code></td><td class="ded">não faz nada (em <code>else null;</code>)</td><td>s.19</td></tr>
+</table></div>
+
+<h2>Uma task tem duas partes</h2>
+<pre><code>task Buffer is                        -- specification: o que a task oferece
+  entry Append (I: in Integer);
+  entry Take (I: out Integer);
+end Buffer;
+
+task body Buffer is                   -- body: o código
+begin
+  …
+  accept Append(I: in Integer) do
+    … corpo do accept
+  end Append;
+  …
+end Buffer;</code></pre>
+<p class="src">s.4–6. Entries ficam na specification; <code>accept</code> fica no body.</p>
+
+<h2>Rendezvous, passo a passo (s.7)</h2>
+<ol>
+<li>A <strong>calling task</strong> chama <code>Buffer.Append(I)</code>, passa os parâmetros <code>in</code> e <strong>espera</strong>.</li>
+<li>A <strong>accepting task</strong> executa o corpo do <code>accept</code>, até o <code>end</code>.</li>
+<li>Os parâmetros <code>out</code> voltam para a calling task.</li>
+<li>Fim do rendezvous: as duas seguem.</li>
+</ol>
+<p>Quem chega primeiro espera o outro. A calling task precisa saber o nome da accepting task e da entry; a accepting não precisa saber quem chama: <strong>identificação assimétrica</strong>, bom para <strong>servidores</strong> (s.3–4, 9).</p>
+
+<h2><code>select</code> com guardas</h2>
+<pre><code>select
+  when Count &lt; N =&gt;              -- guarda: só abre se houver vaga
+    accept Append(I: in Integer) do B(In_Ptr) := I; end Append;
+    Count := Count + 1;
+or
+  when Count &gt; 0 =&gt;              -- só abre se houver item
+    accept Take(I: out Integer) do I := B(Out_Ptr); end Take;
+    Count := Count - 1;
+end select;</code></pre>
+<ol>
+<li>Avalia as guardas <code>when</code> → conjunto de <strong>alternativas abertas</strong>. Precisa haver ao menos uma, ou um <code>else</code>.</li>
+<li>Se há tasks na fila de alguma entry aberta → rendezvous com <strong>a primeira de uma das filas</strong> (o slide não diz qual fila).</li>
+<li>Se todas as filas abertas estão vazias → a accepting task <strong>suspende</strong> até chegar uma chamada; as alternativas abertas não mudam enquanto isso.</li>
+<li>A última alternativa pode ser <code>else …</code>, <code>delay T …</code> ou <code>terminate</code>.</li>
+</ol>
+<p class="src">s.10–13.</p>
+
+<h2>Os exemplos dos slides</h2>
+<div class="wrap"><table>
+<tr><th>Exemplo</th><th>Ideia central</th><th>Onde</th></tr>
+<tr><td>Buffer degenerado</td><td>dois <code>accept</code> em sequência: depois de <code>Append</code> só aceita <code>Take</code>; <span class="ded">nunca guarda mais de 1 item, embora tenha N posições</span></td><td>s.8</td></tr>
+<tr><td>Buffer com <code>select</code></td><td>guardas <code>Count &lt; N</code> e <code>Count &gt; 0</code> no lugar de <code>Not_Full</code>/<code>Not_Empty</code> do monitor</td><td>s.10–11</td></tr>
+<tr><td>Semáforo binário</td><td><code>loop accept Wait; accept Signal; end loop;</code>: <span class="ded">um Wait por vez, liberado pelo Signal</span></td><td>s.14–15</td></tr>
+<tr><td>Accepts aninhados</td><td><code>accept Synch_2 do accept Synch_3; end Synch_2;</code>: sincroniza múltiplas tarefas</td><td>s.15–16</td></tr>
+<tr><td>Even_Odd</td><td>a mesma entry <code>E</code> aceita duas vezes no laço: chamadas ímpares e pares tratadas por corpos diferentes</td><td>s.17</td></tr>
+<tr><td>Sensor com timeout</td><td>na <strong>calling</strong> task: <code>select Sensor.Sample(…); or delay 1.0; Notify_Operator; end select;</code>. A calling task só pode suspender em <strong>uma</strong> entry</td><td>s.18</td></tr>
+<tr><td>Polling de vários servidores</td><td><code>select Server_1.E(…); else null; end select;</code> e o mesmo para Server_2: alterna a busca</td><td>s.19–20</td></tr>
+<tr><td>Polling de um servidor</td><td><code>select Server_1.E(…); else select Server_2.E(…); …</code>: só usa o segundo quando o primeiro falha</td><td>s.20</td></tr>
+<tr><td>Array de tasks</td><td><code>task type Buffer_Type</code>; <code>Buffers : array(1..20) of Buffer_Type;</code>; <code>Buffers(I+1).Append(E1);</code></td><td>s.21–23</td></tr>
+<tr><td>Leitores e escritores</td><td>exercício: o <code>select</code> sem guardas aceita <code>Start_Read</code> no meio de uma escrita; <span class="ded">falta estado e guardas <code>when</code> (resposta na Lição 7)</span></td><td>s.23–24</td></tr>
+</table></div>
+
+<h2>Frases do slide 14 que caem</h2>
+<ul>
+<li>rendezvous implementa <strong>RPC</strong> (remote procedure call);</li>
+<li><code>delay</code> implementa <strong>timeout</strong>;</li>
+<li><code>else</code> implementa <strong>polling</strong>;</li>
+<li>sincronização pode ser feita com corpos de <code>accept</code> <strong>vazios</strong>.</li>
+</ul>
+
+<p class="src" style="margin-top:3rem">Convenção: texto em <span class="ded">cinza itálico</span> é dedução desta página a partir do código dos slides; o resto está nos slides citados. Esta página não traz nada de fora do material da disciplina.</p>
+</body>
+</html>

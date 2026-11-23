@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Go: referência — Programação Concorrente</title>
+<style>
+  :root { --ink:#1a1a1a; --muted:#6b6b6b; --rule:#d9d4c7; --accent:#8b2500; --bg:#fffdf8; --soft:#f3efe4; --hi:#f6e3b4; }
+  html { background:var(--bg); }
+  body { max-width: 50rem; margin: 3rem auto 6rem; padding: 0 1.25rem; color:var(--ink);
+         font: 17px/1.55 Georgia, "Iowan Old Style", "Palatino Linotype", serif; }
+  h1 { font-weight: normal; font-size: 2.2rem; margin: 0 0 .25rem; letter-spacing:-.01em; }
+  .sub { color:var(--muted); font-style: italic; margin: 0 0 2rem; }
+  h2 { font-weight: normal; font-size: 1.35rem; margin: 2.5rem 0 .5rem; border-bottom: 1px solid var(--rule); padding-bottom:.2rem; }
+  h3 { font-weight: normal; font-style: italic; font-size: 1.1rem; margin: 1.6rem 0 .3rem; }
+  .src { color:var(--muted); font-size: .82rem; }
+  p.src { margin-top:.2rem; }
+  code { font: .88em/1.4 "SF Mono", Menlo, Consolas, monospace; background:var(--soft); padding:0 .25em; border-radius:3px; }
+  pre { background:var(--soft); padding:.7rem 1rem; border-radius:4px; overflow-x:auto; font-size:.85rem; line-height:1.45; margin:.5rem 0; }
+  pre code { background:none; padding:0; }
+  a { color: var(--accent); }
+  nav { font-size:.9rem; color:var(--muted); margin-bottom: 2rem; }
+  nav a { margin-right: .75rem; }
+  .wrap { overflow-x:auto; }
+  table { border-collapse: collapse; width:100%; font-size:.93rem; margin:.6rem 0; }
+  td, th { padding:.35rem .5rem; border-bottom:1px solid var(--rule); text-align:left; vertical-align:top; }
+  th { font-weight:normal; color:var(--muted); font-size:.8rem; }
+  td:first-child { white-space:nowrap; }
+  .box { border:1px solid var(--rule); border-radius:6px; padding:.8rem 1.1rem; margin:1rem 0; background:#fff; }
+  .box.key { border-left:4px solid var(--accent); }
+  .box.warn { border-left:4px solid #9b1c1c; }
+  .ded { color:var(--muted); font-style:italic; }
+  @media print { body { margin:0; max-width:none; font-size:10.5pt; } nav { display:none; } pre { white-space:pre-wrap; } td:first-child { white-space:normal; } }
+</style>
+</head>
+<body>
+<nav><a href="../index.html">Início</a> <a href="./glossario.html">Glossário</a> <a href="./ref-ada.html">Ada</a> <a href="./ref-linda.html">Linda</a> <a href="./ref-erlang.html">Erlang</a> <a href="./ref-go.html">Go</a> <a href="./ref-comparacao.html">Comparação</a></nav>
+<h1>Go: referência rápida</h1>
+<p class="sub">Goroutines e channels: como ler o código dos slides (09c-Go.pdf, "s.N" = página do PDF; e 08-Ada.pdf s.24–26). Lição completa: <a href="../lessons/0009-go-goroutines-e-channels.html">Lição 9</a>. Go não caiu em nenhuma das 4 provas.</p>
+
+<div class="box key"><p><strong>Em uma frase.</strong> <strong>Goroutines</strong> (threads leves da runtime) que se comunicam por <strong>channels</strong>, no modelo <strong>CSP</strong> de Tony Hoare: "comunicar-se para compartilhar memória" em vez de compartilhar memória para se comunicar (s.2–3). <span class="ded">Canal sem buffer: síncrono (como o rendezvous). Canal com buffer: assíncrono enquanto há espaço.</span></p></div>
+
+<h2>Como ler o código</h2>
+<div class="wrap"><table>
+<tr><th>Você vê</th><th>Significa</th><th>Onde</th></tr>
+<tr><td><code>func main() { … }</code></td><td class="ded">a função principal do programa</td><td>s.11; 08 s.26</td></tr>
+<tr><td><code>ch := make(chan string)</code></td><td class="ded"><code>:=</code> cria a variável e atribui; <code>make(chan T)</code> cria um canal de T, <strong>sem buffer</strong></td><td>s.11</td></tr>
+<tr><td><code>make(chan string, 2)</code></td><td>canal <strong>com buffer</strong> para 2 valores</td><td>s.9</td></tr>
+<tr><td><code>ch &lt;- "hello"</code></td><td><strong>envia</strong> pelo canal</td><td>08 s.24; s.12</td></tr>
+<tr><td><code>msg := &lt;-ch</code></td><td><strong>recebe</strong> do canal e guarda em <code>msg</code></td><td>08 s.24, 26</td></tr>
+<tr><td><code>go func() { … }()</code></td><td>cria uma goroutine que começa a rodar (<span class="ded">o <code>()</code> final chama a função criada ali</span>)</td><td>s.5, 12</td></tr>
+<tr><td><code>fmt.Println(x)</code></td><td class="ded">imprime</td><td>s.12–14</td></tr>
+<tr><td><code>// texto</code></td><td class="ded">comentário</td><td>s.9, 12</td></tr>
+<tr><td><code>chan</code> · <code>chan&lt;-</code> · <code>&lt;-chan</code></td><td>bidirecional · unidirecionais; o compilador impede usar no sentido errado</td><td>s.7</td></tr>
+</table></div>
+<p class="ded">Regra da seta: ela aponta para onde o dado vai. <code>ch &lt;- v</code>: v entra no canal. <code>&lt;-ch</code>: o dado sai do canal.</p>
+
+<h2>Os três pilares e os diferenciais</h2>
+<ul>
+<li><strong>Goroutines:</strong> threads de nível de usuário, extremamente leves, gerenciadas pela runtime (s.2).</li>
+<li><strong>Channels (CSP):</strong> processos não compartilham memória para se comunicar (s.3).</li>
+<li><strong>Scheduler M:N:</strong> M goroutines em N threads do sistema operacional, usando bem vários núcleos (s.4).</li>
+<li>Diferenciais: <strong>simplicidade</strong> (basta <code>go</code>, sem locks e semáforos), <strong>segurança</strong> (channels como pipelines evitam race conditions), <strong>eficiência</strong> (milhares de goroutines) (s.4–6).</li>
+</ul>
+
+<h2>Bloqueia ou não?</h2>
+<div class="wrap"><table>
+<tr><th>Situação</th><th>Resultado</th><th>Onde</th></tr>
+<tr><td>sem buffer, ninguém do outro lado</td><td><strong>bloqueia</strong> até as duas partes estarem prontas</td><td>08 s.25</td></tr>
+<tr><td>sem buffer, o outro lado já esperando</td><td>encontro na hora, os dois seguem</td><td class="ded">08 s.25</td></tr>
+<tr><td>buffer de 2, 1º e 2º envio</td><td>não bloqueia</td><td>s.9</td></tr>
+<tr><td>buffer de 2, 3º envio sem leitura</td><td><strong>bloquearia</strong></td><td>s.9</td></tr>
+</table></div>
+
+<h2>Exemplo Ada × Go (08 s.26)</h2>
+<pre><code>func main() {
+    getData := make(chan int)     // canal é o ponto de rendezvous
+    go func() {                   // equivalente à task Server
+        getData &lt;- 42             // equivalente ao Accept
+    }()
+    data := &lt;-getData             // cliente bloqueia até servidor enviar
+    fmt.Println(data)
+}</code></pre>
+<div class="wrap"><table>
+<tr><th>Ada</th><th>Go</th></tr>
+<tr><td>task</td><td>goroutine</td></tr>
+<tr><td>entry / accept</td><td>envio e recebimento num canal não bufferizado</td></tr>
+<tr><td>entries</td><td>canais</td></tr>
+</table></div>
+
+<h2><code>select</code></h2>
+<pre><code>select {
+case msg1 := &lt;-ch1:
+    fmt.Println(msg1)
+case msg2 := &lt;-ch2:
+    fmt.Println(msg2)
+case &lt;-time.After(2*time.Second):
+    fmt.Println("Timed out")
+//default: No message available
+//    fmt.Println("No message")
+}</code></pre>
+<p class="ded">Espera uma das alternativas: mensagem em ch1, em ch2, ou 2 segundos sem nada ("Timed out"). Com <code>default</code>, se não há mensagem na hora, não espera. Os slides só mostram o código (s.13–14).</p>
+
+<div class="box warn"><p><strong>Slide 8:</strong> <code>screen := make(chan-&gt; int)</code> usa <code>chan-&gt;</code>, mas o slide 7 diz que as formas são <code>chan&lt;-</code> e <code>&lt;-chan</code>. Provável erro de digitação.</p></div>
+
+<p class="src" style="margin-top:3rem">Convenção: texto em <span class="ded">cinza itálico</span> é dedução desta página a partir do código dos slides; o resto está nos slides citados. Esta página não traz nada de fora do material da disciplina.</p>
+</body>
+</html>
